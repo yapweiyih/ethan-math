@@ -373,24 +373,92 @@
     min-width: 300px;
   }
   #user-greeting span { color: #ffd86b; }
-  #logout-btn {
-    font-family: 'Boogaloo', cursive;
-    font-size: 1rem;
-    padding: 8px 28px;
+  /* HAMBURGER MENU BUTTON */
+  #menu-btn {
+    width: 44px; height: 44px;
     border: 1.5px solid rgba(255,255,255,0.2);
-    border-radius: 50px;
+    border-radius: 50%;
     background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.5);
     cursor: pointer;
-    transition: transform 0.15s, background 0.15s, color 0.15s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 5px; padding: 0;
+    transition: transform 0.15s, background 0.15s;
     margin-top: 1.2em;
   }
-  #logout-btn:hover {
-    transform: scale(1.05);
-    background: rgba(255,70,70,0.15);
-    color: rgba(255,255,255,0.8);
-    border-color: rgba(255,70,70,0.4);
+  #menu-btn:hover { transform: scale(1.08); background: rgba(255,255,255,0.12); }
+  .hamburger-line {
+    width: 20px; height: 2px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 1px;
+    transition: background 0.15s;
   }
+  #menu-btn:hover .hamburger-line { background: rgba(255,255,255,0.8); }
+
+  /* USER MENU OVERLAY */
+  #user-menu-overlay {
+    display: none; position: fixed; inset: 0; z-index: 350;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #user-menu-overlay.active { display: flex; }
+  #user-menu-panel {
+    background: linear-gradient(135deg,#1e0a3a,#12213f);
+    border: 1.5px solid rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 28px 32px; width: 340px; max-width: 90vw;
+    text-align: center; animation: goIn 0.25s ease;
+  }
+  #user-menu-panel h2 {
+    font-family: 'Boogaloo', cursive; font-size: 1.6rem;
+    color: var(--accent); margin-bottom: 1em;
+    text-shadow: 0 0 14px var(--accent);
+  }
+  .menu-option {
+    font-family: 'Boogaloo', cursive; font-size: 1.2rem;
+    padding: 14px 20px; border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 12px; background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.85); cursor: pointer; width: 100%;
+    margin-bottom: 10px; transition: transform 0.12s, background 0.15s;
+    display: flex; align-items: center; gap: 12px; justify-content: center;
+  }
+  .menu-option:hover { transform: scale(1.04); background: rgba(255,255,255,0.12); }
+  .menu-option.danger { border-color: rgba(255,70,70,0.3); }
+  .menu-option.danger:hover { background: rgba(255,70,70,0.15); }
+  .menu-close {
+    font-family: 'Boogaloo', cursive; font-size: 1rem;
+    color: rgba(255,255,255,0.4); cursor: pointer;
+    margin-top: 10px; text-decoration: underline;
+    background: none; border: none; transition: color 0.15s;
+  }
+  .menu-close:hover { color: rgba(255,255,255,0.7); }
+  /* Change password form */
+  #chg-pw-content .auth-input { margin-bottom: 10px; }
+  #chg-pw-error {
+    font-family: 'Space Mono', monospace; font-size: 0.8rem;
+    color: #ff4466; min-height: 1.2em; margin-bottom: 6px;
+  }
+  /* Success popup */
+  .success-popup {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: linear-gradient(135deg,#0d2b1f,#1a3300);
+    border: 2px solid #7fffb2; border-radius: 18px;
+    padding: 28px 36px; text-align: center; z-index: 500;
+    animation: goIn 0.3s ease; box-shadow: 0 0 40px rgba(127,255,178,0.3);
+  }
+  .success-popup h3 {
+    font-family: 'Boogaloo', cursive; font-size: 1.6rem;
+    color: #7fffb2; margin-bottom: 0.5em;
+  }
+  .success-popup p {
+    font-family: 'Space Mono', monospace; font-size: 0.9rem;
+    color: rgba(255,255,255,0.7); margin-bottom: 1em;
+  }
+  .success-popup button {
+    font-family: 'Boogaloo', cursive; font-size: 1.1rem;
+    padding: 10px 30px; border: none; border-radius: 50px;
+    background: #7fffb2; color: #1a0533; cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .success-popup button:hover { transform: scale(1.08); }
 
   /* ─── AUTH SCREEN ─── */
   #auth-screen {
@@ -964,7 +1032,23 @@
       History
     </button>
   </div>
-  <button id="logout-btn" onclick="logout()">Logout</button>
+  <button id="menu-btn" onclick="openUserMenu()" title="Menu">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+  </button>
+</div>
+
+<!-- USER MENU OVERLAY -->
+<div id="user-menu-overlay">
+  <div id="user-menu-panel">
+    <h2>Account</h2>
+    <div id="user-menu-content">
+      <button class="menu-option" onclick="showChangePassword()">🔑 Change Password</button>
+      <button class="menu-option danger" onclick="closeUserMenu(); logout();">🚪 Logout</button>
+    </div>
+    <button class="menu-close" onclick="closeUserMenu()">Close</button>
+  </div>
 </div>
 
 <script>
@@ -1101,17 +1185,89 @@ function logout() {
 
 function updateUserGreeting() {
   const el = document.getElementById('user-greeting');
-  const logoutBtn = document.getElementById('logout-btn');
   if (currentUser) {
-    // Check if returning user (has play history)
     const history = getUserHistory();
     const greeting = history.length > 0 ? 'Welcome back' : 'Welcome';
     el.innerHTML = `${greeting}, <span>${currentUser}</span>!`;
-    logoutBtn.textContent = 'Logout';
   } else {
     el.innerHTML = `Playing as <span>Guest</span>`;
-    logoutBtn.textContent = 'Switch User';
   }
+}
+
+// ─── USER MENU (HAMBURGER) ──────────────────────────────────────────────────
+function openUserMenu() {
+  playClick();
+  // Reset to main menu view
+  const content = document.getElementById('user-menu-content');
+  content.innerHTML = currentUser
+    ? `<button class="menu-option" onclick="showChangePassword()">🔑 Change Password</button>
+       <button class="menu-option danger" onclick="closeUserMenu(); logout();">🚪 Logout</button>`
+    : `<button class="menu-option danger" onclick="closeUserMenu(); logout();">🔄 Switch User</button>`;
+  document.getElementById('user-menu-overlay').classList.add('active');
+}
+
+function closeUserMenu() {
+  playClick();
+  document.getElementById('user-menu-overlay').classList.remove('active');
+}
+
+function showChangePassword() {
+  if (!currentUser) return;
+  const content = document.getElementById('user-menu-content');
+  content.innerHTML = `
+    <h2 style="font-family:'Boogaloo',cursive;font-size:1.4rem;color:var(--accent);margin-bottom:0.8em;">Change Password</h2>
+    <input class="auth-input" type="password" id="chg-old-pw" placeholder="Old Password">
+    <input class="auth-input" type="password" id="chg-new-pw" placeholder="New Password">
+    <input class="auth-input" type="password" id="chg-confirm-pw" placeholder="Confirm New Password">
+    <div id="chg-pw-error" style="font-family:'Space Mono',monospace;font-size:0.8rem;color:#ff4466;min-height:1.2em;margin-bottom:6px;"></div>
+    <div class="help-buttons">
+      <button class="help-btn-primary" onclick="submitChangePassword()">Change</button>
+      <button class="help-btn-secondary" onclick="openUserMenu()">Back</button>
+    </div>`;
+  setTimeout(() => document.getElementById('chg-old-pw').focus(), 100);
+}
+
+function submitChangePassword() {
+  const oldPw = document.getElementById('chg-old-pw').value;
+  const newPw = document.getElementById('chg-new-pw').value;
+  const confirmPw = document.getElementById('chg-confirm-pw').value;
+  const errEl = document.getElementById('chg-pw-error');
+
+  const users = getUsers();
+  if (users[currentUser] !== oldPw) {
+    errEl.textContent = 'Old password is incorrect.';
+    return;
+  }
+  if (newPw.length < 3) {
+    errEl.textContent = 'New password must be at least 3 characters.';
+    return;
+  }
+  if (newPw !== confirmPw) {
+    errEl.textContent = 'New passwords do not match.';
+    return;
+  }
+  if (newPw === oldPw) {
+    errEl.textContent = 'New password must be different.';
+    return;
+  }
+
+  // Save new password
+  users[currentUser] = newPw;
+  saveUsers(users);
+
+  // Close menu and show success popup
+  document.getElementById('user-menu-overlay').classList.remove('active');
+  showSuccessPopup();
+}
+
+function showSuccessPopup() {
+  const popup = document.createElement('div');
+  popup.className = 'success-popup';
+  popup.innerHTML = `
+    <h3>✅ Password Changed!</h3>
+    <p>Your password has been updated successfully.</p>
+    <button onclick="this.parentElement.remove()">OK</button>`;
+  document.body.appendChild(popup);
 }
 
 // ─── PASSWORD VISIBILITY TOGGLE ─────────────────────────────────────────────
@@ -1645,6 +1801,14 @@ function restartGame() {
 }
 
 function goHome() {
+  // Save abandoned game if mid-game with score > 0
+  if (score > 0 && document.getElementById('startscreen').style.display === 'none') {
+    const record = { score: score, date: new Date().toLocaleString(), abandoned: true };
+    let gameHistory = getUserHistory();
+    gameHistory.unshift(record);
+    if (gameHistory.length > 10) gameHistory.pop();
+    saveUserHistory(gameHistory);
+  }
   level = 1; score = 0; lastDiffName = '';
   hasImmunity = false; lightbulbUsed = false; scoreAtLastHint = null;
   clearInterval(timerInterval);
@@ -1740,7 +1904,7 @@ function openHistory() {
   gameHistory.forEach((g, i) => {
     html += `<div class="history-item">
                <div><div class="score">${g.score}</div><div class="date">${g.date}</div></div>
-               <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);">${i === 0 ? 'Most Recent' : i + ' Games Ago'}</div>
+               <div style="font-size:0.8rem;color:${g.abandoned ? '#ff4466' : 'rgba(255,255,255,0.4)'};">${g.abandoned ? 'Game Abandoned' : ''}</div>
              </div>`;
   });
   

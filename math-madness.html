@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MathMadness — Find the Wrong One!</title>
+<title>MathError — Find the Wrong One!</title>
 <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -365,9 +365,12 @@
   /* USER GREETING ON START SCREEN */
   #user-greeting {
     font-family: 'Boogaloo', cursive;
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 0.5em;
+    font-size: 2rem;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 1.2em;
+    padding-bottom: 0.8em;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    min-width: 300px;
   }
   #user-greeting span { color: #ffd86b; }
   #logout-btn {
@@ -922,7 +925,7 @@
 
 <!-- AUTH SCREEN -->
 <div id="auth-screen">
-  <h1>MathMadness</h1>
+  <h1>MathError</h1>
   <div id="auth-box">
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
@@ -948,7 +951,7 @@
 </div>
 
 <div id="startscreen" style="display:none;">
-  <h1>MathMadness</h1>
+  <h1>MathError</h1>
   <div id="user-greeting"></div>
   <p>One equation is <span class="tag">WRONG</span>.<br>
      Find it before time runs out!<br>
@@ -1100,7 +1103,10 @@ function updateUserGreeting() {
   const el = document.getElementById('user-greeting');
   const logoutBtn = document.getElementById('logout-btn');
   if (currentUser) {
-    el.innerHTML = `Welcome, <span>${currentUser}</span>!`;
+    // Check if returning user (has play history)
+    const history = getUserHistory();
+    const greeting = history.length > 0 ? 'Welcome back' : 'Welcome';
+    el.innerHTML = `${greeting}, <span>${currentUser}</span>!`;
     logoutBtn.textContent = 'Logout';
   } else {
     el.innerHTML = `Playing as <span>Guest</span>`;
@@ -1525,7 +1531,7 @@ function handleCorrect() {
   
   score += basePoints + speedBonus;
   
-  if (scoreAtLastHint !== null && score >= scoreAtLastHint + 100) {
+  if (scoreAtLastHint !== null && score >= scoreAtLastHint + 50) {
     scoreAtLastHint = null;
     lightbulbUsed = false;
     document.getElementById('lightbulb-btn').classList.remove('hidden');

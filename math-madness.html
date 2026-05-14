@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathMadness — Find the Wrong One!</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a0533;
+    --card: rgba(255,255,255,0.08);
+    --accent: #ff6bff;
+    --timer-color: #7fffb2;
+    --text: #fff;
+    --shake-intensity: 0px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Space Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow: hidden;
+    transition: background 2s ease;
+    position: relative;
+  }
+
+  /* POLKA DOTS LAYER */
+  #polka-layer {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .polka-dot {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    animation: dotPop 0.4s ease forwards, dotFloat linear infinite;
+  }
+  @keyframes dotPop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 0.18; }
+  }
+  @keyframes dotFloat {
+    0%   { transform: translateY(0) scale(1); }
+    50%  { transform: translateY(-20px) scale(1.05); }
+    100% { transform: translateY(0) scale(1); }
+  }
+
+  /* VIBRATE BODY */
+  @keyframes vibrate {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    20%  { transform: translate(-2px, 2px) rotate(-0.3deg); }
+    40%  { transform: translate(2px,-2px) rotate(0.3deg); }
+    60%  { transform: translate(-2px,-2px) rotate(-0.2deg); }
+    80%  { transform: translate(2px, 2px) rotate(0.2deg); }
+  }
+  body.vibrating { animation: vibrate 0.12s linear infinite; }
+
+  /* DIFFICULTY BANNER */
+  #diff-banner {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 50;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.5rem;
+    color: var(--accent);
+    pointer-events: none;
+    text-shadow: 0 0 20px var(--accent);
+    height: 2rem;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .diff-line {
+    display: block;
+    animation: slideInUp 0.5s cubic-bezier(.22,.68,0,1.2) forwards;
+  }
+  @keyframes slideInUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  .diff-line.out {
+    animation: slideOutUp 0.4s ease forwards;
+  }
+  @keyframes slideOutUp {
+    from { transform: translateY(0);     opacity: 1; }
+    to   { transform: translateY(-100%); opacity: 0; }
+  }
+
+  /* HUD */
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 30;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 28px;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+  }
+  #settings-toggle {
+    width: 40px; height: 40px;
+    border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, background 0.15s;
+  }
+  #settings-toggle:hover { transform: scale(1.15) rotate(30deg); background: rgba(255,255,255,0.22); }
+  #settings-toggle svg { width: 22px; height: 22px; fill: #fff; }
+  #score-display {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.2rem;
+    color: #ffd86b;
+  }
+
+  /* TIMER BAR */
+  #timer-wrap {
+    position: fixed; top: 52px; left: 0; right: 0; height: 5px; z-index: 29;
+    background: rgba(255,255,255,0.1);
+  }
+  #timer-bar {
+    height: 100%; width: 100%;
+    background: var(--timer-color);
+    box-shadow: 0 0 8px var(--timer-color);
+    transition: width linear, background 0.5s;
+    transform-origin: left;
+  }
+
+  /* INSTRUCTION */
+  #instruction {
+    position: fixed; top: 62px; left: 0; right: 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.12em;
+    padding: 4px;
+    z-index: 28;
+  }
+
+  /* GRID */
+  #game-area {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+    padding: 90px 20px 20px;
+  }
+  #grid {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  /* EQUATION CARD */
+  .eq-card {
+    background: var(--card);
+    border: 1.5px solid rgba(255,255,255,0.14);
+    border-radius: 14px;
+    padding: 18px 12px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Boogaloo', cursive;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    letter-spacing: 0.04em;
+    transition: transform 0.12s, background 0.15s, box-shadow 0.15s;
+    user-select: none;
+    backdrop-filter: blur(4px);
+    position: relative;
+    overflow: hidden;
+  }
+  .eq-card:hover {
+    background: rgba(255,255,255,0.15);
+    box-shadow: 0 0 20px rgba(255,107,255,0.3);
+    transform: scale(1.08);
+  }
+  .eq-card:active { transform: scale(0.96); }
+
+  /* PER-CARD SHAKE */
+  @keyframes cardShake {
+    0%,100% { transform: translate(0,0) rotate(0); }
+    25% { transform: translate(calc(-1*var(--shake-intensity)), calc(var(--shake-intensity)*0.5)) rotate(-0.5deg); }
+    75% { transform: translate(var(--shake-intensity), calc(-1*var(--shake-intensity)*0.5)) rotate(0.5deg); }
+  }
+  .eq-card.shaking {
+    animation: cardShake 0.18s linear infinite;
+  }
+
+  /* FLASH OVERLAYS */
+  #flash {
+    position: fixed; inset: 0; z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  #flash.correct { background: #00ff88; opacity: 0.28; }
+  #flash.wrong   { background: #ff2244; opacity: 0.5; }
+
+  /* GAME OVER SCREEN */
+  #gameover {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(180,0,30,0.93);
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    animation: goIn 0.35s ease;
+  }
+  @keyframes goIn {
+    from { opacity:0; transform: scale(1.08); }
+    to   { opacity:1; transform: scale(1); }
+  }
+  #gameover.active { display: flex; }
+  #gameover h1 {
+    font-family: 'Boogaloo', cursive;
+    font-size: clamp(3rem, 10vw, 7rem);
+    color: #fff;
+    text-shadow: 0 0 40px rgba(255,255,255,0.6);
+    line-height: 1;
+    margin-bottom: 0.3em;
+  }
+  #gameover p {
+    font-size: 1.1rem; color: rgba(255,255,255,0.8);
+    margin-bottom: 1.5em;
+  }
+
+  /* SCORE & HIGH SCORE DISPLAY ON GAME OVER */
+  #go-score {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.5rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.2em;
+  }
+  #go-highscore-wrap {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.5rem;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 0.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  #go-highscore-value {
+    transition: color 0.3s;
+  }
+  #go-highscore-value.rainbow {
+    background: linear-gradient(90deg, #ff0000, #ff8800, #ffdd00, #00ff66, #00ccff, #8855ff, #ff44cc);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbowShift 2s linear infinite;
+    font-size: 1.8rem;
+  }
+  @keyframes rainbowShift {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+  .new-high-badge {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: linear-gradient(90deg, #ff0000, #ff8800, #ffdd00, #00ff66, #00ccff, #8855ff, #ff44cc);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbowShift 2s linear infinite, badgePop 0.5s cubic-bezier(.22,.68,0,1.2) forwards;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  @keyframes badgePop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  /* BUTTONS ROW */
+  .go-buttons {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  #restart-btn {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.6rem;
+    padding: 14px 48px;
+    border: none; border-radius: 50px;
+    background: #fff; color: #cc0020;
+    cursor: pointer;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  #restart-btn:hover { transform: scale(1.06); box-shadow: 0 6px 40px rgba(0,0,0,0.4); }
+  #home-btn {
+    width: 52px; height: 52px;
+    border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.12s, background 0.15s;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  #home-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255,255,255,0.35);
+  }
+  #home-btn svg {
+    width: 26px; height: 26px;
+    fill: #fff;
+  }
+
+  /* START SCREEN */
+  #startscreen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    background: #1a0533;
+  }
+  #startscreen h1 {
+    font-family: 'Boogaloo', cursive;
+    font-size: clamp(2.5rem, 9vw, 6rem);
+    color: var(--accent);
+    text-shadow: 0 0 40px var(--accent);
+    margin-bottom: 0.2em;
+  }
+  #startscreen p {
+    font-size: 1rem; color: rgba(255,255,255,0.7);
+    max-width: 480px; line-height: 1.6;
+    margin-bottom: 0.6em;
+  }
+  .tag { color: #ffd86b; font-weight: bold; }
+
+  /* START SCREEN BUTTONS - CONSISTENT STYLE */
+  .start-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 1.5em;
+    flex-wrap: wrap;
+  }
+  .start-btn-primary {
+    font-family: 'Boogaloo', cursive;
+    font-size: 2rem; padding: 16px 60px;
+    border: none; border-radius: 50px;
+    background: var(--accent); color: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(255,107,255,0.5);
+    transition: transform 0.15s;
+  }
+  .start-btn-primary:hover { transform: scale(1.1); }
+  .start-btn-secondary {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.4rem; padding: 14px 36px;
+    border: 2px solid rgba(255,107,255,0.5); border-radius: 50px;
+    background: rgba(255,107,255,0.12); color: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,107,255,0.2);
+    transition: transform 0.15s, background 0.15s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .start-btn-secondary:hover { transform: scale(1.08); background: rgba(255,107,255,0.25); }
+  .start-btn-secondary svg { width: 22px; height: 22px; fill: #fff; }
+
+  /* USER GREETING ON START SCREEN */
+  #user-greeting {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 0.5em;
+  }
+  #user-greeting span { color: #ffd86b; }
+  #logout-btn {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1rem;
+    padding: 8px 28px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s, color 0.15s;
+    margin-top: 1.2em;
+  }
+  #logout-btn:hover {
+    transform: scale(1.05);
+    background: rgba(255,70,70,0.15);
+    color: rgba(255,255,255,0.8);
+    border-color: rgba(255,70,70,0.4);
+  }
+
+  /* ─── AUTH SCREEN ─── */
+  #auth-screen {
+    position: fixed; inset: 0; z-index: 250;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    background: #1a0533;
+  }
+  #auth-screen.hidden { display: none; }
+  #auth-screen h1 {
+    font-family: 'Boogaloo', cursive;
+    font-size: clamp(2.5rem, 9vw, 5rem);
+    color: var(--accent);
+    text-shadow: 0 0 40px var(--accent);
+    margin-bottom: 0.4em;
+  }
+  #auth-box {
+    background: linear-gradient(135deg, #1e0a3a, #12213f);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 28px 32px 24px;
+    width: 360px;
+    max-width: 90vw;
+    animation: goIn 0.25s ease;
+  }
+  .auth-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .auth-tab {
+    flex: 1;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.2rem;
+    padding: 10px 0;
+    border: none; border-radius: 10px;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .auth-tab.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(255,107,255,0.4);
+  }
+  .auth-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
+  .auth-input {
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    padding: 12px 16px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .auth-input:focus { border-color: var(--accent); }
+  .auth-input::placeholder { color: rgba(255,255,255,0.3); }
+  /* Password wrapper with eye toggle */
+  .password-wrap {
+    position: relative;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .password-wrap .auth-input {
+    margin-bottom: 0;
+    padding-right: 48px;
+  }
+  .password-eye {
+    position: absolute;
+    right: 12px; top: 50%; transform: translateY(-50%);
+    width: 28px; height: 28px;
+    border: none; border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    padding: 0;
+  }
+  .password-eye:hover { background: rgba(255,255,255,0.12); }
+  .password-eye svg { width: 20px; height: 20px; fill: rgba(255,255,255,0.4); transition: fill 0.15s; }
+  .password-eye:hover svg { fill: rgba(255,255,255,0.7); }
+  .password-eye.showing svg { fill: var(--accent); }
+  .auth-submit {
+    width: 100%;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.4rem;
+    padding: 12px;
+    border: none; border-radius: 50px;
+    background: var(--accent); color: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 24px rgba(255,107,255,0.4);
+    transition: transform 0.15s;
+    margin-top: 4px;
+  }
+  .auth-submit:hover { transform: scale(1.05); }
+  .auth-error {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: #ff4466;
+    min-height: 1.2em;
+    margin-bottom: 8px;
+  }
+  .auth-disclaimer {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    line-height: 1.5;
+    margin-top: 16px;
+    padding: 10px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .auth-disclaimer strong {
+    color: rgba(255,255,255,0.55);
+  }
+  .auth-guest {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 16px;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.15s;
+  }
+  .auth-guest:hover { color: rgba(255,255,255,0.7); }
+
+  /* SETTINGS OVERLAY */
+  #settings-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #settings-overlay.active { display: flex; }
+  #settings-panel {
+    background: linear-gradient(135deg, #1e0a3a, #12213f);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 32px 36px 28px;
+    width: 340px;
+    max-width: 90vw;
+    position: relative;
+    animation: goIn 0.25s ease;
+  }
+  #settings-panel h2 {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-bottom: 1.2em;
+    text-align: center;
+    text-shadow: 0 0 16px var(--accent);
+  }
+  #settings-close {
+    position: absolute; top: 14px; right: 16px;
+    width: 32px; height: 32px;
+    border: none; border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, background 0.15s;
+    color: #fff; font-size: 1.2rem; line-height: 1;
+  }
+  #settings-close:hover { transform: scale(1.15); background: rgba(255,70,70,0.4); }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.85);
+  }
+  .settings-row label { flex: 1; }
+  .settings-row input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 140px; height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+  }
+  .settings-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* TOGGLE SWITCH */
+  .toggle-switch {
+    position: relative;
+    width: 48px; height: 26px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: 26px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-slider {
+    background: #7fffb2;
+  }
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(22px);
+  }
+  /* Debug mode active indicator */
+  .debug-indicator {
+    position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
+    font-family: 'Boogaloo', cursive; font-size: 0.9rem;
+    color: #7fffb2; z-index: 25;
+    background: rgba(127,255,178,0.15);
+    padding: 4px 16px; border-radius: 20px;
+    border: 1px solid rgba(127,255,178,0.3);
+    pointer-events: none;
+    display: none;
+  }
+  .debug-indicator.active { display: block; }
+
+  #settings-home-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; margin-top: 10px;
+    padding: 12px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    cursor: pointer;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.8);
+    transition: transform 0.15s, background 0.15s;
+  }
+  #settings-home-btn:hover { transform: scale(1.04); background: rgba(255,255,255,0.12); }
+  #settings-home-btn svg { width: 20px; height: 20px; fill: #fff; }
+
+  /* CONFIRM DIALOG */
+  #confirm-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  #confirm-overlay.active { display: flex; }
+  #confirm-box {
+    background: linear-gradient(135deg, #2a0e45, #16294a);
+    border: 1.5px solid rgba(255,255,255,0.18);
+    border-radius: 18px;
+    padding: 28px 32px;
+    text-align: center;
+    width: 300px;
+    max-width: 85vw;
+    animation: goIn 0.2s ease;
+  }
+  #confirm-box p {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 1.2em;
+  }
+  .confirm-buttons {
+    display: flex; gap: 14px; justify-content: center;
+  }
+  .confirm-buttons button {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.1rem;
+    padding: 10px 28px;
+    border: none; border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .confirm-buttons button:hover { transform: scale(1.08); }
+  #confirm-yes {
+    background: #ff4466; color: #fff;
+    box-shadow: 0 2px 16px rgba(255,68,102,0.4);
+  }
+  #confirm-cancel {
+    background: rgba(255,255,255,0.15); color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  .highlight-correct {
+    background: rgba(127, 255, 178, 0.4) !important;
+    border: 2px solid #7fffb2 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 20px #7fffb2 !important;
+    z-index: 10;
+  }
+
+  /* DEBUG MODE HIGHLIGHT (always visible, subtle) */
+  .debug-highlight {
+    box-shadow: 0 0 12px rgba(127,255,178,0.5), inset 0 0 8px rgba(127,255,178,0.15) !important;
+    border: 2px dashed #7fffb2 !important;
+  }
+
+  /* SPEED BONUS POPUP */
+  .speed-bonus {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-family: 'Boogaloo', cursive; font-size: 1.6rem;
+    color: #7fffb2; text-shadow: 0 0 16px rgba(127,255,178,0.6);
+    z-index: 150; pointer-events: none;
+    animation: bonusFly 1.2s ease forwards;
+  }
+  @keyframes bonusFly {
+    0%   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-120%) scale(1.3); }
+  }
+
+  /* LIGHTBULB BUTTON */
+  #lightbulb-btn {
+    position: fixed; bottom: 24px; right: 24px; z-index: 25;
+    width: 50px; height: 50px; border: none; border-radius: 50%;
+    background: rgba(255,215,0,0.2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 0 16px rgba(255,215,0,0.2);
+  }
+  #lightbulb-btn:hover { transform: scale(1.15); background: rgba(255,215,0,0.35); box-shadow: 0 0 24px rgba(255,215,0,0.4); }
+  #lightbulb-btn svg { width: 26px; height: 26px; fill: #ffd700; }
+  #lightbulb-btn.hidden { display: none; }
+
+  /* HISTORY OVERLAY */
+  #history-overlay {
+    display: none; position: fixed; inset: 0; z-index: 350;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #history-overlay.active { display: flex; }
+  #history-panel {
+    background: linear-gradient(135deg,#1e0a3a,#12213f);
+    border: 1.5px solid rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 24px; width: 420px; max-width: 90vw;
+    animation: goIn 0.25s ease;
+  }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+  .history-header h2 { font-family: 'Boogaloo', cursive; color: var(--accent); font-size: 2rem; margin: 0; text-shadow: 0 0 12px var(--accent); }
+  #history-stats {
+    font-family: 'Space Mono', monospace; font-size: 0.95rem; color: rgba(255,255,255,0.85);
+    margin-bottom: 15px; line-height: 1.5; text-align: center;
+    background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px;
+  }
+  #history-list {
+    max-height: 50vh; overflow-y: auto; padding-right: 8px; text-align: left;
+  }
+  .history-item {
+    background: rgba(255,255,255,0.08); border-radius: 8px;
+    padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between;
+    align-items: center; font-family: 'Space Mono', monospace;
+  }
+  .history-item.best {
+    border: 1px solid #ffcc00; box-shadow: 0 0 8px rgba(255,204,0,0.3); background: rgba(255,204,0,0.1);
+  }
+  .history-item .score { font-size: 1.2rem; font-weight: bold; color: #fff; }
+  .history-item .date { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+
+  /* HELP OVERLAY */
+  #help-overlay {
+    display: none; position: fixed; inset: 0; z-index: 350;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #help-overlay.active { display: flex; }
+  #help-panel {
+    background: linear-gradient(135deg,#1e0a3a,#12213f);
+    border: 1.5px solid rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 28px 32px; width: 380px; max-width: 90vw;
+    text-align: center; animation: goIn 0.25s ease;
+  }
+  #help-panel h2 {
+    font-family: 'Boogaloo', cursive; font-size: 1.6rem;
+    color: var(--accent); margin-bottom: 0.8em;
+    text-shadow: 0 0 14px var(--accent);
+  }
+  #help-panel p { font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-bottom: 1em; line-height: 1.5; }
+  #help-panel .eq-display {
+    font-family: 'Boogaloo', cursive; font-size: 1.8rem;
+    color: #fff; margin: 0.6em 0;
+  }
+  #help-panel input[type=text] {
+    font-family: 'Boogaloo', cursive; font-size: 1.4rem;
+    width: 120px; padding: 8px 12px; border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 12px; background: rgba(255,255,255,0.08);
+    color: #fff; text-align: center; outline: none;
+  }
+  #help-panel input[type=text]:focus { border-color: var(--accent); }
+  #help-timer-bar {
+    width: 100%; height: 5px; border-radius: 3px;
+    background: rgba(255,255,255,0.15); margin: 12px 0;
+    overflow: hidden;
+  }
+  #help-timer-fill { height: 100%; width: 100%; background: #7fffb2; transition: width 50ms linear; }
+  .help-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 14px; }
+  .help-buttons button {
+    font-family: 'Boogaloo', cursive; font-size: 1rem;
+    padding: 10px 22px; border: none; border-radius: 50px;
+    cursor: pointer; transition: transform 0.12s;
+  }
+  .help-buttons button:hover { transform: scale(1.08); }
+  .help-btn-primary { background: var(--accent); color: #fff; box-shadow: 0 2px 12px rgba(255,107,255,0.4); }
+  .help-btn-secondary { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25) !important; }
+  .help-choice-btn {
+    font-family: 'Boogaloo', cursive; font-size: 1rem;
+    padding: 12px 16px; border: 1.5px solid rgba(255,255,255,0.2) !important;
+    border-radius: 12px; background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.85); cursor: pointer; width: 100%;
+    margin-bottom: 10px; transition: transform 0.12s, background 0.15s;
+  }
+  .help-choice-btn:hover { transform: scale(1.04); background: rgba(255,255,255,0.12); }
+  .help-result { font-family: 'Boogaloo', cursive; font-size: 1.3rem; margin: 0.6em 0; }
+  .help-result.wrong { color: #ff4466; }
+  .help-result.correct { color: #7fffb2; }
+
+</style>
+</head>
+<body>
+<div id="polka-layer"></div>
+
+<div id="hud">
+  <button id="settings-toggle" onclick="openSettings()" title="Settings">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
+  </button>
+  <div id="diff-banner">Difficulty: <span id="diff-val">Easy</span></div>
+  <div id="score-display">Score: 0</div>
+</div>
+
+<div id="timer-wrap"><div id="timer-bar"></div></div>
+<div id="instruction">Click the <span style="color:#ff6bff">WRONG</span> equation</div>
+
+<div id="game-area">
+  <div id="grid"></div>
+</div>
+
+<div id="flash"></div>
+
+<!-- DEBUG MODE INDICATOR -->
+<div id="debug-indicator" class="debug-indicator">🐛 DEBUG MODE ON</div>
+
+<!-- LIGHTBULB HELP BUTTON -->
+<button id="lightbulb-btn" onclick="openHelp()" title="Get Help">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"/></svg>
+</button>
+
+<!-- HELP OVERLAY -->
+<div id="help-overlay">
+  <div id="help-panel">
+    <div id="help-content"></div>
+  </div>
+</div>
+
+<div id="gameover">
+  <h1>GAME OVER</h1>
+  <div id="go-score">Score: 0</div>
+  <div id="go-highscore-wrap">
+    High Score: <span id="go-highscore-value">0</span>
+    <span id="new-high-badge"></span>
+  </div>
+  <p>Better luck next time — the numbers had other plans.</p>
+  <div class="go-buttons">
+    <button id="restart-btn" onclick="restartGame()">Try Again</button>
+    <button id="home-btn" onclick="goHome()" title="Return to Homepage">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- SETTINGS OVERLAY -->
+<div id="settings-overlay">
+  <div id="settings-panel">
+    <button id="settings-close" onclick="closeSettings()">✕</button>
+    <h2>Settings</h2>
+    <div class="settings-row">
+      <label>Click Volume</label>
+      <input type="range" id="click-vol" min="0" max="100" value="60" oninput="setClickVolume(this.value)">
+    </div>
+    <div class="settings-row">
+      <label>Debug Mode</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="debug-toggle" onchange="toggleDebugMode(this.checked)">
+        <span class="toggle-slider"></span>
+      </div>
+    </div>
+    <button id="settings-home-btn" onclick="confirmGoHome()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Return to Homepage
+    </button>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div id="confirm-overlay">
+  <div id="confirm-box">
+    <p>Return to homepage?<br><span style="font-size:0.9rem;color:rgba(255,255,255,0.55);">Your progress will be lost.</span></p>
+    <div class="confirm-buttons">
+      <button id="confirm-yes" onclick="confirmYes()">Yes</button>
+      <button id="confirm-cancel" onclick="confirmCancel()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY OVERLAY -->
+<div id="history-overlay">
+  <div id="history-panel">
+    <div class="history-header">
+      <button onclick="closeHistory()" title="Return" style="background:transparent;border:none;cursor:pointer;fill:#fff;">
+        <svg viewBox="0 0 24 24" width="32" height="32"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <h2>History</h2>
+      <div style="width:32px"></div>
+    </div>
+    <div id="history-stats"></div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <h1>MathMadness</h1>
+  <div id="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+    </div>
+    <div id="auth-form">
+      <input class="auth-input" type="text" id="auth-username" placeholder="Username" autocomplete="off">
+      <div class="password-wrap">
+        <input class="auth-input" type="password" id="auth-password" placeholder="Password">
+        <button class="password-eye" type="button" onclick="togglePasswordVisibility()" title="Show/Hide Password">
+          <svg id="eye-icon-open" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          <svg id="eye-icon-closed" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 001 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+        </button>
+      </div>
+      <div class="auth-error" id="auth-error"></div>
+      <button class="auth-submit" id="auth-submit-btn" onclick="handleAuth()">Login</button>
+    </div>
+    <div class="auth-disclaimer">
+      <strong>⚠️ Disclaimer:</strong> Do NOT use real personal information, real passwords, or sensitive data. This is a fun game — use a made-up username and a simple password. Data is stored locally in your browser only.
+    </div>
+    <div class="auth-guest" onclick="playAsGuest()">Play as Guest</div>
+  </div>
+</div>
+
+<div id="startscreen" style="display:none;">
+  <h1>MathMadness</h1>
+  <div id="user-greeting"></div>
+  <p>One equation is <span class="tag">WRONG</span>.<br>
+     Find it before time runs out!<br>
+     As you advance, things get... <span class="tag">chaotic</span>.</p>
+  <p style="font-size:0.8rem; color:rgba(255,255,255,0.4);">Wrong answer = game over</p>
+  <div class="start-buttons">
+    <button class="start-btn-primary" onclick="startGame()">PLAY</button>
+    <button class="start-btn-secondary" onclick="openHistory()" title="History">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      History
+    </button>
+  </div>
+  <button id="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const BG_THEMES = [
+  ['#1a0533','#0d1f3c'],  // Deep purple + navy (easy)
+  ['#0d2b1f','#1a3300'],  // Dark teal + forest
+  ['#2b1400','#331a00'],  // Deep amber
+  ['#1a001a','#330033'],  // Dark magenta
+  ['#001a33','#00001a'],  // Deep ocean
+  ['#1f0000','#2a0a00'],  // Dark blood
+  ['#000a1a','#001433'],  // Midnight
+  ['#1a1a00','#2b2b00'],  // Dark olive
+];
+
+const DIFFICULTY_NAMES = [
+  [1,  'Easy'],
+  [5,  'Medium'],
+  [10, 'Hard'],
+  [20, 'Expert'],
+  [30, 'Brutal'],
+  [50, 'Insane'],
+  [75, 'Mythic'],
+  [100,'Chaos'],
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let level = 1, score = 0;
+let timerInterval = null, timerLeft = 0, timerDuration = 0;
+let lastDiffName = 'Easy';
+let polkaSpawner = null;
+let wrongIdx = -1;
+let highScore = 0;
+let gamePaused = false;
+let hasImmunity = false;
+let lightbulbUsed = false;
+let roundStartTime = 0;
+let scoreAtLastHint = null;
+let isAnimating = false;
+let debugMode = false;
+let currentUser = null; // null = guest
+let authMode = 'login'; // 'login' or 'register'
+
+// ─── AUTH SYSTEM ─────────────────────────────────────────────────────────────
+function getUsers() {
+  return JSON.parse(localStorage.getItem('mathMadness_users') || '{}');
+}
+
+function saveUsers(users) {
+  localStorage.setItem('mathMadness_users', JSON.stringify(users));
+}
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+  document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+  document.getElementById('auth-submit-btn').textContent = mode === 'login' ? 'Login' : 'Register';
+  document.getElementById('auth-error').textContent = '';
+  document.getElementById('auth-username').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-username').focus();
+}
+
+function handleAuth() {
+  const username = document.getElementById('auth-username').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const errorEl = document.getElementById('auth-error');
+
+  if (!username || !password) {
+    errorEl.textContent = 'Please enter both username and password.';
+    return;
+  }
+  if (username.length < 2) {
+    errorEl.textContent = 'Username must be at least 2 characters.';
+    return;
+  }
+  if (password.length < 3) {
+    errorEl.textContent = 'Password must be at least 3 characters.';
+    return;
+  }
+
+  const users = getUsers();
+
+  if (authMode === 'register') {
+    if (users[username]) {
+      errorEl.textContent = 'Username already exists. Try logging in.';
+      return;
+    }
+    users[username] = password;
+    saveUsers(users);
+    currentUser = username;
+    loginSuccess();
+  } else {
+    if (!users[username]) {
+      errorEl.textContent = 'Username not found. Register first.';
+      return;
+    }
+    if (users[username] !== password) {
+      errorEl.textContent = 'Wrong password. Try again.';
+      return;
+    }
+    currentUser = username;
+    loginSuccess();
+  }
+}
+
+function loginSuccess() {
+  localStorage.setItem('mathMadness_currentUser', currentUser);
+  loadUserData();
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('startscreen').style.display = '';
+  updateUserGreeting();
+}
+
+function playAsGuest() {
+  currentUser = null;
+  localStorage.removeItem('mathMadness_currentUser');
+  loadUserData();
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('startscreen').style.display = '';
+  updateUserGreeting();
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('mathMadness_currentUser');
+  document.getElementById('startscreen').style.display = 'none';
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('auth-username').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-error').textContent = '';
+  switchAuthTab('login');
+}
+
+function updateUserGreeting() {
+  const el = document.getElementById('user-greeting');
+  const logoutBtn = document.getElementById('logout-btn');
+  if (currentUser) {
+    el.innerHTML = `Welcome, <span>${currentUser}</span>!`;
+    logoutBtn.textContent = 'Logout';
+  } else {
+    el.innerHTML = `Playing as <span>Guest</span>`;
+    logoutBtn.textContent = 'Switch User';
+  }
+}
+
+// ─── PASSWORD VISIBILITY TOGGLE ─────────────────────────────────────────────
+function togglePasswordVisibility() {
+  const input = document.getElementById('auth-password');
+  const eyeBtn = input.closest('.password-wrap').querySelector('.password-eye');
+  const iconOpen = document.getElementById('eye-icon-open');
+  const iconClosed = document.getElementById('eye-icon-closed');
+  if (input.type === 'password') {
+    input.type = 'text';
+    iconOpen.style.display = 'none';
+    iconClosed.style.display = '';
+    eyeBtn.classList.add('showing');
+  } else {
+    input.type = 'password';
+    iconOpen.style.display = '';
+    iconClosed.style.display = 'none';
+    eyeBtn.classList.remove('showing');
+  }
+}
+
+// ─── PER-USER DATA ──────────────────────────────────────────────────────────
+function storageKey(key) {
+  const prefix = currentUser ? `mathMadness_user_${currentUser}` : 'mathMadness_guest';
+  return `${prefix}_${key}`;
+}
+
+function loadUserData() {
+  highScore = parseInt(localStorage.getItem(storageKey('highScore')) || '0', 10);
+}
+
+function saveHighScore() {
+  localStorage.setItem(storageKey('highScore'), String(highScore));
+}
+
+function getUserHistory() {
+  return JSON.parse(localStorage.getItem(storageKey('history')) || '[]');
+}
+
+function saveUserHistory(history) {
+  localStorage.setItem(storageKey('history'), JSON.stringify(history));
+}
+
+function getUserBestGame() {
+  return JSON.parse(localStorage.getItem(storageKey('bestGame')) || 'null');
+}
+
+function saveUserBestGame(best) {
+  localStorage.setItem(storageKey('bestGame'), JSON.stringify(best));
+}
+
+// ─── CHECK AUTO-LOGIN ───────────────────────────────────────────────────────
+function checkAutoLogin() {
+  const saved = localStorage.getItem('mathMadness_currentUser');
+  if (saved) {
+    const users = getUsers();
+    if (users[saved]) {
+      currentUser = saved;
+      loadUserData();
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('startscreen').style.display = '';
+      updateUserGreeting();
+      return;
+    }
+  }
+  // Show auth screen
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('startscreen').style.display = 'none';
+}
+
+// ─── DEBUG MODE ─────────────────────────────────────────────────────────────
+function toggleDebugMode(enabled) {
+  debugMode = enabled;
+  document.getElementById('debug-indicator').classList.toggle('active', enabled);
+  applyDebugHighlight();
+}
+
+function applyDebugHighlight() {
+  // Remove any existing debug highlights
+  document.querySelectorAll('.eq-card.debug-highlight').forEach(c => c.classList.remove('debug-highlight'));
+  if (!debugMode) return;
+  // Highlight the wrong card (the one user should click)
+  const wrongCard = document.querySelector('.eq-card[data-wrong="1"]');
+  if (wrongCard) {
+    wrongCard.classList.add('debug-highlight');
+  }
+}
+
+// ─── AUDIO ──────────────────────────────────────────────────────────────────
+let clickVol = 0.6;
+let audioCtx = null;
+
+function ensureAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playClick() {
+  ensureAudioCtx();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.type = 'sine'; osc.frequency.value = 880;
+  gain.gain.setValueAtTime(clickVol * 0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+}
+
+function setClickVolume(v) { clickVol = v / 100; }
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function getDiffName(lvl) {
+  let name = 'Easy';
+  for (const [threshold, n] of DIFFICULTY_NAMES) {
+    if (lvl >= threshold) name = n;
+  }
+  return name;
+}
+
+function getBgColors(lvl) {
+  const idx = Math.min(Math.floor((lvl-1) / 12), BG_THEMES.length-1);
+  return BG_THEMES[idx];
+}
+
+function getGridSize(lvl) {
+  if (lvl < 10) return [2,2];
+  if (lvl < 30) return [3,3];
+  if (lvl < 55) return [4,4];
+  return [4,5];
+}
+
+function getTimerDuration(lvl) {
+  return Math.max(3000, 10000 - (lvl - 1) * 120);
+}
+
+function getShakeIntensity(lvl) {
+  if (lvl < 15) return 0;
+  if (lvl < 30) return 1 + (lvl - 15) * 0.15;
+  if (lvl < 50) return 3.5 + (lvl - 30) * 0.1;
+  return Math.min(8, 5.5 + (lvl-50)*0.05);
+}
+
+function shouldVibrate(lvl) { return lvl >= 40; }
+function shouldPolka(lvl)   { return lvl >= 25; }
+
+// ─── EQUATION GENERATOR ──────────────────────────────────────────────────────
+function randInt(a, b) { return Math.floor(Math.random()*(b-a+1))+a; }
+function randPick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+function makeEquation(lvl, correct) {
+  const type = chooseType(lvl);
+  return buildEq(type, correct, lvl);
+}
+
+function chooseType(lvl) {
+  const pool = ['add','sub'];
+  if (lvl >= 5)  pool.push('mul');
+  if (lvl >= 8)  pool.push('div');
+  if (lvl >= 15) pool.push('mixed');
+  if (lvl >= 25) pool.push('sqrt');
+  if (lvl >= 40) pool.push('cube');
+  if (lvl >= 55) pool.push('power');
+  if (lvl >= 70) pool.push('complex');
+  const bias = Math.min(lvl, 80) / 80;
+  const hardPool = pool.slice(Math.floor(pool.length * (1-bias)));
+  return randPick(hardPool.length > 0 ? hardPool : pool);
+}
+
+function buildEq(type, correct, lvl) {
+  let a, b, c, op, ans, display;
+  const complexity = Math.floor(lvl / 20);
+
+  switch(type) {
+    case 'add': {
+      const mag = complexity < 1 ? 10 : complexity < 2 ? 100 : 1000;
+      a = randInt(1, mag); b = randInt(1, mag);
+      ans = a + b;
+      display = `${a} + ${b} = ${correct ? ans : wrongAns(ans, mag)}`;
+      break;
+    }
+    case 'sub': {
+      const mag = complexity < 1 ? 10 : complexity < 2 ? 50 : 200;
+      a = randInt(1, mag); b = randInt(1, a);
+      ans = a - b;
+      display = `${a} − ${b} = ${correct ? ans : wrongAns(ans, mag)}`;
+      break;
+    }
+    case 'mul': {
+      const mag = complexity < 2 ? 12 : complexity < 3 ? 25 : 50;
+      a = randInt(2, mag); b = randInt(2, mag);
+      ans = a * b;
+      display = `${a} × ${b} = ${correct ? ans : wrongAns(ans, a*b*0.3+1)}`;
+      break;
+    }
+    case 'div': {
+      b = randInt(2, complexity < 2 ? 12 : 20);
+      ans = randInt(2, complexity < 2 ? 12 : 20);
+      a = b * ans;
+      display = `${a} ÷ ${b} = ${correct ? ans : wrongAns(ans, ans*0.4+1)}`;
+      break;
+    }
+    case 'mixed': {
+      a = randInt(2,20); b = randInt(2,10); c = randInt(1,10);
+      ans = a * b + c;
+      display = `${a}×${b}+${c} = ${correct ? ans : wrongAns(ans, ans*0.25+1)}`;
+      break;
+    }
+    case 'sqrt': {
+      b = randInt(2, complexity < 3 ? 12 : 20);
+      ans = b;
+      a = b * b;
+      const fakeAns = correct ? ans : wrongAns(ans, ans*0.4+1);
+      display = `√${a} = ${fakeAns}`;
+      break;
+    }
+    case 'cube': {
+      b = randInt(2, complexity < 3 ? 6 : 10);
+      ans = b;
+      a = b * b * b;
+      const fakeAns = correct ? ans : wrongAns(ans, ans*0.4+1);
+      display = `∛${a} = ${fakeAns}`;
+      break;
+    }
+    case 'power': {
+      a = randInt(2, complexity < 3 ? 8 : 12);
+      b = randInt(2, 4);
+      ans = Math.pow(a,b);
+      display = `${a}^${b} = ${correct ? ans : wrongAns(ans, ans*0.3+1)}`;
+      break;
+    }
+    case 'complex': {
+      a = randInt(2,15); b = randInt(2,8); c = randInt(2,6);
+      ans = a * b - c * c;
+      display = `${a}×${b}−${c}² = ${correct ? ans : wrongAns(ans, Math.abs(ans)*0.35+1)}`;
+      break;
+    }
+    default: {
+      a = randInt(1,10); b = randInt(1,10); ans = a+b;
+      display = `${a}+${b}=${correct ? ans : wrongAns(ans, 5)}`;
+    }
+  }
+  return { display, correct };
+}
+
+function wrongAns(correct, spread) {
+  let delta = Math.max(1, Math.round(spread * 0.4 + 1));
+  let offset = randInt(1, delta) * (Math.random() < 0.5 ? 1 : -1);
+  if (offset === 0) offset = 1;
+  return correct + offset;
+}
+
+// ─── UI BUILDERS ─────────────────────────────────────────────────────────────
+function buildLevel() {
+  const [rows, cols] = getGridSize(level);
+  const total = rows * cols;
+  wrongIdx = randInt(0, total - 1);
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
+
+  const shake = getShakeIntensity(level);
+  document.documentElement.style.setProperty('--shake-intensity', shake + 'px');
+
+  for (let i = 0; i < total; i++) {
+    const isWrong = (i === wrongIdx);
+    const eq = makeEquation(level, !isWrong);
+    const card = document.createElement('div');
+    card.className = 'eq-card' + (shake > 0 ? ' shaking' : '');
+    card.innerHTML = eq.display;
+    card.dataset.wrong = isWrong ? '1' : '0';
+    card.style.animationDelay = (Math.random()*0.18) + 's';
+    card.addEventListener('click', () => { playClick(); handleClick(isWrong); });
+    grid.appendChild(card);
+  }
+
+  // Timer
+  timerDuration = getTimerDuration(level);
+  startTimer();
+
+  // HUD
+  document.getElementById('score-display').textContent  = `Score: ${score}`;
+
+  // Background
+  updateBackground();
+  updateDifficultyBanner();
+  updateVibrate();
+  managePolka();
+  
+  // Apply debug highlight if debug mode is on
+  applyDebugHighlight();
+  
+  isAnimating = false;
+}
+
+function updateBackground() {
+  const [c1, c2] = getBgColors(level);
+  document.body.style.background = `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`;
+}
+
+function updateDifficultyBanner() {
+  const name = getDiffName(level);
+  if (name === lastDiffName) return;
+
+  const banner = document.getElementById('diff-banner');
+  const old = banner.querySelector('.diff-line');
+  if (old) {
+    old.classList.add('out');
+    setTimeout(() => old.remove(), 400);
+  }
+  const line = document.createElement('span');
+  line.className = 'diff-line';
+  line.textContent = `Difficulty: ${name}`;
+  banner.appendChild(line);
+  lastDiffName = name;
+}
+
+function updateVibrate() {
+  if (shouldVibrate(level)) {
+    document.body.classList.add('vibrating');
+  } else {
+    document.body.classList.remove('vibrating');
+  }
+}
+
+function managePolka() {
+  const layer = document.getElementById('polka-layer');
+  if (!shouldPolka(level)) {
+    layer.innerHTML = '';
+    clearInterval(polkaSpawner);
+    polkaSpawner = null;
+    return;
+  }
+  if (polkaSpawner) return;
+  const spawnRate = Math.max(200, 1000 - level * 10);
+  polkaSpawner = setInterval(spawnDot, spawnRate);
+}
+
+function spawnDot() {
+  const layer = document.getElementById('polka-layer');
+  if (layer.children.length > 80) layer.removeChild(layer.firstChild);
+  const dot = document.createElement('div');
+  dot.className = 'polka-dot';
+  const size = randInt(12, 50);
+  const hue  = randInt(0, 360);
+  dot.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    background: hsl(${hue},80%,65%);
+    animation-duration: 0.4s, ${(1.5+Math.random()*2).toFixed(2)}s;
+    animation-delay: 0s, 0.4s;
+  `;
+  layer.appendChild(dot);
+}
+
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+function startTimer() {
+  clearInterval(timerInterval);
+  timerLeft = timerDuration;
+  roundStartTime = Date.now();
+  const bar = document.getElementById('timer-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  bar.style.background = '#7fffb2';
+  runTimer();
+}
+
+function resumeTimer() {
+  clearInterval(timerInterval);
+  roundStartTime = Date.now() - (timerDuration - timerLeft);
+  runTimer();
+}
+
+function runTimer() {
+  const bar = document.getElementById('timer-bar');
+  const step = 50;
+  timerInterval = setInterval(() => {
+    timerLeft -= step;
+    const pct = Math.max(0, timerLeft / timerDuration * 100);
+    bar.style.transition = `width ${step}ms linear`;
+    bar.style.width = pct + '%';
+    const r = Math.round(255 * (1 - pct/100));
+    const g = Math.round(200 * (pct/100));
+    bar.style.background = `rgb(${r+100},${g+55},80)`;
+    if (timerLeft <= 0) {
+      clearInterval(timerInterval);
+      handleWrong();
+    }
+  }, step);
+}
+
+// ─── GAME LOGIC ──────────────────────────────────────────────────────────────
+function handleClick(isWrong) {
+  if (gamePaused || isAnimating) return;
+  isAnimating = true;
+  clearInterval(timerInterval);
+  if (isWrong) {
+    handleCorrect();
+  } else {
+    handleWrong();
+  }
+}
+
+function handleCorrect() {
+  const elapsed = Date.now() - roundStartTime;
+  const basePoints = level * 10;
+  
+  let speedBonus = 0;
+  if (elapsed <= 2000) {
+    speedBonus = 50;
+  } else if (elapsed <= 4000) {
+    speedBonus = 25;
+  } else {
+    speedBonus = 0;
+  }
+  
+  score += basePoints + speedBonus;
+  
+  if (scoreAtLastHint !== null && score >= scoreAtLastHint + 100) {
+    scoreAtLastHint = null;
+    lightbulbUsed = false;
+    document.getElementById('lightbulb-btn').classList.remove('hidden');
+  }
+  
+  level++;
+  if (speedBonus > 0) showSpeedBonus(speedBonus);
+  flashScreen('correct', 600, buildLevel);
+}
+
+function showSpeedBonus(pts) {
+  const el = document.createElement('div');
+  el.className = 'speed-bonus';
+  el.textContent = `Speed Bonus: +${pts}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+function handleWrong() {
+  if (hasImmunity) {
+    hasImmunity = false;
+    const f = document.getElementById('flash');
+    f.style.background = '#ff4466';
+    f.style.opacity = '0.35';
+    setTimeout(() => { f.style.opacity = '0'; f.style.background = ''; }, 1000);
+    
+    const el = document.createElement('div');
+    el.className = 'speed-bonus';
+    el.style.color = '#ff4466';
+    el.textContent = 'Immunity Activated!';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+    
+    const correctCard = document.querySelector('.eq-card[data-wrong="1"]');
+    if (correctCard) {
+      correctCard.classList.add('highlight-correct');
+    }
+    
+    level++;
+    setTimeout(() => buildLevel(), 1500);
+    return;
+  }
+  
+  const correctCard = document.querySelector('.eq-card[data-wrong="1"]');
+  if (correctCard) {
+    correctCard.classList.add('highlight-correct');
+  }
+  
+  setTimeout(() => {
+    flashScreen('wrong', 300, showGameOver);
+  }, 1000);
+}
+
+function flashScreen(type, dur, cb) {
+  const f = document.getElementById('flash');
+  f.className = type;
+  setTimeout(() => { f.className = ''; if(cb) cb(); }, dur);
+}
+
+function showGameOver() {
+  document.body.classList.remove('vibrating');
+  clearInterval(polkaSpawner); polkaSpawner = null;
+  document.getElementById('polka-layer').innerHTML = '';
+  document.getElementById('go-score').textContent = `Score: ${score}`;
+
+  // Save history (per-user)
+  const record = { score: score, date: new Date().toLocaleString() };
+  let gameHistory = getUserHistory();
+  gameHistory.unshift(record);
+  if (gameHistory.length > 10) gameHistory.pop();
+  saveUserHistory(gameHistory);
+
+  let bestGame = getUserBestGame();
+  if (!bestGame || score > bestGame.score) {
+    bestGame = record;
+    saveUserBestGame(bestGame);
+  }
+
+  // High score logic (per-user)
+  const isNewHigh = score > highScore && score > 0;
+  if (isNewHigh) {
+    highScore = score;
+    saveHighScore();
+  }
+  const hsVal = document.getElementById('go-highscore-value');
+  hsVal.textContent = highScore;
+  const badge = document.getElementById('new-high-badge');
+  if (isNewHigh) {
+    hsVal.classList.add('rainbow');
+    badge.textContent = '🎉 New High!';
+    badge.className = 'new-high-badge';
+  } else {
+    hsVal.classList.remove('rainbow');
+    badge.textContent = '';
+    badge.className = '';
+  }
+
+  document.getElementById('gameover').classList.add('active');
+}
+
+function restartGame() {
+  playClick();
+  level = 1; score = 0; lastDiffName = '';
+  hasImmunity = false; lightbulbUsed = false; scoreAtLastHint = null;
+  document.getElementById('lightbulb-btn').classList.remove('hidden');
+  document.getElementById('gameover').classList.remove('active');
+  document.body.style.background = 'linear-gradient(135deg, #1a0533 0%, #0d1f3c 100%)';
+  document.getElementById('polka-layer').innerHTML = '';
+  clearInterval(polkaSpawner); polkaSpawner = null;
+  buildLevel();
+}
+
+function goHome() {
+  level = 1; score = 0; lastDiffName = '';
+  hasImmunity = false; lightbulbUsed = false; scoreAtLastHint = null;
+  clearInterval(timerInterval);
+  clearInterval(polkaSpawner); polkaSpawner = null;
+  document.getElementById('gameover').classList.remove('active');
+  document.getElementById('settings-overlay').classList.remove('active');
+  document.getElementById('confirm-overlay').classList.remove('active');
+  document.getElementById('help-overlay').classList.remove('active');
+  document.getElementById('lightbulb-btn').classList.remove('hidden');
+  document.getElementById('polka-layer').innerHTML = '';
+  document.body.classList.remove('vibrating');
+  document.body.style.background = '#1a0533';
+  document.getElementById('grid').innerHTML = '';
+  document.getElementById('startscreen').style.display = '';
+  gamePaused = false;
+}
+
+function startGame() {
+  playClick();
+  document.getElementById('startscreen').style.display = 'none';
+  lastDiffName = '';
+  buildLevel();
+}
+
+// ─── SETTINGS & CONFIRM ─────────────────────────────────────────────────────
+function openSettings() {
+  playClick();
+  gamePaused = true;
+  clearInterval(timerInterval);
+  // Sync debug toggle with current state
+  document.getElementById('debug-toggle').checked = debugMode;
+  document.getElementById('settings-overlay').classList.add('active');
+}
+
+function closeSettings() {
+  playClick();
+  document.getElementById('settings-overlay').classList.remove('active');
+  gamePaused = false;
+  if (!document.getElementById('gameover').classList.contains('active') &&
+      document.getElementById('startscreen').style.display === 'none') {
+    resumeTimer();
+  }
+}
+
+function confirmGoHome() {
+  playClick();
+  document.getElementById('confirm-overlay').classList.add('active');
+}
+
+function confirmYes() {
+  playClick();
+  goHome();
+}
+
+function confirmCancel() {
+  playClick();
+  document.getElementById('confirm-overlay').classList.remove('active');
+}
+
+// ─── HISTORY ────────────────────────────────────────────────────────────────
+function openHistory() {
+  playClick();
+  const historyList = document.getElementById('history-list');
+  const historyStats = document.getElementById('history-stats');
+  
+  let gameHistory = getUserHistory();
+  let bestGame = getUserBestGame();
+  
+  if (gameHistory.length === 0 && !bestGame) {
+    historyList.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5);">No history yet.</p>';
+    historyStats.innerHTML = '';
+    document.getElementById('history-overlay').classList.add('active');
+    return;
+  }
+  
+  let totalScore = gameHistory.reduce((sum, g) => sum + g.score, 0);
+  let avg = gameHistory.length > 0 ? (totalScore / gameHistory.length).toFixed(1) : 0;
+  let highest = bestGame ? bestGame.score : 0;
+  
+  historyStats.innerHTML = `Avg (Past 10): <span style="color:#7fffb2">${avg}</span><br>Highest Score: <span style="color:#ffcc00">${highest}</span>`;
+  
+  let html = '';
+  if (bestGame) {
+    html += `<div class="history-item best">
+               <div><div class="score" style="color:#ffcc00">★ ${bestGame.score}</div><div class="date">${bestGame.date}</div></div>
+               <div style="font-size:0.8rem;color:#ffcc00;">All-Time Best</div>
+             </div>`;
+    if (gameHistory.length > 0) {
+      html += `<hr style="border:none;border-top:1px dashed rgba(255,255,255,0.2);margin:12px 0;">`;
+    }
+  }
+  
+  gameHistory.forEach((g, i) => {
+    html += `<div class="history-item">
+               <div><div class="score">${g.score}</div><div class="date">${g.date}</div></div>
+               <div style="font-size:0.8rem;color:rgba(255,255,255,0.4);">${i === 0 ? 'Most Recent' : i + ' Games Ago'}</div>
+             </div>`;
+  });
+  
+  historyList.innerHTML = html;
+  document.getElementById('history-overlay').classList.add('active');
+}
+
+function closeHistory() {
+  playClick();
+  document.getElementById('history-overlay').classList.remove('active');
+}
+
+// ─── LIGHTBULB HELP SYSTEM ──────────────────────────────────────────────────
+let helpTimerInterval = null;
+let helpAnswer = 0;
+
+function openHelp() {
+  playClick();
+  gamePaused = true;
+  clearInterval(timerInterval);
+  const hc = document.getElementById('help-content');
+  hc.innerHTML = `
+    <h2>Solve One Question for Help</h2>
+    <p>Answer a math question correctly to earn a power-up!</p>
+    <div class="help-buttons">
+      <button class="help-btn-primary" onclick="startHelpChallenge()">Yes, let's go!</button>
+      <button class="help-btn-secondary" onclick="closeHelp()">Cancel</button>
+    </div>`;
+  document.getElementById('help-overlay').classList.add('active');
+}
+
+function closeHelp() {
+  playClick();
+  document.getElementById('help-overlay').classList.remove('active');
+  clearInterval(helpTimerInterval);
+  gamePaused = false;
+  if (!document.getElementById('gameover').classList.contains('active') &&
+      document.getElementById('startscreen').style.display === 'none') {
+    resumeTimer();
+  }
+}
+
+function startHelpChallenge() {
+  playClick();
+  
+  const a = randInt(2, 6);
+  const b = randInt(2, 6);
+  const c = randInt(10, 30);
+  const e = randInt(2, 6);
+  const d = e * randInt(2, 6);
+  const ans = (a * b) + c - (d / e);
+  
+  helpAnswer = ans;
+  const hc = document.getElementById('help-content');
+  hc.innerHTML = `
+    <h2>Solve to Earn Help</h2>
+    <div id="help-timer-bar"><div id="help-timer-fill"></div></div>
+    <div class="eq-display">${a} &times; ${b} + ${c} &minus; ${d} &divide; ${e} = ?</div>
+    <input type="text" id="help-input" autocomplete="off" inputmode="numeric" placeholder="?">
+    <div class="help-buttons">
+      <button class="help-btn-primary" onclick="submitHelpAnswer()">Submit</button>
+    </div>`;
+  setTimeout(() => document.getElementById('help-input').focus(), 100);
+  document.getElementById('help-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitHelpAnswer();
+  });
+  let helpLeft = 8000;
+  const fill = document.getElementById('help-timer-fill');
+  helpTimerInterval = setInterval(() => {
+    helpLeft -= 50;
+    fill.style.width = Math.max(0, helpLeft/8000*100) + '%';
+    if (helpLeft <= 0) {
+      clearInterval(helpTimerInterval);
+      helpFailed('Time\'s up! Answer: ' + helpAnswer);
+    }
+  }, 50);
+}
+
+function submitHelpAnswer() {
+  playClick();
+  clearInterval(helpTimerInterval);
+  const input = document.getElementById('help-input');
+  const val = parseInt(input.value, 10);
+  if (val === helpAnswer) {
+    showHelpRewards();
+  } else {
+    helpFailed('Wrong! The answer was ' + helpAnswer);
+  }
+}
+
+function helpFailed(msg) {
+  lightbulbUsed = true;
+  document.getElementById('lightbulb-btn').classList.add('hidden');
+  const hc = document.getElementById('help-content');
+  hc.innerHTML = `
+    <h2 style="color:#ff4466">Failed</h2>
+    <p class="help-result wrong">${msg}</p>
+    <div class="help-buttons">
+      <button class="help-btn-secondary" onclick="closeHelp()">Close</button>
+    </div>`;
+  const panel = document.getElementById('help-panel');
+  panel.style.borderColor = '#ff4466';
+  setTimeout(() => panel.style.borderColor = '', 1500);
+}
+
+function showHelpRewards() {
+  const hc = document.getElementById('help-content');
+  hc.innerHTML = `
+    <h2>Choose Your Reward</h2>
+    <button class="help-choice-btn" onclick="useHalfEliminate()">Close half incorrect options</button>
+    <button class="help-choice-btn" onclick="useImmunity()">Immunity for one round</button>`;
+}
+
+function useHalfEliminate() {
+  playClick();
+  lightbulbUsed = true;
+  scoreAtLastHint = score;
+  document.getElementById('lightbulb-btn').classList.add('hidden');
+  document.getElementById('help-overlay').classList.remove('active');
+  const cards = document.querySelectorAll('.eq-card');
+  const correctCards = [];
+  cards.forEach(c => { if (c.dataset.wrong === '0') correctCards.push(c); });
+  const toRemove = Math.floor(correctCards.length / 2);
+  for (let i = correctCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [correctCards[i], correctCards[j]] = [correctCards[j], correctCards[i]];
+  }
+  for (let i = 0; i < toRemove; i++) {
+    correctCards[i].style.transition = 'opacity 0.4s, transform 0.4s';
+    correctCards[i].style.opacity = '0';
+    correctCards[i].style.transform = 'scale(0.5)';
+    correctCards[i].style.pointerEvents = 'none';
+  }
+  gamePaused = false;
+  resumeTimer();
+}
+
+function useImmunity() {
+  playClick();
+  lightbulbUsed = true;
+  scoreAtLastHint = score;
+  hasImmunity = true;
+  document.getElementById('lightbulb-btn').classList.add('hidden');
+  document.getElementById('help-overlay').classList.remove('active');
+  gamePaused = false;
+  resumeTimer();
+}
+
+// ─── AUTH INPUT ENTER KEY SUPPORT ───────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('auth-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleAuth();
+  });
+  document.getElementById('auth-username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('auth-password').focus();
+  });
+  checkAutoLogin();
+});
+</script>
+</body>
+</html>

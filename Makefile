@@ -11,9 +11,15 @@ all: help
 .PHONY: help
 help:
 	@echo "Usage:"
+	@echo "  make run          Run locally with uvicorn (port 8080)"
 	@echo "  make deploy       Deploy the application to Cloud Run"
 	@echo "  make build-local  Build the Docker image locally"
-	@echo "  make run-local    Run the Docker container locally (port 8080)"
+	@echo "  make run-docker   Run the Docker container locally (port 8080)"
+
+# Run locally (no Docker)
+.PHONY: run
+run:
+	uv run python server.py
 
 # Deploy target
 .PHONY: deploy
@@ -24,14 +30,14 @@ deploy:
 		--region $(REGION) \
 		--project $(PROJECT_ID) \
 		--allow-unauthenticated \
-		--port 80
+		--port 8080
 
 # Local build target
 .PHONY: build-local
 build-local:
 	docker build -t $(SERVICE_NAME) .
 
-# Local run target
-.PHONY: run-local
-run-local:
-	docker run -p 8080:80 $(SERVICE_NAME)
+# Local Docker run target
+.PHONY: run-docker
+run-docker:
+	docker run -p 8080:8080 $(SERVICE_NAME)

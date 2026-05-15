@@ -3046,7 +3046,7 @@ function spawnMathFloat(bg) {
   bg.appendChild(el);
 }
 
-// ─── ROOM SYSTEM ────────────────────────────────────────────────────────────
+// ─── ROOM SYSTEM (API-backed — works across browsers) ───────────────────────
 let currentRoom = null;
 let isRoomMode = false;
 let isRoomHost = false;
@@ -3056,24 +3056,54 @@ let roomCurrentQ = 0;
 let roomScore = 0;
 let roomAnswers = [];
 let roomLiveWaiting = false;
+let _roomCache = {};
 
-// --- Room Data ---
-function getAllRooms() { return JSON.parse(localStorage.getItem('mathMadness_rooms') || '{}'); }
-function saveAllRooms(rooms) { localStorage.setItem('mathMadness_rooms', JSON.stringify(rooms)); }
-function getRoom(code) { return getAllRooms()[code] || null; }
+// --- Room Data (API-backed) ---
+function getRoom(code) { return _roomCache[code] || null; }
+
+async function fetchRoom(code) {
+  try {
+    const res = await fetch('/api/rooms/' + code);
+    const data = await res.json();
+    if (!data.error) { _roomCache[code] = data; return data; }
+  } catch(e) { console.warn('fetchRoom error:', e); }
+  return null;
+}
+
+async function api(path, body) {
+  try {
+    const opts = { method: 'POST', headers: {'Content-Type': 'application/json'} };
+    if (body !== undefined) opts.body = JSON.stringify(body);
+    const res = await fetch(path, opts);
+    return await res.json();
+  } catch(e) { return { error: e.message }; }
+}
+
+async function apiDelete(path) {
+  try {
+    const res = await fetch(path, { method: 'DELETE' });
+    return await res.json();
+  } catch(e) { return { error: e.message }; }
+}
+
+// Backward-compatible wrappers — mutate cache & sync to server
+function getAllRooms() { return _roomCache; }
+function saveAllRooms(rooms) {
+  for (const code in _roomCache) { if (!(code in rooms)) apiDelete('/api/rooms/' + code); }
+  _roomCache = rooms;
+  for (const code in rooms) api('/api/rooms', { room: rooms[code] });
+}
 function updateRoom(code, fn) {
-  const rooms = getAllRooms();
-  if (!rooms[code]) return null;
-  fn(rooms[code]);
-  saveAllRooms(rooms);
-  return rooms[code];
+  if (!_roomCache[code]) return null;
+  fn(_roomCache[code]);
+  api('/api/rooms', { room: _roomCache[code] });
+  return _roomCache[code];
 }
 
 function generateRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const rooms = getAllRooms();
-  let code;
-  do { code = ''; for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)]; } while (rooms[code]);
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return code;
 }
 
@@ -3166,21 +3196,20 @@ function showJoinRoom() {
   }, 100);
 }
 
-function submitJoinRoom() {
+async function submitJoinRoom() {
   playClick();
   const code = document.getElementById('join-room-code').value.trim().toUpperCase();
   const err = document.getElementById('join-room-error');
   if (!code || code.length < 6) { err.textContent = 'Enter a valid 6-character code.'; return; }
-  const room = getRoom(code);
+  const room = await fetchRoom(code);
   if (!room) { err.textContent = 'Room not found. Check the code.'; return; }
   if (room.status !== 'waiting') { err.textContent = 'This room has already started or ended.'; return; }
   if (room.players.find(p => p.username === currentUser)) {
     currentRoom = code; isRoomHost = false; isRoomMode = true;
     showLobby(); return;
   }
-  updateRoom(code, r => {
-    r.players.push({ username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId, status: 'joined' });
-  });
+  await api('/api/rooms/' + code + '/join', { username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId });
+  await fetchRoom(code);
   currentRoom = code; isRoomHost = false; isRoomMode = true;
   showLobby();
 }
@@ -3380,19 +3409,15 @@ function toggleRoomPublic() {
 }
 
 function saveRoomInvite(targetUser, roomCode, fromUser) {
-  const key = 'mathMadness_roomInvites_' + targetUser;
-  const inv = JSON.parse(localStorage.getItem(key) || '[]');
-  if (!inv.find(i => i.roomCode === roomCode)) {
-    inv.push({ roomCode, fromUser, fromName: getDisplayName(fromUser), timestamp: Date.now() });
-    localStorage.setItem(key, JSON.stringify(inv));
-  }
+  api('/api/invites', { targetUser, roomCode, fromUser, fromName: getDisplayName(fromUser) });
 }
 
 // --- UI: Lobby / Waiting Room ---
 function showLobby() {
   playClick();
   if (!getRoom(currentRoom)) return;
-  const renderLobby = () => {
+  const renderLobby = async () => {
+    await fetchRoom(currentRoom);
     const r = getRoom(currentRoom);
     if (!r) return;
     // Non-host: if game started, jump into game
@@ -3427,11 +3452,11 @@ function showLobby() {
   roomPollInterval = setInterval(renderLobby, 1000);
 }
 
-function leaveRoomFromLobby() {
+async function leaveRoomFromLobby() {
   playClick();
   if (currentRoom) {
-    if (isRoomHost) { const rooms = getAllRooms(); delete rooms[currentRoom]; saveAllRooms(rooms); }
-    else { updateRoom(currentRoom, r => { r.players = r.players.filter(p => p.username !== currentUser); }); }
+    if (isRoomHost) { await apiDelete('/api/rooms/' + currentRoom); delete _roomCache[currentRoom]; }
+    else { await api('/api/rooms/' + currentRoom + '/leave', { username: currentUser }); delete _roomCache[currentRoom]; }
   }
   if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
   currentRoom = null; isRoomMode = false; isRoomHost = false;
@@ -3439,15 +3464,12 @@ function leaveRoomFromLobby() {
 }
 
 // --- Game Start ---
-function hostStartGame() {
+async function hostStartGame() {
   playClick();
   const room = getRoom(currentRoom);
   if (!room || room.players.length < 2) return;
-  updateRoom(currentRoom, r => {
-    if (r.mode === 'team') { r.players.forEach((p, i) => p.team = i % 2 === 0 ? 'Team A' : 'Team B'); }
-    r.status = 'playing'; r.currentQuestion = 0;
-    r.players.forEach(p => { r.results[p.username] = { score: 0, correct: 0, wrong: 0, answers: [], finished: false }; });
-  });
+  await api('/api/rooms/' + currentRoom + '/start', { host: currentUser });
+  await fetchRoom(currentRoom);
   if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
   startRoomGameAsPlayer();
 }
@@ -3514,7 +3536,6 @@ function handleRoomClick(isWrong, card) {
   document.querySelectorAll('.eq-card').forEach(c => c.style.pointerEvents = 'none');
   const room = getRoom(currentRoom);
   if (isWrong) {
-    // Correct! (clicked the wrong equation)
     let speedBonus = 0;
     const secs = parseFloat(document.getElementById('room-hud-timer').textContent);
     const totalSecs = room.settings.timePerQuestion;
@@ -3524,14 +3545,13 @@ function handleRoomClick(isWrong, card) {
     roomAnswers.push({ qIndex: roomCurrentQ, correct: true, speedBonus });
     card.style.background = 'rgba(127,255,178,0.4)'; card.style.border = '2px solid #7fffb2'; card.style.transform = 'scale(1.1)';
     if (speedBonus > 0) showSpeedBonus(speedBonus);
-    updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.score = roomScore; res.correct++; res.answers.push({ q: roomCurrentQ, correct: true }); } });
+    api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: true, score: roomScore });
     flashScreen('correct', 400, () => advanceRoomQuestion());
   } else {
-    // Wrong pick — but continue playing (no game over)
     roomAnswers.push({ qIndex: roomCurrentQ, correct: false });
     document.querySelectorAll('.eq-card').forEach(c => { if (c.dataset.wrong === '1') c.classList.add('highlight-correct'); });
     card.style.background = 'rgba(255,68,102,0.4)'; card.style.border = '2px solid #ff4466';
-    updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.wrong++; res.answers.push({ q: roomCurrentQ, correct: false }); } });
+    api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: false, score: roomScore });
     flashScreen('wrong', 600, () => advanceRoomQuestion());
   }
   document.getElementById('room-hud-score').textContent = 'Score: ' + roomScore;
@@ -3540,7 +3560,7 @@ function handleRoomClick(isWrong, card) {
 function handleRoomTimeout() {
   roomAnswers.push({ qIndex: roomCurrentQ, correct: false, timeout: true });
   document.querySelectorAll('.eq-card').forEach(c => { if (c.dataset.wrong === '1') c.classList.add('highlight-correct'); c.style.pointerEvents = 'none'; });
-  updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.wrong++; res.answers.push({ q: roomCurrentQ, correct: false, timeout: true }); } });
+  api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: false, score: roomScore, timeout: true });
   setTimeout(() => advanceRoomQuestion(), 1200);
 }
 
@@ -3564,9 +3584,10 @@ function showHostLiveControl(nextQ) {
     + '</div>';
 }
 
-function hostAdvanceQuestion(nextQ) {
+async function hostAdvanceQuestion(nextQ) {
   playClick();
-  updateRoom(currentRoom, r => { r.currentQuestion = nextQ; });
+  await api('/api/rooms/' + currentRoom + '/advance', { nextQuestion: nextQ });
+  await fetchRoom(currentRoom);
   document.getElementById('timer-wrap').style.display = '';
   loadRoomQuestion(nextQ);
 }
@@ -3578,7 +3599,8 @@ function showWaitingForHost() {
     + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.3rem;color:rgba(255,255,255,0.5);"><span class="lobby-waiting-dots">Waiting for moderator</span></div>'
     + '</div>';
   if (roomPollInterval) clearInterval(roomPollInterval);
-  roomPollInterval = setInterval(() => {
+  roomPollInterval = setInterval(async () => {
+    await fetchRoom(currentRoom);
     const r = getRoom(currentRoom);
     if (!r) return;
     if (r.currentQuestion > roomCurrentQ) {
@@ -3592,13 +3614,12 @@ function showWaitingForHost() {
 }
 
 // --- Game Finish ---
-function finishRoomGame() {
+async function finishRoomGame() {
   if (roomTimerInterval) { clearInterval(roomTimerInterval); roomTimerInterval = null; }
   if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
-  updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.score = roomScore; res.finished = true; } });
-  const room = getRoom(currentRoom);
-  const allDone = room.players.every(p => room.results[p.username] && room.results[p.username].finished);
-  if (allDone) { updateRoom(currentRoom, r => r.status = 'finished'); showRoomResults(); }
+  const result = await api('/api/rooms/' + currentRoom + '/finish', { username: currentUser, score: roomScore });
+  await fetchRoom(currentRoom);
+  if (result.allDone) { showRoomResults(); }
   else if (isRoomHost) { showWaitingForResultsHost(); }
   else { showWaitingForResults(); }
 }
@@ -3610,7 +3631,8 @@ function showWaitingForResults() {
     + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.1rem;color:#ffd86b;margin-bottom:8px;">Score: ' + roomScore + '</div>'
     + '<div style="font-family:\'Space Mono\',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);"><span class="lobby-waiting-dots">Waiting for other players</span></div>'
     + '</div>';
-  roomPollInterval = setInterval(() => {
+  roomPollInterval = setInterval(async () => {
+    await fetchRoom(currentRoom);
     const r = getRoom(currentRoom);
     if (!r) return;
     if (r.status === 'finished') { clearInterval(roomPollInterval); roomPollInterval = null; showRoomResults(); }
@@ -3627,7 +3649,8 @@ function showWaitingForResultsHost() {
     + '<div id="host-wait-count" style="font-family:\'Space Mono\',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:16px;">' + finished + '/' + room.players.length + ' players done</div>'
     + '<button class="room-btn-primary" style="max-width:300px;margin:0 auto;" onclick="forceEndRoomGame()">End Game Now</button>'
     + '</div>';
-  roomPollInterval = setInterval(() => {
+  roomPollInterval = setInterval(async () => {
+    await fetchRoom(currentRoom);
     const r = getRoom(currentRoom);
     if (!r) return;
     const done = r.players.filter(p => r.results[p.username] && r.results[p.username].finished).length;
@@ -3635,16 +3658,18 @@ function showWaitingForResultsHost() {
     if (countEl) countEl.textContent = done + '/' + r.players.length + ' players done';
     if (r.players.every(p => r.results[p.username] && r.results[p.username].finished)) {
       clearInterval(roomPollInterval); roomPollInterval = null;
-      updateRoom(currentRoom, rx => rx.status = 'finished');
+      await api('/api/rooms/' + currentRoom + '/end');
+      await fetchRoom(currentRoom);
       showRoomResults();
     }
   }, 500);
 }
 
-function forceEndRoomGame() {
+async function forceEndRoomGame() {
   playClick();
   if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
-  updateRoom(currentRoom, r => r.status = 'finished');
+  await api('/api/rooms/' + currentRoom + '/end');
+  await fetchRoom(currentRoom);
   showRoomResults();
 }
 
@@ -3748,20 +3773,24 @@ function leaveRoom() {
 }
 
 // --- Room Invite Checking (runs on start screen) ---
-function checkRoomInvites() {
+async function checkRoomInvites() {
   if (!currentUser) return;
-  const key = 'mathMadness_roomInvites_' + currentUser;
-  let inv = JSON.parse(localStorage.getItem(key) || '[]');
-  // Remove expired (>10min)
-  inv = inv.filter(i => Date.now() - i.timestamp < 600000);
-  localStorage.setItem(key, JSON.stringify(inv));
-  if (inv.length === 0) return;
-  const latest = inv[inv.length - 1];
+  try {
+    const res = await fetch('/api/invites/' + currentUser);
+    const inv = await res.json();
+    if (!inv || inv.length === 0) return;
+    const latest = inv[inv.length - 1];
+    const room = await fetchRoom(latest.roomCode);
+    if (!room || room.status !== 'waiting') {
+      apiDelete('/api/invites/' + currentUser + '/' + latest.roomCode);
+      return;
+    }
+  } catch(e) { return; }
+  const inv2 = await (await fetch('/api/invites/' + currentUser)).json();
+  if (!inv2 || inv2.length === 0) return;
+  const latest = inv2[inv2.length - 1];
   const room = getRoom(latest.roomCode);
-  if (!room || room.status !== 'waiting') {
-    localStorage.setItem(key, JSON.stringify(inv.filter(i => i.roomCode !== latest.roomCode)));
-    return;
-  }
+  if (!room) return;
   // Don't show popup if already in a room
   if (currentRoom) return;
   const popup = document.getElementById('room-invite-popup');
@@ -3777,14 +3806,15 @@ function checkRoomInvites() {
   popup.classList.add('active');
 }
 
-function acceptRoomInvite(code) {
+async function acceptRoomInvite(code) {
   playClick();
   document.getElementById('room-invite-popup').classList.remove('active');
   clearRoomInvite(code);
-  const room = getRoom(code);
+  const room = await fetchRoom(code);
   if (!room || room.status !== 'waiting') return;
   if (!room.players.find(p => p.username === currentUser)) {
-    updateRoom(code, r => r.players.push({ username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId, status: 'joined' }));
+    await api('/api/rooms/' + code + '/join', { username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId });
+    await fetchRoom(code);
   }
   currentRoom = code; isRoomHost = false; isRoomMode = true;
   document.getElementById('room-overlay').classList.add('active');
@@ -3798,9 +3828,7 @@ function declineRoomInvite(code) {
 }
 
 function clearRoomInvite(code) {
-  const key = 'mathMadness_roomInvites_' + currentUser;
-  let inv = JSON.parse(localStorage.getItem(key) || '[]');
-  localStorage.setItem(key, JSON.stringify(inv.filter(i => i.roomCode !== code)));
+  apiDelete('/api/invites/' + currentUser + '/' + code);
 }
 </script>
 </body>

@@ -30,7 +30,8 @@ deploy:
 		--region $(REGION) \
 		--project $(PROJECT_ID) \
 		--allow-unauthenticated \
-		--port 8080
+		--port 8080 \
+		--max-instances 1
 
 # Local build target
 .PHONY: build-local

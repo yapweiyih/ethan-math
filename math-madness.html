@@ -907,6 +907,479 @@
   .help-result.wrong { color: #ff4466; }
   .help-result.correct { color: #7fffb2; }
 
+  /* PLAYER ID BADGE */
+  #player-id-badge {
+    position: absolute;
+    top: 18px; left: 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.06);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    letter-spacing: 0.05em;
+    z-index: 10;
+  }
+  #player-id-badge span { color: rgba(255,216,107,0.7); }
+
+  /* PLAYER INFO PANEL */
+  .player-info-section {
+    text-align: left;
+    margin-bottom: 14px;
+  }
+  .player-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+  }
+  .player-info-row:last-child { border-bottom: none; }
+  .player-info-label { color: rgba(255,255,255,0.45); font-size: 0.75rem; }
+  .player-info-value { color: #ffd86b; font-weight: bold; }
+  .player-info-input {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    outline: none;
+    width: 140px;
+    transition: border-color 0.2s;
+  }
+  .player-info-input:focus { border-color: var(--accent); }
+  .copy-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+  /* START SCREEN SECONDARY BUTTONS ROW */
+  .start-secondary-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* FRIENDS OVERLAY */
+  #friends-overlay {
+    display: none; position: fixed; inset: 0; z-index: 350;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #friends-overlay.active { display: flex; }
+  #friends-panel {
+    background: linear-gradient(135deg,#1e0a3a,#12213f);
+    border: 1.5px solid rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 24px; width: 420px; max-width: 90vw;
+    animation: goIn 0.25s ease;
+    max-height: 85vh;
+    display: flex; flex-direction: column;
+  }
+  .friends-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 15px;
+  }
+  .friends-header h2 {
+    font-family: 'Boogaloo', cursive; color: var(--accent);
+    font-size: 2rem; margin: 0; text-shadow: 0 0 12px var(--accent);
+  }
+  .friends-tabs {
+    display: flex; gap: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 4px;
+    margin-bottom: 14px;
+  }
+  .friends-tab {
+    flex: 1;
+    font-family: 'Boogaloo', cursive; font-size: 1.1rem;
+    padding: 10px 0; border: none; border-radius: 10px;
+    background: transparent; color: rgba(255,255,255,0.5);
+    cursor: pointer; transition: background 0.2s, color 0.2s;
+  }
+  .friends-tab.active {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 0 16px rgba(255,107,255,0.4);
+  }
+  .friends-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
+  .friends-content {
+    flex: 1; overflow-y: auto; min-height: 200px;
+  }
+  .friends-empty {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 200px;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Boogaloo', cursive;
+  }
+  .friends-empty-icon {
+    font-size: 3rem; margin-bottom: 10px;
+    opacity: 0.3;
+  }
+  .friends-empty p { font-size: 1.1rem; text-align: center; line-height: 1.5; }
+  .friend-item {
+    background: rgba(255,255,255,0.08); border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Space Mono', monospace;
+  }
+  .friend-name { color: #fff; font-size: 0.95rem; font-weight: bold; }
+  .friend-id { color: rgba(255,255,255,0.4); font-size: 0.7rem; }
+  .friend-action-btn {
+    font-family: 'Boogaloo', cursive; font-size: 0.9rem;
+    padding: 6px 14px; border: none; border-radius: 20px;
+    cursor: pointer; transition: transform 0.12s;
+  }
+  .friend-action-btn:hover { transform: scale(1.08); }
+  .friend-accept { background: #7fffb2; color: #1a0533; }
+  .friend-decline { background: rgba(255,68,102,0.3); color: #ff4466; margin-left: 6px; }
+  .friend-remove { background: rgba(255,68,102,0.2); color: #ff4466; }
+  .friend-pending { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+
+  /* REQUEST SUB-TABS */
+  .request-subtabs {
+    display: flex; gap: 0; margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .request-subtab {
+    flex: 1; font-family: 'Boogaloo', cursive; font-size: 1rem;
+    padding: 8px 0; border: none; background: transparent;
+    color: rgba(255,255,255,0.4); cursor: pointer;
+    transition: color 0.2s; border-bottom: 2px solid transparent;
+  }
+  .request-subtab.active {
+    color: var(--accent); border-bottom-color: var(--accent);
+  }
+  .request-subtab:hover:not(.active) { color: rgba(255,255,255,0.7); }
+
+  /* ADD FRIEND INPUT */
+  .add-friend-wrap {
+    display: flex; gap: 8px; margin-bottom: 14px;
+  }
+  .add-friend-wrap input {
+    flex: 1;
+    font-family: 'Space Mono', monospace; font-size: 0.85rem;
+    padding: 10px 12px;
+    border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px;
+    background: rgba(255,255,255,0.06); color: #fff;
+    outline: none; transition: border-color 0.2s;
+  }
+  .add-friend-wrap input:focus { border-color: var(--accent); }
+  .add-friend-wrap input::placeholder { color: rgba(255,255,255,0.3); }
+  .add-friend-send {
+    font-family: 'Boogaloo', cursive; font-size: 1rem;
+    padding: 10px 18px; border: none; border-radius: 10px;
+    background: var(--accent); color: #fff; cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .add-friend-send:hover { transform: scale(1.06); }
+  .add-friend-msg {
+    font-family: 'Space Mono', monospace; font-size: 0.75rem;
+    min-height: 1.2em; margin-bottom: 8px;
+    text-align: center;
+  }
+  .add-friend-msg.error { color: #ff4466; }
+  .add-friend-msg.success { color: #7fffb2; }
+  .outgoing-label {
+    font-family: 'Boogaloo', cursive; font-size: 0.95rem;
+    color: rgba(255,255,255,0.4); margin: 10px 0 6px;
+  }
+
+  /* ─── ROOM SYSTEM ─── */
+  /* Mode selection overlay */
+  #mode-select-overlay {
+    display:none; position:fixed; inset:0; z-index:350;
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(6px);
+    align-items:center; justify-content:center;
+  }
+  #mode-select-overlay.active { display:flex; }
+  .mode-panel {
+    background:linear-gradient(135deg,#1e0a3a,#12213f);
+    border:1.5px solid rgba(255,255,255,0.15); border-radius:20px;
+    padding:28px 32px; width:380px; max-width:90vw;
+    text-align:center; animation:goIn 0.25s ease;
+  }
+  .mode-panel h2 {
+    font-family:'Boogaloo',cursive; font-size:1.8rem;
+    color:var(--accent); margin-bottom:0.8em;
+    text-shadow:0 0 14px var(--accent);
+  }
+  .mode-card {
+    font-family:'Boogaloo',cursive; font-size:1.3rem;
+    padding:20px; border:1.5px solid rgba(255,255,255,0.2);
+    border-radius:14px; background:rgba(255,255,255,0.06);
+    color:rgba(255,255,255,0.85); cursor:pointer; width:100%;
+    margin-bottom:12px; transition:transform 0.12s, background 0.15s, box-shadow 0.15s;
+    display:flex; align-items:center; gap:14px; text-align:left;
+  }
+  .mode-card:hover { transform:scale(1.04); background:rgba(255,255,255,0.12); box-shadow:0 0 20px rgba(255,107,255,0.2); }
+  .mode-card-icon { font-size:2rem; }
+  .mode-card-desc { font-size:0.8rem; color:rgba(255,255,255,0.45); font-family:'Space Mono',monospace; margin-top:4px; }
+
+  /* Room overlay (host/join/setup/invite/lobby all render here) */
+  #room-overlay {
+    display:none; position:fixed; inset:0; z-index:360;
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);
+    align-items:center; justify-content:center;
+  }
+  #room-overlay.active { display:flex; }
+  #room-panel {
+    background:linear-gradient(135deg,#1e0a3a,#12213f);
+    border:1.5px solid rgba(255,255,255,0.15); border-radius:20px;
+    padding:24px 28px; width:480px; max-width:92vw; max-height:88vh;
+    overflow-y:auto; animation:goIn 0.25s ease;
+  }
+  .room-header {
+    display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;
+  }
+  .room-header h2 {
+    font-family:'Boogaloo',cursive; color:var(--accent); font-size:1.7rem;
+    margin:0; text-shadow:0 0 12px var(--accent);
+  }
+  .room-back-btn {
+    background:transparent; border:none; cursor:pointer; fill:#fff;
+    transition:transform 0.15s;
+  }
+  .room-back-btn:hover { transform:scale(1.15); }
+
+  /* Room setup form */
+  .room-form-group {
+    margin-bottom:16px;
+  }
+  .room-form-label {
+    font-family:'Boogaloo',cursive; font-size:1rem;
+    color:rgba(255,255,255,0.6); margin-bottom:6px; display:block;
+  }
+  .room-toggle-group {
+    display:flex; gap:4px; background:rgba(255,255,255,0.06);
+    border-radius:10px; padding:3px;
+  }
+  .room-toggle-opt {
+    flex:1; font-family:'Boogaloo',cursive; font-size:0.95rem;
+    padding:8px 0; border:none; border-radius:8px;
+    background:transparent; color:rgba(255,255,255,0.5);
+    cursor:pointer; transition:all 0.2s; text-align:center;
+  }
+  .room-toggle-opt.active {
+    background:var(--accent); color:#fff;
+    box-shadow:0 0 12px rgba(255,107,255,0.4);
+  }
+  .room-input {
+    width:100%; font-family:'Space Mono',monospace; font-size:0.9rem;
+    padding:10px 14px; border:1.5px solid rgba(255,255,255,0.2);
+    border-radius:10px; background:rgba(255,255,255,0.06);
+    color:#fff; outline:none; transition:border-color 0.2s;
+  }
+  .room-input:focus { border-color:var(--accent); }
+  .room-input::placeholder { color:rgba(255,255,255,0.3); }
+  .room-slider-wrap {
+    display:flex; align-items:center; gap:12px;
+  }
+  .room-slider-wrap input[type=range] {
+    flex:1; -webkit-appearance:none; appearance:none;
+    height:6px; border-radius:3px; background:rgba(255,255,255,0.2); outline:none;
+  }
+  .room-slider-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background:var(--accent); cursor:pointer; box-shadow:0 0 8px var(--accent);
+  }
+  .room-slider-val {
+    font-family:'Space Mono',monospace; font-size:0.85rem;
+    color:#ffd86b; min-width:40px; text-align:right;
+  }
+  .room-btn-primary {
+    font-family:'Boogaloo',cursive; font-size:1.3rem;
+    padding:12px 36px; border:none; border-radius:50px;
+    background:var(--accent); color:#fff; cursor:pointer;
+    box-shadow:0 0 24px rgba(255,107,255,0.4);
+    transition:transform 0.15s; width:100%; margin-top:8px;
+  }
+  .room-btn-primary:hover { transform:scale(1.05); }
+  .room-btn-secondary {
+    font-family:'Boogaloo',cursive; font-size:1rem;
+    padding:10px 24px; border:1.5px solid rgba(255,255,255,0.25);
+    border-radius:50px; background:rgba(255,255,255,0.08);
+    color:rgba(255,255,255,0.8); cursor:pointer;
+    transition:transform 0.12s, background 0.15s; width:100%; margin-top:6px;
+  }
+  .room-btn-secondary:hover { transform:scale(1.04); background:rgba(255,255,255,0.15); }
+  .room-divider {
+    border:none; border-top:1px solid rgba(255,255,255,0.1);
+    margin:16px 0;
+  }
+  .room-code-display {
+    font-family:'Space Mono',monospace; font-size:2rem; font-weight:bold;
+    color:#ffd86b; text-align:center; letter-spacing:0.2em;
+    padding:12px; background:rgba(255,216,107,0.08);
+    border:1.5px dashed rgba(255,216,107,0.3); border-radius:12px;
+    margin:10px 0; user-select:all;
+  }
+
+  /* Invite list */
+  .invite-player-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 12px; margin-bottom:6px;
+    background:rgba(255,255,255,0.06); border-radius:10px;
+    font-family:'Space Mono',monospace;
+  }
+  .invite-player-name { color:#fff; font-size:0.9rem; font-weight:bold; }
+  .invite-player-id { color:rgba(255,255,255,0.4); font-size:0.7rem; }
+  .invite-btn {
+    font-family:'Boogaloo',cursive; font-size:0.85rem;
+    padding:5px 14px; border:none; border-radius:16px;
+    background:var(--accent); color:#fff; cursor:pointer;
+    transition:transform 0.12s;
+  }
+  .invite-btn:hover { transform:scale(1.08); }
+  .invite-btn.sent { background:rgba(127,255,178,0.2); color:#7fffb2; cursor:default; }
+
+  /* Lobby */
+  .lobby-players {
+    display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; min-height:60px;
+    justify-content:center;
+  }
+  .lobby-player-chip {
+    font-family:'Boogaloo',cursive; font-size:0.95rem;
+    padding:8px 16px; border-radius:20px;
+    background:rgba(127,255,178,0.12); border:1px solid rgba(127,255,178,0.3);
+    color:#7fffb2;
+  }
+  .lobby-player-chip.host { background:rgba(255,216,107,0.12); border-color:rgba(255,216,107,0.3); color:#ffd86b; }
+  .lobby-status {
+    font-family:'Space Mono',monospace; font-size:0.8rem;
+    color:rgba(255,255,255,0.4); text-align:center; margin:8px 0;
+  }
+  .lobby-waiting-dots::after {
+    content:''; animation:dots 1.5s infinite;
+  }
+  @keyframes dots {
+    0%,20% { content:''; } 30%,40% { content:'.'; } 50%,60% { content:'..'; } 70%,100% { content:'...'; }
+  }
+
+  /* Room game HUD */
+  #room-hud {
+    position:fixed; top:0; left:0; right:0; z-index:30;
+    display:none; align-items:center; justify-content:space-between;
+    padding:8px 20px; background:rgba(0,0,0,0.4); backdrop-filter:blur(6px);
+  }
+  #room-hud.active { display:flex; }
+  .room-hud-left, .room-hud-right {
+    display:flex; align-items:center; gap:14px;
+  }
+  .room-hud-q {
+    font-family:'Boogaloo',cursive; font-size:1rem; color:rgba(255,255,255,0.6);
+  }
+  .room-hud-score {
+    font-family:'Boogaloo',cursive; font-size:1.1rem; color:#ffd86b;
+  }
+  .room-hud-timer {
+    font-family:'Space Mono',monospace; font-size:0.9rem; color:#7fffb2;
+  }
+
+  /* Room results */
+  #room-results-overlay {
+    display:none; position:fixed; inset:0; z-index:400;
+    background:rgba(26,5,51,0.97); backdrop-filter:blur(8px);
+    align-items:center; justify-content:center; overflow-y:auto;
+  }
+  #room-results-overlay.active { display:flex; }
+  #room-results-panel {
+    padding:28px; width:560px; max-width:94vw; max-height:90vh; overflow-y:auto;
+    animation:goIn 0.3s ease;
+  }
+  .results-title {
+    font-family:'Boogaloo',cursive; font-size:2.2rem;
+    color:var(--accent); text-align:center; margin-bottom:4px;
+    text-shadow:0 0 20px var(--accent);
+  }
+  .results-winner {
+    font-family:'Boogaloo',cursive; font-size:1.4rem;
+    color:#ffd86b; text-align:center; margin-bottom:16px;
+  }
+  .results-card {
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px; padding:16px; margin-bottom:12px;
+  }
+  .results-card h3 {
+    font-family:'Boogaloo',cursive; font-size:1.2rem; color:#fff; margin-bottom:10px;
+  }
+  .results-stat-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:4px 0; font-family:'Space Mono',monospace; font-size:0.8rem;
+    color:rgba(255,255,255,0.6);
+  }
+  .results-stat-val { color:#ffd86b; font-weight:bold; }
+  /* Pie chart */
+  .pie-wrap { display:flex; align-items:center; justify-content:center; gap:20px; margin:12px 0; }
+  .pie-chart {
+    width:100px; height:100px; border-radius:50%;
+    position:relative;
+  }
+  .pie-legend { font-family:'Space Mono',monospace; font-size:0.75rem; color:rgba(255,255,255,0.6); }
+  .pie-legend-item { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+  .pie-legend-dot { width:10px; height:10px; border-radius:50%; }
+  /* Wrong questions list */
+  .wrong-q-item {
+    font-family:'Space Mono',monospace; font-size:0.8rem;
+    padding:8px 10px; margin-bottom:4px; border-radius:8px;
+    background:rgba(255,68,102,0.08); color:rgba(255,255,255,0.7);
+    border-left:3px solid #ff4466;
+  }
+  .wrong-q-correct { color:#7fffb2; font-size:0.7rem; }
+  .results-leave-btn {
+    font-family:'Boogaloo',cursive; font-size:1.3rem;
+    padding:14px 40px; border:none; border-radius:50px;
+    background:#ff4466; color:#fff; cursor:pointer;
+    box-shadow:0 4px 20px rgba(255,68,102,0.4);
+    transition:transform 0.15s; width:100%; margin-top:14px;
+  }
+  .results-leave-btn:hover { transform:scale(1.05); }
+
+  /* Room invite notification */
+  #room-invite-popup {
+    display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    z-index:500; background:linear-gradient(135deg,#1e0a3a,#12213f);
+    border:2px solid var(--accent); border-radius:20px;
+    padding:24px 28px; width:340px; max-width:90vw;
+    text-align:center; animation:goIn 0.3s ease;
+    box-shadow:0 0 40px rgba(255,107,255,0.3);
+  }
+  #room-invite-popup.active { display:block; }
+  .invite-popup-title {
+    font-family:'Boogaloo',cursive; font-size:1.4rem; color:var(--accent); margin-bottom:6px;
+  }
+  .invite-popup-host {
+    font-family:'Space Mono',monospace; font-size:0.9rem; color:#ffd86b; margin-bottom:14px;
+  }
+  .invite-popup-details {
+    font-family:'Space Mono',monospace; font-size:0.75rem;
+    color:rgba(255,255,255,0.5); margin-bottom:14px; line-height:1.6;
+  }
+  .invite-popup-btns { display:flex; gap:10px; justify-content:center; }
+  .invite-popup-btns button {
+    font-family:'Boogaloo',cursive; font-size:1rem;
+    padding:10px 24px; border:none; border-radius:50px; cursor:pointer;
+    transition:transform 0.12s;
+  }
+  .invite-popup-btns button:hover { transform:scale(1.08); }
+  .invite-accept-btn { background:#7fffb2; color:#1a0533; }
+  .invite-reject-btn { background:rgba(255,68,102,0.3); color:#ff4466; }
+
 </style>
 </head>
 <body>
@@ -1040,6 +1513,7 @@
 </div>
 
 <div id="startscreen" style="display:none;">
+  <div id="player-id-badge">ID: <span id="player-id-display">----</span></div>
   <h1>MathError</h1>
   <div id="user-greeting"></div>
   <p>One equation is <span class="tag">WRONG</span>.<br>
@@ -1048,6 +1522,12 @@
   <p style="font-size:0.8rem; color:rgba(255,255,255,0.4);">Wrong answer = game over</p>
   <div class="start-buttons">
     <button class="start-btn-primary" onclick="startGame()">PLAY</button>
+  </div>
+  <div class="start-secondary-row">
+    <button class="start-btn-secondary" onclick="openFriends()" title="Friends">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Friends
+    </button>
     <button class="start-btn-secondary" onclick="openHistory()" title="History">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
       History
@@ -1071,6 +1551,64 @@
     <button class="menu-close" onclick="closeUserMenu()">Close</button>
   </div>
 </div>
+
+<!-- FRIENDS OVERLAY -->
+<div id="friends-overlay">
+  <div id="friends-panel">
+    <div class="friends-header">
+      <button onclick="closeFriends()" title="Return" style="background:transparent;border:none;cursor:pointer;fill:#fff;">
+        <svg viewBox="0 0 24 24" width="32" height="32"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <h2>Friends</h2>
+      <div style="width:32px"></div>
+    </div>
+    <div class="friends-tabs">
+      <button class="friends-tab active" id="friends-tab-list" onclick="switchFriendsTab('list')">Friends</button>
+      <button class="friends-tab" id="friends-tab-requests" onclick="switchFriendsTab('requests')">Requests</button>
+    </div>
+    <div class="friends-content" id="friends-content"></div>
+  </div>
+</div>
+
+<!-- MODE SELECTION OVERLAY -->
+<div id="mode-select-overlay">
+  <div class="mode-panel">
+    <h2>Choose Mode</h2>
+    <button class="mode-card" onclick="startClassicMode()">
+      <span class="mode-card-icon">⚡</span>
+      <div>Classic<div class="mode-card-desc">Solo — survive as long as you can</div></div>
+    </button>
+    <button class="mode-card" onclick="openRoomChoice()">
+      <span class="mode-card-icon">👥</span>
+      <div>Private Room<div class="mode-card-desc">Play with friends in a custom game</div></div>
+    </button>
+    <button class="room-btn-secondary" onclick="closeModeSelect()" style="margin-top:8px;">Cancel</button>
+  </div>
+</div>
+
+<!-- ROOM OVERLAY (dynamic content) -->
+<div id="room-overlay">
+  <div id="room-panel"></div>
+</div>
+
+<!-- ROOM GAME HUD -->
+<div id="room-hud">
+  <div class="room-hud-left">
+    <span class="room-hud-q" id="room-hud-q">Q 1/10</span>
+    <span class="room-hud-score" id="room-hud-score">Score: 0</span>
+  </div>
+  <div class="room-hud-right">
+    <span class="room-hud-timer" id="room-hud-timer">10s</span>
+  </div>
+</div>
+
+<!-- ROOM RESULTS -->
+<div id="room-results-overlay">
+  <div id="room-results-panel"></div>
+</div>
+
+<!-- ROOM INVITE POPUP -->
+<div id="room-invite-popup"></div>
 
 <script>
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
@@ -1112,6 +1650,54 @@ let isAnimating = false;
 let debugMode = false;
 let currentUser = null; // null = guest
 let authMode = 'login'; // 'login' or 'register'
+let currentPlayerId = null;
+let friendsTab = 'list'; // 'list' or 'requests'
+let requestSubTab = 'add'; // 'add' or 'incoming'
+
+// ─── PLAYER ID SYSTEM ───────────────────────────────────────────────────────
+function generatePlayerId() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let id = '';
+  for (let i = 0; i < 8; i++) id += chars[Math.floor(Math.random() * chars.length)];
+  return id;
+}
+
+function getPlayerIdForUser(username) {
+  const ids = JSON.parse(localStorage.getItem('mathMadness_playerIds') || '{}');
+  if (!ids[username]) {
+    ids[username] = generatePlayerId();
+    localStorage.setItem('mathMadness_playerIds', JSON.stringify(ids));
+  }
+  return ids[username];
+}
+
+function getUsernameByPlayerId(pid) {
+  const ids = JSON.parse(localStorage.getItem('mathMadness_playerIds') || '{}');
+  for (const [user, id] of Object.entries(ids)) {
+    if (id === pid.toUpperCase()) return user;
+  }
+  return null;
+}
+
+function getDisplayName(username) {
+  const names = JSON.parse(localStorage.getItem('mathMadness_displayNames') || '{}');
+  return names[username] || username;
+}
+
+function setDisplayName(username, name) {
+  const names = JSON.parse(localStorage.getItem('mathMadness_displayNames') || '{}');
+  names[username] = name;
+  localStorage.setItem('mathMadness_displayNames', JSON.stringify(names));
+}
+
+function updatePlayerIdBadge() {
+  const el = document.getElementById('player-id-display');
+  if (currentPlayerId) {
+    el.textContent = currentPlayerId;
+  } else {
+    el.textContent = 'Guest';
+  }
+}
 
 // ─── AUTH SYSTEM ─────────────────────────────────────────────────────────────
 function getUsers() {
@@ -1178,19 +1764,23 @@ function handleAuth() {
 
 function loginSuccess() {
   localStorage.setItem('mathMadness_currentUser', currentUser);
+  currentPlayerId = getPlayerIdForUser(currentUser);
   loadUserData();
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('startscreen').style.display = '';
   updateUserGreeting();
+  updatePlayerIdBadge();
 }
 
 function playAsGuest() {
   currentUser = null;
+  currentPlayerId = null;
   localStorage.removeItem('mathMadness_currentUser');
   loadUserData();
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('startscreen').style.display = '';
   updateUserGreeting();
+  updatePlayerIdBadge();
 }
 
 function logout() {
@@ -1207,9 +1797,10 @@ function logout() {
 function updateUserGreeting() {
   const el = document.getElementById('user-greeting');
   if (currentUser) {
+    const dname = getDisplayName(currentUser);
     const history = getUserHistory();
     const greeting = history.length > 0 ? 'Welcome back' : 'Welcome';
-    el.innerHTML = `${greeting}, <span>${currentUser}</span>!`;
+    el.innerHTML = `${greeting}, <span>${dname}</span>!`;
   } else {
     el.innerHTML = `Playing as <span>Guest</span>`;
   }
@@ -1218,10 +1809,10 @@ function updateUserGreeting() {
 // ─── USER MENU (HAMBURGER) ──────────────────────────────────────────────────
 function openUserMenu() {
   playClick();
-  // Reset to main menu view
   const content = document.getElementById('user-menu-content');
   content.innerHTML = currentUser
-    ? `<button class="menu-option" onclick="showChangePassword()">Change Password</button>
+    ? `<button class="menu-option" onclick="showPlayerInfo()">👤 Player Info</button>
+       <button class="menu-option" onclick="showChangePassword()">🔒 Change Password</button>
        <button class="menu-option danger" onclick="confirmLogout()">Logout</button>`
     : `<button class="menu-option danger" onclick="confirmLogout()">Switch User</button>`;
   document.getElementById('user-menu-overlay').classList.add('active');
@@ -1325,6 +1916,273 @@ function showSuccessPopup() {
   document.body.appendChild(popup);
 }
 
+// ─── PLAYER INFO ────────────────────────────────────────────────────────────
+function showPlayerInfo() {
+  if (!currentUser) return;
+  const dname = getDisplayName(currentUser);
+  const content = document.getElementById('user-menu-content');
+  content.innerHTML = `
+    <h2 style="font-family:'Boogaloo',cursive;font-size:1.4rem;color:var(--accent);margin-bottom:0.8em;">Player Info</h2>
+    <div class="player-info-section">
+      <div class="player-info-row">
+        <span class="player-info-label">Player ID</span>
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span class="player-info-value">${currentPlayerId}</span>
+          <button class="copy-btn" onclick="copyPlayerId()">Copy</button>
+        </span>
+      </div>
+      <div class="player-info-row">
+        <span class="player-info-label">Username</span>
+        <span class="player-info-value" style="color:rgba(255,255,255,0.6)">${currentUser}</span>
+      </div>
+      <div class="player-info-row">
+        <span class="player-info-label">Display Name</span>
+        <span style="display:flex;align-items:center;gap:6px;">
+          <input class="player-info-input" id="display-name-input" value="${dname}" maxlength="20">
+          <button class="copy-btn" onclick="saveDisplayNameFromInput()" style="background:var(--accent);color:#fff;border-color:var(--accent);">Save</button>
+        </span>
+      </div>
+    </div>
+    <div id="player-info-msg" style="font-family:'Space Mono',monospace;font-size:0.75rem;min-height:1.2em;margin-bottom:6px;text-align:center;"></div>
+    <div class="help-buttons">
+      <button class="help-btn-secondary" onclick="openUserMenu()">Back</button>
+    </div>`;
+  setTimeout(() => document.getElementById('display-name-input').focus(), 100);
+}
+
+function copyPlayerId() {
+  navigator.clipboard.writeText(currentPlayerId).then(() => {
+    const msg = document.getElementById('player-info-msg');
+    msg.textContent = 'Copied to clipboard!';
+    msg.style.color = '#7fffb2';
+    setTimeout(() => msg.textContent = '', 2000);
+  });
+}
+
+function saveDisplayNameFromInput() {
+  const input = document.getElementById('display-name-input');
+  const name = input.value.trim();
+  const msg = document.getElementById('player-info-msg');
+  if (!name || name.length < 1) {
+    msg.textContent = 'Name cannot be empty.';
+    msg.style.color = '#ff4466';
+    return;
+  }
+  setDisplayName(currentUser, name);
+  updateUserGreeting();
+  msg.textContent = 'Display name updated!';
+  msg.style.color = '#7fffb2';
+  setTimeout(() => msg.textContent = '', 2000);
+}
+
+// ─── FRIENDS SYSTEM ─────────────────────────────────────────────────────────
+function getFriendData() {
+  return JSON.parse(localStorage.getItem('mathMadness_friends') || '{}');
+}
+
+function saveFriendData(data) {
+  localStorage.setItem('mathMadness_friends', JSON.stringify(data));
+}
+
+function getUserFriends(username) {
+  const data = getFriendData();
+  if (!data[username]) data[username] = { friends: [], outgoing: [], incoming: [] };
+  return data[username];
+}
+
+function saveUserFriends(username, fdata) {
+  const data = getFriendData();
+  data[username] = fdata;
+  saveFriendData(data);
+}
+
+function openFriends() {
+  playClick();
+  friendsTab = 'list';
+  document.getElementById('friends-tab-list').classList.add('active');
+  document.getElementById('friends-tab-requests').classList.remove('active');
+  renderFriendsContent();
+  document.getElementById('friends-overlay').classList.add('active');
+}
+
+function closeFriends() {
+  playClick();
+  document.getElementById('friends-overlay').classList.remove('active');
+}
+
+function switchFriendsTab(tab) {
+  playClick();
+  friendsTab = tab;
+  document.getElementById('friends-tab-list').classList.toggle('active', tab === 'list');
+  document.getElementById('friends-tab-requests').classList.toggle('active', tab === 'requests');
+  if (tab === 'requests') requestSubTab = 'add';
+  renderFriendsContent();
+}
+
+function renderFriendsContent() {
+  const container = document.getElementById('friends-content');
+  if (!currentUser) {
+    container.innerHTML = '<div class="friends-empty"><p>Login to use Friends!</p></div>';
+    return;
+  }
+  if (friendsTab === 'list') {
+    renderFriendsList(container);
+  } else {
+    renderRequestsTab(container);
+  }
+}
+
+function renderFriendsList(container) {
+  const fdata = getUserFriends(currentUser);
+  if (fdata.friends.length === 0) {
+    container.innerHTML = `
+      <div class="friends-empty">
+        <div class="friends-empty-icon">+</div>
+        <p>No friends yet.<br>Add one now!</p>
+      </div>`;
+    return;
+  }
+  let html = '';
+  fdata.friends.forEach(friendUser => {
+    const dname = getDisplayName(friendUser);
+    const pid = getPlayerIdForUser(friendUser);
+    html += `<div class="friend-item">
+      <div><div class="friend-name">${dname}</div><div class="friend-id">ID: ${pid}</div></div>
+      <button class="friend-action-btn friend-remove" onclick="removeFriend('${friendUser}')">Remove</button>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderRequestsTab(container) {
+  let html = `<div class="request-subtabs">
+    <button class="request-subtab ${requestSubTab === 'add' ? 'active' : ''}" onclick="switchRequestSubTab('add')">Add</button>
+    <button class="request-subtab ${requestSubTab === 'incoming' ? 'active' : ''}" onclick="switchRequestSubTab('incoming')">Incoming</button>
+  </div>`;
+  if (requestSubTab === 'add') {
+    html += renderAddSection();
+  } else {
+    html += renderIncomingSection();
+  }
+  container.innerHTML = html;
+}
+
+function switchRequestSubTab(tab) {
+  playClick();
+  requestSubTab = tab;
+  renderFriendsContent();
+}
+
+function renderAddSection() {
+  const fdata = getUserFriends(currentUser);
+  let html = `
+    <div class="add-friend-wrap">
+      <input type="text" id="add-friend-input" placeholder="Enter friend's ID" autocomplete="off" maxlength="8">
+      <button class="add-friend-send" onclick="sendFriendRequest()">Send</button>
+    </div>
+    <div class="add-friend-msg" id="add-friend-msg"></div>`;
+  if (fdata.outgoing && fdata.outgoing.length > 0) {
+    html += '<div class="outgoing-label">Outgoing Requests</div>';
+    fdata.outgoing.forEach(targetUser => {
+      const dname = getDisplayName(targetUser);
+      const pid = getPlayerIdForUser(targetUser);
+      html += `<div class="friend-item">
+        <div><div class="friend-name">${dname}</div><div class="friend-id">ID: ${pid}</div></div>
+        <span class="friend-action-btn friend-pending">Pending</span>
+      </div>`;
+    });
+  }
+  return html;
+}
+
+function renderIncomingSection() {
+  const fdata = getUserFriends(currentUser);
+  if (!fdata.incoming || fdata.incoming.length === 0) {
+    return '<div class="friends-empty" style="min-height:120px;"><p style="font-size:0.95rem;">No incoming requests</p></div>';
+  }
+  let html = '';
+  fdata.incoming.forEach(fromUser => {
+    const dname = getDisplayName(fromUser);
+    const pid = getPlayerIdForUser(fromUser);
+    html += `<div class="friend-item">
+      <div><div class="friend-name">${dname}</div><div class="friend-id">ID: ${pid}</div></div>
+      <div>
+        <button class="friend-action-btn friend-accept" onclick="acceptFriend('${fromUser}')">Accept</button>
+        <button class="friend-action-btn friend-decline" onclick="declineFriend('${fromUser}')">Decline</button>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+function sendFriendRequest() {
+  playClick();
+  const input = document.getElementById('add-friend-input');
+  const msg = document.getElementById('add-friend-msg');
+  const pid = input.value.trim().toUpperCase();
+  if (!pid) { msg.className = 'add-friend-msg error'; msg.textContent = 'Enter a player ID.'; return; }
+  if (pid === currentPlayerId) { msg.className = 'add-friend-msg error'; msg.textContent = "You can't add yourself!"; return; }
+  const targetUser = getUsernameByPlayerId(pid);
+  if (!targetUser) { msg.className = 'add-friend-msg error'; msg.textContent = 'Player not found.'; return; }
+  const myData = getUserFriends(currentUser);
+  if (myData.friends.includes(targetUser)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Already friends!'; return; }
+  if (myData.outgoing.includes(targetUser)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Request already sent.'; return; }
+  // Check if they already sent us a request — auto-accept
+  if (myData.incoming.includes(targetUser)) {
+    acceptFriend(targetUser);
+    return;
+  }
+  // Add to my outgoing
+  myData.outgoing.push(targetUser);
+  saveUserFriends(currentUser, myData);
+  // Add to their incoming
+  const theirData = getUserFriends(targetUser);
+  if (!theirData.incoming.includes(currentUser)) theirData.incoming.push(currentUser);
+  saveUserFriends(targetUser, theirData);
+  msg.className = 'add-friend-msg success';
+  msg.textContent = 'Request sent!';
+  input.value = '';
+  setTimeout(() => renderFriendsContent(), 800);
+}
+
+function acceptFriend(fromUser) {
+  playClick();
+  const myData = getUserFriends(currentUser);
+  // Remove from my incoming
+  myData.incoming = myData.incoming.filter(u => u !== fromUser);
+  // Add to friends
+  if (!myData.friends.includes(fromUser)) myData.friends.push(fromUser);
+  saveUserFriends(currentUser, myData);
+  // Update their data
+  const theirData = getUserFriends(fromUser);
+  theirData.outgoing = theirData.outgoing.filter(u => u !== currentUser);
+  if (!theirData.friends.includes(currentUser)) theirData.friends.push(currentUser);
+  saveUserFriends(fromUser, theirData);
+  renderFriendsContent();
+}
+
+function declineFriend(fromUser) {
+  playClick();
+  const myData = getUserFriends(currentUser);
+  myData.incoming = myData.incoming.filter(u => u !== fromUser);
+  saveUserFriends(currentUser, myData);
+  const theirData = getUserFriends(fromUser);
+  theirData.outgoing = theirData.outgoing.filter(u => u !== currentUser);
+  saveUserFriends(fromUser, theirData);
+  renderFriendsContent();
+}
+
+function removeFriend(friendUser) {
+  playClick();
+  const myData = getUserFriends(currentUser);
+  myData.friends = myData.friends.filter(u => u !== friendUser);
+  saveUserFriends(currentUser, myData);
+  const theirData = getUserFriends(friendUser);
+  theirData.friends = theirData.friends.filter(u => u !== currentUser);
+  saveUserFriends(friendUser, theirData);
+  renderFriendsContent();
+}
+
 // ─── PASSWORD VISIBILITY TOGGLE ─────────────────────────────────────────────
 function togglePasswordVisibility() {
   const input = document.getElementById('auth-password');
@@ -1381,10 +2239,12 @@ function checkAutoLogin() {
     const users = getUsers();
     if (users[saved]) {
       currentUser = saved;
+      currentPlayerId = getPlayerIdForUser(saved);
       loadUserData();
       document.getElementById('auth-screen').classList.add('hidden');
       document.getElementById('startscreen').style.display = '';
       updateUserGreeting();
+      updatePlayerIdBadge();
       return;
     }
   }
@@ -1857,7 +2717,7 @@ function restartGame() {
 
 function goHome() {
   // Save abandoned game if mid-game with score > 0
-  if (score > 0 && document.getElementById('startscreen').style.display === 'none') {
+  if (score > 0 && !isRoomMode && document.getElementById('startscreen').style.display === 'none') {
     const record = { score: score, date: new Date().toLocaleString(), abandoned: true };
     let gameHistory = getUserHistory();
     gameHistory.unshift(record);
@@ -1872,6 +2732,15 @@ function goHome() {
   document.getElementById('settings-overlay').classList.remove('active');
   document.getElementById('confirm-overlay').classList.remove('active');
   document.getElementById('help-overlay').classList.remove('active');
+  document.getElementById('friends-overlay').classList.remove('active');
+  document.getElementById('mode-select-overlay').classList.remove('active');
+  document.getElementById('room-overlay').classList.remove('active');
+  document.getElementById('room-hud').classList.remove('active');
+  document.getElementById('room-results-overlay').classList.remove('active');
+  document.getElementById('room-invite-popup').classList.remove('active');
+  document.getElementById('hud').style.display = '';
+  document.getElementById('timer-wrap').style.display = '';
+  document.getElementById('instruction').style.display = '';
   document.getElementById('lightbulb-btn').classList.remove('hidden');
   document.getElementById('polka-layer').innerHTML = '';
   document.body.classList.remove('vibrating');
@@ -1879,10 +2748,26 @@ function goHome() {
   document.getElementById('grid').innerHTML = '';
   document.getElementById('startscreen').style.display = '';
   gamePaused = false;
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  if (roomTimerInterval) { clearInterval(roomTimerInterval); roomTimerInterval = null; }
+  currentRoom = null;
+  isRoomMode = false;
+  isRoomHost = false;
 }
 
 function startGame() {
   playClick();
+  document.getElementById('mode-select-overlay').classList.add('active');
+}
+
+function closeModeSelect() {
+  playClick();
+  document.getElementById('mode-select-overlay').classList.remove('active');
+}
+
+function startClassicMode() {
+  playClick();
+  document.getElementById('mode-select-overlay').classList.remove('active');
   document.getElementById('startscreen').style.display = 'none';
   lastDiffName = '';
   buildLevel();
@@ -2116,6 +3001,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   checkAutoLogin();
   initMathBg();
+  // Periodically check for room invites on start screen
+  setInterval(() => {
+    if (document.getElementById('startscreen').style.display !== 'none' && currentUser) {
+      checkRoomInvites();
+    }
+  }, 3000);
 });
 
 // ─── FLOATING MATH BACKGROUND ──────────────────────────────────────────────
@@ -2153,6 +3044,763 @@ function spawnMathFloat(bg) {
     opacity: ${0.03 + Math.random() * 0.06};
   `;
   bg.appendChild(el);
+}
+
+// ─── ROOM SYSTEM ────────────────────────────────────────────────────────────
+let currentRoom = null;
+let isRoomMode = false;
+let isRoomHost = false;
+let roomPollInterval = null;
+let roomTimerInterval = null;
+let roomCurrentQ = 0;
+let roomScore = 0;
+let roomAnswers = [];
+let roomLiveWaiting = false;
+
+// --- Room Data ---
+function getAllRooms() { return JSON.parse(localStorage.getItem('mathMadness_rooms') || '{}'); }
+function saveAllRooms(rooms) { localStorage.setItem('mathMadness_rooms', JSON.stringify(rooms)); }
+function getRoom(code) { return getAllRooms()[code] || null; }
+function updateRoom(code, fn) {
+  const rooms = getAllRooms();
+  if (!rooms[code]) return null;
+  fn(rooms[code]);
+  saveAllRooms(rooms);
+  return rooms[code];
+}
+
+function generateRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const rooms = getAllRooms();
+  let code;
+  do { code = ''; for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)]; } while (rooms[code]);
+  return code;
+}
+
+function getDiffLevel(diff) {
+  return { easy: 2, medium: 7, hard: 15, expert: 25, brutal: 40 }[diff] || 2;
+}
+
+function getRoomGridSize(diff) {
+  return { easy: [2,2], medium: [2,2], hard: [3,3], expert: [3,3], brutal: [4,4] }[diff] || [2,2];
+}
+
+function generateRoomQuestions(numQ, difficulty) {
+  const lvl = getDiffLevel(difficulty);
+  const [rows, cols] = getRoomGridSize(difficulty);
+  const questions = [];
+  for (let q = 0; q < numQ; q++) {
+    const total = rows * cols;
+    const wIdx = randInt(0, total - 1);
+    const eqs = [];
+    for (let j = 0; j < total; j++) {
+      const isW = (j === wIdx);
+      const eq = makeEquation(lvl, !isW);
+      eqs.push({ display: eq.display, isWrong: isW });
+    }
+    questions.push({ equations: eqs, gridRows: rows, gridCols: cols, wrongIdx: wIdx });
+  }
+  return questions;
+}
+
+// --- UI: Room Choice (Host / Join) ---
+function openRoomChoice() {
+  playClick();
+  document.getElementById('mode-select-overlay').classList.remove('active');
+  const panel = document.getElementById('room-panel');
+  panel.innerHTML = `
+    <div class="room-header">
+      <button class="room-back-btn" onclick="backToModeSelect()">
+        <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg>
+      </button>
+      <h2>Private Room</h2>
+      <div style="width:28px"></div>
+    </div>
+    <button class="mode-card" onclick="showHostSetup()">
+      <span class="mode-card-icon">🏠</span>
+      <div>Host Room<div class="mode-card-desc">Create and customize your own game</div></div>
+    </button>
+    <button class="mode-card" onclick="showJoinRoom()">
+      <span class="mode-card-icon">🚪</span>
+      <div>Join Room<div class="mode-card-desc">Enter a room code to join a game</div></div>
+    </button>`;
+  document.getElementById('room-overlay').classList.add('active');
+}
+
+function backToModeSelect() {
+  playClick();
+  document.getElementById('room-overlay').classList.remove('active');
+  document.getElementById('mode-select-overlay').classList.add('active');
+}
+
+function closeRoomOverlay() {
+  playClick();
+  document.getElementById('room-overlay').classList.remove('active');
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+}
+
+// --- UI: Join Room ---
+function showJoinRoom() {
+  playClick();
+  if (!currentUser) { showRoomLoginRequired(); return; }
+  const panel = document.getElementById('room-panel');
+  panel.innerHTML = `
+    <div class="room-header">
+      <button class="room-back-btn" onclick="openRoomChoice()">
+        <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg>
+      </button>
+      <h2>Join Room</h2>
+      <div style="width:28px"></div>
+    </div>
+    <p style="font-family:'Space Mono',monospace;font-size:0.85rem;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:16px;">
+      Enter the 6-character room code
+    </p>
+    <input class="room-input" type="text" id="join-room-code" placeholder="Room Code" maxlength="6" autocomplete="off"
+      style="text-align:center;font-size:1.4rem;letter-spacing:0.15em;text-transform:uppercase;">
+    <div id="join-room-error" style="font-family:'Space Mono',monospace;font-size:0.8rem;color:#ff4466;min-height:1.2em;margin:8px 0;text-align:center;"></div>
+    <button class="room-btn-primary" onclick="submitJoinRoom()">Join</button>`;
+  setTimeout(() => {
+    const inp = document.getElementById('join-room-code');
+    inp.focus();
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitJoinRoom(); });
+  }, 100);
+}
+
+function submitJoinRoom() {
+  playClick();
+  const code = document.getElementById('join-room-code').value.trim().toUpperCase();
+  const err = document.getElementById('join-room-error');
+  if (!code || code.length < 6) { err.textContent = 'Enter a valid 6-character code.'; return; }
+  const room = getRoom(code);
+  if (!room) { err.textContent = 'Room not found. Check the code.'; return; }
+  if (room.status !== 'waiting') { err.textContent = 'This room has already started or ended.'; return; }
+  if (room.players.find(p => p.username === currentUser)) {
+    currentRoom = code; isRoomHost = false; isRoomMode = true;
+    showLobby(); return;
+  }
+  updateRoom(code, r => {
+    r.players.push({ username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId, status: 'joined' });
+  });
+  currentRoom = code; isRoomHost = false; isRoomMode = true;
+  showLobby();
+}
+
+function showRoomLoginRequired() {
+  const panel = document.getElementById('room-panel');
+  panel.innerHTML = `
+    <div class="room-header">
+      <button class="room-back-btn" onclick="openRoomChoice()">
+        <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg>
+      </button>
+      <h2>Login Required</h2>
+      <div style="width:28px"></div>
+    </div>
+    <p style="font-family:'Space Mono',monospace;font-size:0.9rem;color:rgba(255,255,255,0.6);text-align:center;margin:20px 0;">
+      You need to be logged in to use Private Rooms.
+    </p>
+    <button class="room-btn-secondary" onclick="closeRoomOverlay()">OK</button>`;
+}
+
+// --- UI: Host Setup ---
+function showHostSetup() {
+  playClick();
+  if (!currentUser) { showRoomLoginRequired(); return; }
+  const panel = document.getElementById('room-panel');
+  panel.innerHTML = `
+    <div class="room-header">
+      <button class="room-back-btn" onclick="openRoomChoice()">
+        <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg>
+      </button>
+      <h2>Host Room</h2>
+      <div style="width:28px"></div>
+    </div>
+    <div class="room-form-group">
+      <span class="room-form-label">Mode</span>
+      <div class="room-toggle-group" id="room-mode-toggle">
+        <button class="room-toggle-opt active" data-val="individual" onclick="toggleRoomOpt(this,'room-mode-toggle')">Individual</button>
+        <button class="room-toggle-opt" data-val="team" onclick="toggleRoomOpt(this,'room-mode-toggle')">Team</button>
+      </div>
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:4px;font-family:'Space Mono',monospace;" id="room-mode-desc">
+        Each player competes for themselves
+      </div>
+    </div>
+    <div class="room-form-group">
+      <span class="room-form-label">Play Style</span>
+      <div class="room-toggle-group" id="room-style-toggle">
+        <button class="room-toggle-opt active" data-val="self-paced" onclick="toggleRoomOpt(this,'room-style-toggle')">Self-Paced</button>
+        <button class="room-toggle-opt" data-val="live" onclick="toggleRoomOpt(this,'room-style-toggle')">Live</button>
+      </div>
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:4px;font-family:'Space Mono',monospace;" id="room-style-desc">
+        Players go at their own pace
+      </div>
+    </div>
+    <hr class="room-divider">
+    <span class="room-form-label" style="margin-bottom:12px;display:block;">⚙ Settings</span>
+    <div class="room-form-group">
+      <span class="room-form-label">Time per Question</span>
+      <div class="room-slider-wrap">
+        <input type="range" id="room-time-slider" min="5" max="30" value="10" step="5"
+          oninput="document.getElementById('room-time-val').textContent=this.value+'s'">
+        <span class="room-slider-val" id="room-time-val">10s</span>
+      </div>
+    </div>
+    <div class="room-form-group">
+      <span class="room-form-label">Difficulty</span>
+      <div class="room-toggle-group" id="room-diff-toggle">
+        <button class="room-toggle-opt active" data-val="easy" onclick="toggleRoomOpt(this,'room-diff-toggle')">Easy</button>
+        <button class="room-toggle-opt" data-val="medium" onclick="toggleRoomOpt(this,'room-diff-toggle')">Medium</button>
+        <button class="room-toggle-opt" data-val="hard" onclick="toggleRoomOpt(this,'room-diff-toggle')">Hard</button>
+      </div>
+    </div>
+    <div class="room-form-group">
+      <span class="room-form-label">Number of Questions</span>
+      <div class="room-slider-wrap">
+        <input type="range" id="room-numq-slider" min="5" max="30" value="10" step="5"
+          oninput="document.getElementById('room-numq-val').textContent=this.value">
+        <span class="room-slider-val" id="room-numq-val">10</span>
+      </div>
+    </div>
+    <button class="room-btn-primary" onclick="submitHostSetup()">Invite Players</button>`;
+}
+
+function toggleRoomOpt(btn, groupId) {
+  playClick();
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.room-toggle-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (groupId === 'room-mode-toggle') {
+    document.getElementById('room-mode-desc').textContent = btn.dataset.val === 'team'
+      ? 'Players split into teams — team with most points wins' : 'Each player competes for themselves';
+  }
+  if (groupId === 'room-style-toggle') {
+    document.getElementById('room-style-desc').textContent = btn.dataset.val === 'live'
+      ? 'Moderator controls when to show next question' : 'Players go at their own pace';
+  }
+}
+
+function getActiveToggleVal(groupId) {
+  const el = document.querySelector('#' + groupId + ' .room-toggle-opt.active');
+  return el ? el.dataset.val : null;
+}
+
+function submitHostSetup() {
+  playClick();
+  const mode = getActiveToggleVal('room-mode-toggle');
+  const playStyle = getActiveToggleVal('room-style-toggle');
+  const difficulty = getActiveToggleVal('room-diff-toggle');
+  const timePerQ = parseInt(document.getElementById('room-time-slider').value);
+  const numQ = parseInt(document.getElementById('room-numq-slider').value);
+  const code = generateRoomCode();
+  const questions = generateRoomQuestions(numQ, difficulty);
+  const room = {
+    code, host: currentUser, mode, playStyle,
+    settings: { timePerQuestion: timePerQ, difficulty, numQuestions: numQ },
+    isPublic: false,
+    players: [{ username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId, status: 'joined' }],
+    invites: [], status: 'waiting', currentQuestion: 0, questions, results: {}
+  };
+  const rooms = getAllRooms();
+  rooms[code] = room;
+  saveAllRooms(rooms);
+  currentRoom = code; isRoomHost = true; isRoomMode = true;
+  showInvitePlayers();
+}
+
+// --- UI: Invite Players ---
+function showInvitePlayers() {
+  playClick();
+  const room = getRoom(currentRoom);
+  const fdata = currentUser ? getUserFriends(currentUser) : { friends: [] };
+  let friendsHtml = '';
+  if (fdata.friends.length > 0) {
+    friendsHtml = '<div style="margin-top:14px;"><span class="room-form-label">Friends</span>';
+    fdata.friends.forEach(f => {
+      const dn = getDisplayName(f); const pid = getPlayerIdForUser(f);
+      const done = room.invites.includes(f) || room.players.find(p => p.username === f);
+      friendsHtml += '<div class="invite-player-item"><div><div class="invite-player-name">' + dn + '</div><div class="invite-player-id">ID: ' + pid + '</div></div>'
+        + (done ? '<span class="invite-btn sent">Invited ✓</span>' : '<button class="invite-btn" onclick="invitePlayer(\'' + f + '\',this)">Invite</button>')
+        + '</div>';
+    });
+    friendsHtml += '</div>';
+  } else {
+    friendsHtml = '<div style="text-align:center;color:rgba(255,255,255,0.35);font-family:\'Space Mono\',monospace;font-size:0.8rem;margin:14px 0;">No friends yet — share the room code!</div>';
+  }
+  const panel = document.getElementById('room-panel');
+  panel.innerHTML = '<div class="room-header">'
+    + '<button class="room-back-btn" onclick="showHostSetup()"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg></button>'
+    + '<h2>Invite Players</h2><div style="width:28px"></div></div>'
+    + '<div class="room-form-group"><span class="room-form-label">Search by Player ID</span>'
+    + '<div class="add-friend-wrap"><input type="text" id="invite-search-input" placeholder="Enter Player ID" autocomplete="off" maxlength="8">'
+    + '<button class="add-friend-send" onclick="inviteByPlayerId()">Invite</button></div>'
+    + '<div id="invite-search-msg" class="add-friend-msg"></div></div>'
+    + friendsHtml
+    + '<hr class="room-divider">'
+    + '<div class="room-form-group"><span class="room-form-label">Or share the Room Code</span>'
+    + '<div class="room-code-display">' + currentRoom + '</div>'
+    + '<button class="room-btn-secondary" onclick="toggleRoomPublic()" id="public-toggle-btn" style="font-size:0.9rem;">'
+    + (room.isPublic ? '🔓 Public Game' : '🔒 Make Public') + '</button></div>'
+    + '<button class="room-btn-primary" onclick="showLobby()">Next →</button>';
+  setTimeout(() => {
+    const inp = document.getElementById('invite-search-input');
+    if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') inviteByPlayerId(); });
+  }, 100);
+}
+
+function inviteByPlayerId() {
+  playClick();
+  const inp = document.getElementById('invite-search-input');
+  const msg = document.getElementById('invite-search-msg');
+  const pid = inp.value.trim().toUpperCase();
+  if (!pid) { msg.className = 'add-friend-msg error'; msg.textContent = 'Enter a player ID.'; return; }
+  if (pid === currentPlayerId) { msg.className = 'add-friend-msg error'; msg.textContent = "Can't invite yourself!"; return; }
+  const target = getUsernameByPlayerId(pid);
+  if (!target) { msg.className = 'add-friend-msg error'; msg.textContent = 'Player not found.'; return; }
+  const room = getRoom(currentRoom);
+  if (room.players.find(p => p.username === target)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Already in room.'; return; }
+  if (room.invites.includes(target)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Already invited.'; return; }
+  updateRoom(currentRoom, r => r.invites.push(target));
+  saveRoomInvite(target, currentRoom, currentUser);
+  msg.className = 'add-friend-msg success';
+  msg.textContent = 'Invited ' + getDisplayName(target) + '!';
+  inp.value = '';
+}
+
+function invitePlayer(friendUser, btn) {
+  playClick();
+  updateRoom(currentRoom, r => { if (!r.invites.includes(friendUser)) r.invites.push(friendUser); });
+  saveRoomInvite(friendUser, currentRoom, currentUser);
+  btn.textContent = 'Invited ✓'; btn.className = 'invite-btn sent'; btn.onclick = null;
+}
+
+function toggleRoomPublic() {
+  playClick();
+  updateRoom(currentRoom, r => r.isPublic = !r.isPublic);
+  const room = getRoom(currentRoom);
+  document.getElementById('public-toggle-btn').textContent = room.isPublic ? '🔓 Public Game' : '🔒 Make Public';
+}
+
+function saveRoomInvite(targetUser, roomCode, fromUser) {
+  const key = 'mathMadness_roomInvites_' + targetUser;
+  const inv = JSON.parse(localStorage.getItem(key) || '[]');
+  if (!inv.find(i => i.roomCode === roomCode)) {
+    inv.push({ roomCode, fromUser, fromName: getDisplayName(fromUser), timestamp: Date.now() });
+    localStorage.setItem(key, JSON.stringify(inv));
+  }
+}
+
+// --- UI: Lobby / Waiting Room ---
+function showLobby() {
+  playClick();
+  if (!getRoom(currentRoom)) return;
+  const renderLobby = () => {
+    const r = getRoom(currentRoom);
+    if (!r) return;
+    // Non-host: if game started, jump into game
+    if (r.status === 'playing' && !isRoomHost) {
+      clearInterval(roomPollInterval); roomPollInterval = null;
+      startRoomGameAsPlayer(); return;
+    }
+    let chips = '';
+    r.players.forEach(p => {
+      const h = p.username === r.host;
+      chips += '<div class="lobby-player-chip ' + (h ? 'host' : '') + '">' + (h ? '👑 ' : '') + p.displayName + '</div>';
+    });
+    const desc = r.settings.numQuestions + 'Q · ' + r.settings.difficulty + ' · ' + r.settings.timePerQuestion + 's · ' + r.mode + ' · ' + r.playStyle;
+    const panel = document.getElementById('room-panel');
+    panel.innerHTML = '<div class="room-header">'
+      + (isRoomHost ? '<button class="room-back-btn" onclick="showInvitePlayers()"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg></button>' : '<div style="width:28px"></div>')
+      + '<h2>Waiting Room</h2><div style="width:28px"></div></div>'
+      + '<div class="room-code-display" style="font-size:1.4rem;margin-bottom:6px;">' + currentRoom + '</div>'
+      + '<p style="font-family:\'Space Mono\',monospace;font-size:0.7rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;">' + desc + '</p>'
+      + '<span class="room-form-label" style="text-align:center;display:block;">Players (' + r.players.length + ')</span>'
+      + '<div class="lobby-players">' + chips + '</div>'
+      + '<div class="lobby-status">'
+      + (isRoomHost
+        ? (r.players.length < 2 ? '<span class="lobby-waiting-dots">Waiting for players to join</span>' : '✅ Ready to start!')
+        : '<span class="lobby-waiting-dots">Waiting for host to start</span>')
+      + '</div>'
+      + (isRoomHost ? '<button class="room-btn-primary" onclick="hostStartGame()"' + (r.players.length < 2 ? ' disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Start Game</button>' : '')
+      + '<button class="room-btn-secondary" onclick="leaveRoomFromLobby()" style="margin-top:8px;">Leave Room</button>';
+  };
+  renderLobby();
+  if (roomPollInterval) clearInterval(roomPollInterval);
+  roomPollInterval = setInterval(renderLobby, 1000);
+}
+
+function leaveRoomFromLobby() {
+  playClick();
+  if (currentRoom) {
+    if (isRoomHost) { const rooms = getAllRooms(); delete rooms[currentRoom]; saveAllRooms(rooms); }
+    else { updateRoom(currentRoom, r => { r.players = r.players.filter(p => p.username !== currentUser); }); }
+  }
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  currentRoom = null; isRoomMode = false; isRoomHost = false;
+  closeRoomOverlay();
+}
+
+// --- Game Start ---
+function hostStartGame() {
+  playClick();
+  const room = getRoom(currentRoom);
+  if (!room || room.players.length < 2) return;
+  updateRoom(currentRoom, r => {
+    if (r.mode === 'team') { r.players.forEach((p, i) => p.team = i % 2 === 0 ? 'Team A' : 'Team B'); }
+    r.status = 'playing'; r.currentQuestion = 0;
+    r.players.forEach(p => { r.results[p.username] = { score: 0, correct: 0, wrong: 0, answers: [], finished: false }; });
+  });
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  startRoomGameAsPlayer();
+}
+
+function startRoomGameAsPlayer() {
+  roomCurrentQ = 0; roomScore = 0; roomAnswers = []; roomLiveWaiting = false;
+  document.getElementById('room-overlay').classList.remove('active');
+  document.getElementById('startscreen').style.display = 'none';
+  document.getElementById('lightbulb-btn').classList.add('hidden');
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('instruction').style.display = 'none';
+  document.getElementById('timer-wrap').style.display = '';
+  document.getElementById('room-hud').classList.add('active');
+  document.body.style.background = 'linear-gradient(135deg, #1a0533 0%, #0d1f3c 100%)';
+  loadRoomQuestion(0);
+}
+
+// --- Room Game Logic ---
+function loadRoomQuestion(qIdx) {
+  const room = getRoom(currentRoom);
+  if (!room || qIdx >= room.questions.length) { finishRoomGame(); return; }
+  roomCurrentQ = qIdx; roomLiveWaiting = false;
+  const q = room.questions[qIdx];
+  // Update HUD
+  document.getElementById('room-hud-q').textContent = 'Q ' + (qIdx + 1) + '/' + room.questions.length;
+  document.getElementById('room-hud-score').textContent = 'Score: ' + roomScore;
+  // Build grid
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = 'repeat(' + q.gridCols + ', 1fr)';
+  grid.style.gridTemplateRows = 'repeat(' + q.gridRows + ', 1fr)';
+  q.equations.forEach((eq) => {
+    const card = document.createElement('div');
+    card.className = 'eq-card';
+    card.innerHTML = eq.display;
+    card.dataset.wrong = eq.isWrong ? '1' : '0';
+    card.addEventListener('click', () => { playClick(); handleRoomClick(eq.isWrong, card); });
+    grid.appendChild(card);
+  });
+  // Timer
+  const timeMs = room.settings.timePerQuestion * 1000;
+  const timerEl = document.getElementById('room-hud-timer');
+  timerEl.textContent = room.settings.timePerQuestion + 's';
+  const bar = document.getElementById('timer-bar');
+  document.getElementById('timer-wrap').style.display = '';
+  bar.style.transition = 'none'; bar.style.width = '100%'; bar.style.background = '#7fffb2';
+  if (roomTimerInterval) clearInterval(roomTimerInterval);
+  let timeLeft = timeMs;
+  roomTimerInterval = setInterval(() => {
+    timeLeft -= 50;
+    const pct = Math.max(0, timeLeft / timeMs * 100);
+    bar.style.transition = 'width 50ms linear'; bar.style.width = pct + '%';
+    const rv = Math.round(255 * (1 - pct / 100));
+    const gv = Math.round(200 * (pct / 100));
+    bar.style.background = 'rgb(' + (rv + 100) + ',' + (gv + 55) + ',80)';
+    timerEl.textContent = Math.ceil(Math.max(0, timeLeft) / 1000) + 's';
+    if (timeLeft <= 0) { clearInterval(roomTimerInterval); handleRoomTimeout(); }
+  }, 50);
+}
+
+function handleRoomClick(isWrong, card) {
+  if (roomLiveWaiting) return;
+  clearInterval(roomTimerInterval);
+  document.querySelectorAll('.eq-card').forEach(c => c.style.pointerEvents = 'none');
+  const room = getRoom(currentRoom);
+  if (isWrong) {
+    // Correct! (clicked the wrong equation)
+    let speedBonus = 0;
+    const secs = parseFloat(document.getElementById('room-hud-timer').textContent);
+    const totalSecs = room.settings.timePerQuestion;
+    if (secs > totalSecs * 0.7) speedBonus = 50;
+    else if (secs > totalSecs * 0.4) speedBonus = 25;
+    roomScore += 100 + speedBonus;
+    roomAnswers.push({ qIndex: roomCurrentQ, correct: true, speedBonus });
+    card.style.background = 'rgba(127,255,178,0.4)'; card.style.border = '2px solid #7fffb2'; card.style.transform = 'scale(1.1)';
+    if (speedBonus > 0) showSpeedBonus(speedBonus);
+    updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.score = roomScore; res.correct++; res.answers.push({ q: roomCurrentQ, correct: true }); } });
+    flashScreen('correct', 400, () => advanceRoomQuestion());
+  } else {
+    // Wrong pick — but continue playing (no game over)
+    roomAnswers.push({ qIndex: roomCurrentQ, correct: false });
+    document.querySelectorAll('.eq-card').forEach(c => { if (c.dataset.wrong === '1') c.classList.add('highlight-correct'); });
+    card.style.background = 'rgba(255,68,102,0.4)'; card.style.border = '2px solid #ff4466';
+    updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.wrong++; res.answers.push({ q: roomCurrentQ, correct: false }); } });
+    flashScreen('wrong', 600, () => advanceRoomQuestion());
+  }
+  document.getElementById('room-hud-score').textContent = 'Score: ' + roomScore;
+}
+
+function handleRoomTimeout() {
+  roomAnswers.push({ qIndex: roomCurrentQ, correct: false, timeout: true });
+  document.querySelectorAll('.eq-card').forEach(c => { if (c.dataset.wrong === '1') c.classList.add('highlight-correct'); c.style.pointerEvents = 'none'; });
+  updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.wrong++; res.answers.push({ q: roomCurrentQ, correct: false, timeout: true }); } });
+  setTimeout(() => advanceRoomQuestion(), 1200);
+}
+
+function advanceRoomQuestion() {
+  const room = getRoom(currentRoom);
+  if (!room) return;
+  const nextQ = roomCurrentQ + 1;
+  if (room.playStyle === 'live' && isRoomHost) { showHostLiveControl(nextQ); }
+  else if (room.playStyle === 'live' && !isRoomHost) { showWaitingForHost(); }
+  else { setTimeout(() => loadRoomQuestion(nextQ), 600); }
+}
+
+// --- Live Mode Controls ---
+function showHostLiveControl(nextQ) {
+  const room = getRoom(currentRoom);
+  if (nextQ >= room.questions.length) { finishRoomGame(); return; }
+  document.getElementById('timer-wrap').style.display = 'none';
+  document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
+    + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.5rem;color:rgba(255,255,255,0.6);margin-bottom:16px;">Question ' + (roomCurrentQ + 1) + ' complete</div>'
+    + '<button class="room-btn-primary" style="max-width:300px;margin:0 auto;" onclick="hostAdvanceQuestion(' + nextQ + ')">Next Question →</button>'
+    + '</div>';
+}
+
+function hostAdvanceQuestion(nextQ) {
+  playClick();
+  updateRoom(currentRoom, r => { r.currentQuestion = nextQ; });
+  document.getElementById('timer-wrap').style.display = '';
+  loadRoomQuestion(nextQ);
+}
+
+function showWaitingForHost() {
+  roomLiveWaiting = true;
+  document.getElementById('timer-wrap').style.display = 'none';
+  document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
+    + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.3rem;color:rgba(255,255,255,0.5);"><span class="lobby-waiting-dots">Waiting for moderator</span></div>'
+    + '</div>';
+  if (roomPollInterval) clearInterval(roomPollInterval);
+  roomPollInterval = setInterval(() => {
+    const r = getRoom(currentRoom);
+    if (!r) return;
+    if (r.currentQuestion > roomCurrentQ) {
+      clearInterval(roomPollInterval); roomPollInterval = null;
+      roomLiveWaiting = false;
+      document.getElementById('timer-wrap').style.display = '';
+      loadRoomQuestion(r.currentQuestion);
+    }
+    if (r.status === 'finished') { clearInterval(roomPollInterval); roomPollInterval = null; showRoomResults(); }
+  }, 500);
+}
+
+// --- Game Finish ---
+function finishRoomGame() {
+  if (roomTimerInterval) { clearInterval(roomTimerInterval); roomTimerInterval = null; }
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  updateRoom(currentRoom, r => { const res = r.results[currentUser]; if (res) { res.score = roomScore; res.finished = true; } });
+  const room = getRoom(currentRoom);
+  const allDone = room.players.every(p => room.results[p.username] && room.results[p.username].finished);
+  if (allDone) { updateRoom(currentRoom, r => r.status = 'finished'); showRoomResults(); }
+  else if (isRoomHost) { showWaitingForResultsHost(); }
+  else { showWaitingForResults(); }
+}
+
+function showWaitingForResults() {
+  document.getElementById('timer-wrap').style.display = 'none';
+  document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
+    + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.5rem;color:rgba(255,255,255,0.6);margin-bottom:8px;">You finished!</div>'
+    + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.1rem;color:#ffd86b;margin-bottom:8px;">Score: ' + roomScore + '</div>'
+    + '<div style="font-family:\'Space Mono\',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);"><span class="lobby-waiting-dots">Waiting for other players</span></div>'
+    + '</div>';
+  roomPollInterval = setInterval(() => {
+    const r = getRoom(currentRoom);
+    if (!r) return;
+    if (r.status === 'finished') { clearInterval(roomPollInterval); roomPollInterval = null; showRoomResults(); }
+  }, 500);
+}
+
+function showWaitingForResultsHost() {
+  document.getElementById('timer-wrap').style.display = 'none';
+  const room = getRoom(currentRoom);
+  const finished = room.players.filter(p => room.results[p.username] && room.results[p.username].finished).length;
+  document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
+    + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.5rem;color:rgba(255,255,255,0.6);margin-bottom:8px;">You finished!</div>'
+    + '<div style="font-family:\'Boogaloo\',cursive;font-size:1.1rem;color:#ffd86b;margin-bottom:8px;">Score: ' + roomScore + '</div>'
+    + '<div id="host-wait-count" style="font-family:\'Space Mono\',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:16px;">' + finished + '/' + room.players.length + ' players done</div>'
+    + '<button class="room-btn-primary" style="max-width:300px;margin:0 auto;" onclick="forceEndRoomGame()">End Game Now</button>'
+    + '</div>';
+  roomPollInterval = setInterval(() => {
+    const r = getRoom(currentRoom);
+    if (!r) return;
+    const done = r.players.filter(p => r.results[p.username] && r.results[p.username].finished).length;
+    const countEl = document.getElementById('host-wait-count');
+    if (countEl) countEl.textContent = done + '/' + r.players.length + ' players done';
+    if (r.players.every(p => r.results[p.username] && r.results[p.username].finished)) {
+      clearInterval(roomPollInterval); roomPollInterval = null;
+      updateRoom(currentRoom, rx => rx.status = 'finished');
+      showRoomResults();
+    }
+  }, 500);
+}
+
+function forceEndRoomGame() {
+  playClick();
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  updateRoom(currentRoom, r => r.status = 'finished');
+  showRoomResults();
+}
+
+// --- Results Screen ---
+function showRoomResults() {
+  if (roomTimerInterval) { clearInterval(roomTimerInterval); roomTimerInterval = null; }
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  document.getElementById('room-hud').classList.remove('active');
+  document.getElementById('timer-wrap').style.display = 'none';
+  document.getElementById('grid').innerHTML = '';
+  const room = getRoom(currentRoom);
+  if (!room) return;
+  const results = room.results;
+  const players = room.players;
+  const numQ = room.settings.numQuestions;
+  const sorted = [...players].sort((a, b) => (results[b.username] ? results[b.username].score : 0) - (results[a.username] ? results[a.username].score : 0));
+
+  // Determine winner
+  let winnerText;
+  if (room.mode === 'team') {
+    const ts = {};
+    players.forEach(p => { const t = p.team || 'Team A'; ts[t] = (ts[t] || 0) + (results[p.username] ? results[p.username].score : 0); });
+    const best = Object.entries(ts).sort((a, b) => b[1] - a[1]);
+    winnerText = '🏆 ' + best[0][0] + ' Wins! (' + best[0][1] + ' pts)';
+  } else {
+    const w = sorted[0];
+    winnerText = '🏆 ' + w.displayName + ' Wins! (' + (results[w.username] ? results[w.username].score : 0) + ' pts)';
+  }
+
+  // Scoreboard
+  let sb = '<div class="results-card"><h3>Scoreboard</h3>';
+  sorted.forEach((p, i) => {
+    const r = results[p.username] || { score: 0 };
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
+    const tt = room.mode === 'team' ? ' <span style="font-size:0.65rem;color:rgba(255,255,255,0.4);">(' + p.team + ')</span>' : '';
+    sb += '<div class="results-stat-row"><span>' + medal + ' ' + p.displayName + tt + '</span><span class="results-stat-val">' + r.score + '</span></div>';
+  });
+  sb += '</div>';
+
+  // Team scores card (if team mode)
+  let teamCard = '';
+  if (room.mode === 'team') {
+    const ts = {};
+    players.forEach(p => { const t = p.team || 'Team A'; ts[t] = (ts[t] || 0) + (results[p.username] ? results[p.username].score : 0); });
+    teamCard = '<div class="results-card"><h3>Team Scores</h3>';
+    Object.entries(ts).sort((a, b) => b[1] - a[1]).forEach(([team, sc]) => {
+      teamCard += '<div class="results-stat-row"><span>' + team + '</span><span class="results-stat-val">' + sc + '</span></div>';
+    });
+    teamCard += '</div>';
+  }
+
+  // Current user stats
+  const my = results[currentUser] || { score: 0, correct: 0, wrong: 0, answers: [] };
+  const acc = numQ > 0 ? Math.round((my.correct / numQ) * 100) : 0;
+  const wrongPct = 100 - acc;
+
+  // Avg accuracy
+  let totalAcc = 0, pc = 0;
+  Object.values(results).forEach(r => {
+    if (r.correct !== undefined) { totalAcc += numQ > 0 ? (r.correct / numQ) * 100 : 0; pc++; }
+  });
+  const avgAcc = pc > 0 ? Math.round(totalAcc / pc) : 0;
+
+  // Pie chart via conic-gradient
+  const pie = 'background:conic-gradient(#7fffb2 0% ' + acc + '%, #ff4466 ' + acc + '% 100%);';
+
+  // Wrong questions list
+  let wqHtml = '';
+  (my.answers || []).forEach(a => {
+    if (!a.correct && room.questions[a.q]) {
+      const q = room.questions[a.q];
+      const correctEq = q.equations.find(e => e.isWrong);
+      wqHtml += '<div class="wrong-q-item">Q' + (a.q + 1) + ': ' + (a.timeout ? "Time's up!" : 'Incorrect')
+        + '<div class="wrong-q-correct">Answer: ' + (correctEq ? correctEq.display : 'N/A') + '</div></div>';
+    }
+  });
+
+  document.getElementById('room-results-panel').innerHTML =
+    '<div class="results-title">Game Over!</div>'
+    + '<div class="results-winner">' + winnerText + '</div>'
+    + sb + teamCard
+    + '<div class="results-card"><h3>Your Stats</h3>'
+    + '<div class="pie-wrap"><div class="pie-chart" style="' + pie + '"></div>'
+    + '<div class="pie-legend">'
+    + '<div class="pie-legend-item"><div class="pie-legend-dot" style="background:#7fffb2"></div> Correct: ' + my.correct + ' (' + acc + '%)</div>'
+    + '<div class="pie-legend-item"><div class="pie-legend-dot" style="background:#ff4466"></div> Wrong: ' + my.wrong + ' (' + wrongPct + '%)</div>'
+    + '</div></div>'
+    + '<div class="results-stat-row"><span>Score</span><span class="results-stat-val">' + my.score + '</span></div>'
+    + '<div class="results-stat-row"><span>Your Accuracy</span><span class="results-stat-val">' + acc + '%</span></div>'
+    + '<div class="results-stat-row"><span>Avg Accuracy (All)</span><span class="results-stat-val">' + avgAcc + '%</span></div>'
+    + '</div>'
+    + (wqHtml ? '<div class="results-card"><h3>Questions You Got Wrong</h3>' + wqHtml + '</div>' : '')
+    + '<button class="results-leave-btn" onclick="leaveRoom()">Leave Room</button>';
+  document.getElementById('room-results-overlay').classList.add('active');
+}
+
+function leaveRoom() {
+  playClick();
+  document.getElementById('room-results-overlay').classList.remove('active');
+  goHome();
+}
+
+// --- Room Invite Checking (runs on start screen) ---
+function checkRoomInvites() {
+  if (!currentUser) return;
+  const key = 'mathMadness_roomInvites_' + currentUser;
+  let inv = JSON.parse(localStorage.getItem(key) || '[]');
+  // Remove expired (>10min)
+  inv = inv.filter(i => Date.now() - i.timestamp < 600000);
+  localStorage.setItem(key, JSON.stringify(inv));
+  if (inv.length === 0) return;
+  const latest = inv[inv.length - 1];
+  const room = getRoom(latest.roomCode);
+  if (!room || room.status !== 'waiting') {
+    localStorage.setItem(key, JSON.stringify(inv.filter(i => i.roomCode !== latest.roomCode)));
+    return;
+  }
+  // Don't show popup if already in a room
+  if (currentRoom) return;
+  const popup = document.getElementById('room-invite-popup');
+  popup.innerHTML =
+    '<div class="invite-popup-title">Room Invite!</div>'
+    + '<div class="invite-popup-host">' + latest.fromName + ' invited you</div>'
+    + '<div class="invite-popup-details">Mode: ' + room.mode + ' · ' + room.playStyle + '<br>'
+    + room.settings.numQuestions + ' questions · ' + room.settings.difficulty + ' · ' + room.settings.timePerQuestion + 's</div>'
+    + '<div class="invite-popup-btns">'
+    + '<button class="invite-accept-btn" onclick="acceptRoomInvite(\'' + latest.roomCode + '\')">Join</button>'
+    + '<button class="invite-reject-btn" onclick="declineRoomInvite(\'' + latest.roomCode + '\')">Decline</button>'
+    + '</div>';
+  popup.classList.add('active');
+}
+
+function acceptRoomInvite(code) {
+  playClick();
+  document.getElementById('room-invite-popup').classList.remove('active');
+  clearRoomInvite(code);
+  const room = getRoom(code);
+  if (!room || room.status !== 'waiting') return;
+  if (!room.players.find(p => p.username === currentUser)) {
+    updateRoom(code, r => r.players.push({ username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId, status: 'joined' }));
+  }
+  currentRoom = code; isRoomHost = false; isRoomMode = true;
+  document.getElementById('room-overlay').classList.add('active');
+  showLobby();
+}
+
+function declineRoomInvite(code) {
+  playClick();
+  document.getElementById('room-invite-popup').classList.remove('active');
+  clearRoomInvite(code);
+}
+
+function clearRoomInvite(code) {
+  const key = 'mathMadness_roomInvites_' + currentUser;
+  let inv = JSON.parse(localStorage.getItem(key) || '[]');
+  localStorage.setItem(key, JSON.stringify(inv.filter(i => i.roomCode !== code)));
 }
 </script>
 </body>

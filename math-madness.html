@@ -314,7 +314,7 @@
     position: fixed; inset: 0; z-index: 200;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
-    background: rgba(26,5,51,0.92);
+    background: transparent;
   }
   #startscreen h1 {
     font-family: 'Orbitron', sans-serif;
@@ -465,7 +465,7 @@
     position: fixed; inset: 0; z-index: 250;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
-    background: rgba(26,5,51,0.92);
+    background: transparent;
   }
   #auth-screen.hidden { display: none; }
   #auth-screen h1 {
@@ -1137,7 +1137,7 @@
   /* Room overlay (host/join/setup/invite/lobby all render here) */
   #room-overlay {
     display:none; position:fixed; inset:0; z-index:360;
-    background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);
+    background:rgba(0,0,0,0.4); backdrop-filter:blur(2px);
     align-items:center; justify-content:center;
   }
   #room-overlay.active { display:flex; }
@@ -1457,6 +1457,8 @@
   </div>
 </div>
 
+<audio id="bg-music" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_b7b8054c25.mp3" loop preload="auto"></audio>
+
 <!-- SETTINGS OVERLAY -->
 <div id="settings-overlay">
   <div id="settings-panel">
@@ -1470,6 +1472,13 @@
       <label>Debug Mode</label>
       <div class="toggle-switch">
         <input type="checkbox" id="debug-toggle" onchange="toggleDebugMode(this.checked)">
+        <span class="toggle-slider"></span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <label>Music</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="music-toggle" onchange="toggleMusic(this.checked)">
         <span class="toggle-slider"></span>
       </div>
     </div>
@@ -2314,6 +2323,16 @@ function checkAutoLogin() {
   document.getElementById('startscreen').style.display = 'none';
 }
 
+// ─── MUSIC ──────────────────────────────────────────────────────────────────
+function toggleMusic(enabled) {
+  const bgMusic = document.getElementById('bg-music');
+  if (enabled) {
+    bgMusic.play().catch(e => console.log("Audio play blocked", e));
+  } else {
+    bgMusic.pause();
+  }
+}
+
 // ─── DEBUG MODE ─────────────────────────────────────────────────────────────
 function toggleDebugMode(enabled) {
   debugMode = enabled;
@@ -3094,6 +3113,9 @@ const MATH_SYMBOLS = [
   'a²+b²=c²', '∛27=3', '5!=120', 'sin(θ)', 'cos(π)',
   'f(x)', 'log₂8=3', '2⁴=16', 'n!', 'Σ', '∂', '∇',
   '7+5=12', '15−8=7', '6×9=54', '81÷9=9', '∛8=2',
+  'e^{iπ}+1=0', '∫e^xdx=e^x+C', 'lim_{x→0}(sin x)/x=1',
+  '∇×E=−∂B/∂t', 'E=mc²', '∮B⋅dl=μ₀I', 'i²=−1',
+  'd/dx(xⁿ)=nxⁿ⁻¹', 'A=πr²', 'V=4/3πr³'
 ];
 let mathBgInterval = null;
 
@@ -3426,6 +3448,19 @@ function showHostSetup() {
         <input type="range" id="room-numq-slider" min="5" max="30" value="10" step="5"
           oninput="document.getElementById('room-numq-val').textContent=this.value">
         <span class="room-slider-val" id="room-numq-val">10</span>
+      </div>
+    </div>
+    <div class="room-form-group">
+      <span class="room-form-label">Select Topics</span>
+      <div id="room-topics" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <label class="topic-chip"><input type="checkbox" value="add" checked> Addition</label>
+        <label class="topic-chip"><input type="checkbox" value="sub" checked> Subtraction</label>
+        <label class="topic-chip"><input type="checkbox" value="mul"> Multiplication</label>
+        <label class="topic-chip"><input type="checkbox" value="div"> Division</label>
+        <label class="topic-chip"><input type="checkbox" value="mixed"> Mixed Ops</label>
+        <label class="topic-chip"><input type="checkbox" value="sqrt"> Square Root</label>
+        <label class="topic-chip"><input type="checkbox" value="cube"> Cube Root</label>
+        <label class="topic-chip"><input type="checkbox" value="power"> Powers</label>
       </div>
     </div>
     <button class="room-btn-primary" onclick="submitHostSetup()">Invite Players</button>`;

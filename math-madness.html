@@ -314,7 +314,7 @@
     position: fixed; inset: 0; z-index: 200;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
-    background: #1a0533;
+    background: rgba(26,5,51,0.92);
   }
   #startscreen h1 {
     font-family: 'Orbitron', sans-serif;
@@ -465,7 +465,7 @@
     position: fixed; inset: 0; z-index: 250;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
-    background: #1a0533;
+    background: rgba(26,5,51,0.92);
   }
   #auth-screen.hidden { display: none; }
   #auth-screen h1 {
@@ -1383,6 +1383,27 @@
   .invite-accept-btn { background:#7fffb2; color:#1a0533; }
   .invite-reject-btn { background:rgba(255,68,102,0.3); color:#ff4466; }
 
+
+  /* CUSTOM MODE */
+  #custom-mode-overlay {
+    display:none; position:fixed; inset:0; z-index:350;
+    background:rgba(0,0,0,0.65); backdrop-filter:blur(6px);
+    align-items:center; justify-content:center;
+  }
+  #custom-mode-overlay.active { display:flex; }
+  .topic-chip {
+    font-family:'Share Tech Mono',monospace; font-size:0.85rem;
+    padding:8px 14px; border:1.5px solid rgba(255,255,255,0.2);
+    border-radius:10px; background:rgba(255,255,255,0.06);
+    color:rgba(255,255,255,0.7); cursor:pointer;
+    display:flex; align-items:center; gap:6px;
+    transition:background 0.15s, border-color 0.15s;
+  }
+  .topic-chip:has(input:checked) {
+    background:rgba(255,107,255,0.2); border-color:var(--accent); color:#fff;
+  }
+  .topic-chip input { accent-color:var(--accent); }
+
 </style>
 </head>
 <body>
@@ -1392,7 +1413,7 @@
   <button id="settings-toggle" onclick="openSettings()" title="Settings">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
   </button>
-  <div id="diff-banner">Difficulty: <span id="diff-val">Easy</span></div>
+  <div id="diff-banner" style="display:none">Difficulty: <span id="diff-val">Easy</span></div>
   <div id="score-display">Score: 0</div>
 </div>
 
@@ -1579,10 +1600,49 @@
     <button class="mode-card" onclick="startClassicMode()">
       <div>Classic<div class="mode-card-desc">Solo — survive as long as you can</div></div>
     </button>
+    <button class="mode-card" onclick="openCustomMode()">
+      <div>Custom<div class="mode-card-desc">Choose your topics and settings</div></div>
+    </button>
     <button class="mode-card" onclick="openRoomChoice()">
       <div>Private Room<div class="mode-card-desc">Play with friends in a custom game</div></div>
     </button>
     <button class="room-btn-secondary" onclick="closeModeSelect()" style="margin-top:8px;">Cancel</button>
+  </div>
+</div>
+
+
+<!-- CUSTOM MODE OVERLAY -->
+<div id="custom-mode-overlay">
+  <div class="mode-panel" style="width:420px;">
+    <div class="room-header">
+      <button class="room-back-btn" onclick="closeCustomMode()">
+        <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg>
+      </button>
+      <h2>Custom Mode</h2>
+      <div style="width:28px"></div>
+    </div>
+    <div class="room-form-group">
+      <span class="room-form-label">Select Topics</span>
+      <div id="custom-topics" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <label class="topic-chip"><input type="checkbox" value="add" checked> Addition</label>
+        <label class="topic-chip"><input type="checkbox" value="sub" checked> Subtraction</label>
+        <label class="topic-chip"><input type="checkbox" value="mul"> Multiplication</label>
+        <label class="topic-chip"><input type="checkbox" value="div"> Division</label>
+        <label class="topic-chip"><input type="checkbox" value="mixed"> Mixed Ops</label>
+        <label class="topic-chip"><input type="checkbox" value="sqrt"> Square Root</label>
+        <label class="topic-chip"><input type="checkbox" value="cube"> Cube Root</label>
+        <label class="topic-chip"><input type="checkbox" value="power"> Powers</label>
+      </div>
+    </div>
+    <div class="room-form-group">
+      <span class="room-form-label">Time per Question</span>
+      <div class="room-slider-wrap">
+        <input type="range" id="custom-time-slider" min="5" max="30" value="10" step="5"
+          oninput="document.getElementById('custom-time-val').textContent=this.value+'s'">
+        <span class="room-slider-val" id="custom-time-val">10s</span>
+      </div>
+    </div>
+    <button class="room-btn-primary" onclick="startCustomGame()">Play</button>
   </div>
 </div>
 
@@ -2308,24 +2368,23 @@ function getBgColors(lvl) {
 }
 
 function getGridSize(lvl) {
-  if (lvl < 10) return [2,2];
-  if (lvl < 30) return [3,3];
-  if (lvl < 55) return [4,4];
-  return [4,5];
+  if (lvl <= 15) return [3,3];
+  if (lvl <= 30) return [3,4];
+  return [4,4];
 }
 
 function getTimerDuration(lvl) {
-  return Math.max(3000, 10000 - (lvl - 1) * 120);
+  if (typeof isCustomMode !== 'undefined' && isCustomMode) return customTimePerQ;
+  return 10000;
 }
 
 function getShakeIntensity(lvl) {
-  if (lvl < 15) return 0;
-  if (lvl < 30) return 1 + (lvl - 15) * 0.15;
-  if (lvl < 50) return 3.5 + (lvl - 30) * 0.1;
-  return Math.min(8, 5.5 + (lvl-50)*0.05);
+  if (lvl < 31) return 0;
+  if (lvl < 50) return 1 + (lvl - 31) * 0.15;
+  return Math.min(6, 3.85 + (lvl-50)*0.05);
 }
 
-function shouldVibrate(lvl) { return lvl >= 40; }
+function shouldVibrate(lvl) { return lvl >= 31; }
 function shouldPolka(lvl)   { return lvl >= 25; }
 
 // ─── EQUATION GENERATOR ──────────────────────────────────────────────────────
@@ -2338,6 +2397,7 @@ function makeEquation(lvl, correct) {
 }
 
 function chooseType(lvl) {
+  if (isCustomMode) return randPick(customTopics);
   const pool = ['add','sub'];
   if (lvl >= 5)  pool.push('mul');
   if (lvl >= 8)  pool.push('div');
@@ -2678,7 +2738,7 @@ function showGameOver() {
   document.getElementById('go-score').textContent = `Score: ${score}`;
 
   // Save history (per-user)
-  const record = { score: score, date: new Date().toLocaleString() };
+  const record = { score: score, date: new Date().toLocaleString(), custom: isCustomMode || undefined };
   let gameHistory = getUserHistory();
   gameHistory.unshift(record);
   if (gameHistory.length > 10) gameHistory.pop();
@@ -2690,14 +2750,15 @@ function showGameOver() {
     saveUserBestGame(bestGame);
   }
 
-  // High score logic (per-user)
-  const isNewHigh = score > highScore && score > 0;
+  // High score logic (per-user, separate for custom mode)
+  let effectiveHighScore = isCustomMode ? getCustomHighScore() : highScore;
+  const isNewHigh = score > effectiveHighScore && score > 0;
   if (isNewHigh) {
-    highScore = score;
-    saveHighScore();
+    if (isCustomMode) { saveCustomHighScore(score); effectiveHighScore = score; }
+    else { highScore = score; saveHighScore(); effectiveHighScore = highScore; }
   }
   const hsVal = document.getElementById('go-highscore-value');
-  hsVal.textContent = highScore;
+  hsVal.textContent = effectiveHighScore;
   const badge = document.getElementById('new-high-badge');
   if (isNewHigh) {
     hsVal.classList.add('rainbow');
@@ -2744,6 +2805,7 @@ function goHome() {
   document.getElementById('help-overlay').classList.remove('active');
   document.getElementById('friends-overlay').classList.remove('active');
   document.getElementById('mode-select-overlay').classList.remove('active');
+  if (document.getElementById('custom-mode-overlay')) document.getElementById('custom-mode-overlay').classList.remove('active');
   document.getElementById('room-overlay').classList.remove('active');
   document.getElementById('room-hud').classList.remove('active');
   document.getElementById('room-results-overlay').classList.remove('active');
@@ -2763,6 +2825,7 @@ function goHome() {
   currentRoom = null;
   isRoomMode = false;
   isRoomHost = false;
+  isCustomMode = false;
 }
 
 function startGame() {
@@ -3061,6 +3124,64 @@ function spawnMathFloat(bg) {
   bg.appendChild(el);
 }
 
+
+// ─── CUSTOM MODE ────────────────────────────────────────────────────────────
+let customTopics = ['add','sub'];
+let customTimePerQ = 10000;
+let isCustomMode = false;
+
+function openCustomMode() {
+  playClick();
+  document.getElementById('mode-select-overlay').classList.remove('active');
+  document.getElementById('custom-mode-overlay').classList.add('active');
+}
+
+function closeCustomMode() {
+  playClick();
+  document.getElementById('custom-mode-overlay').classList.remove('active');
+  document.getElementById('mode-select-overlay').classList.add('active');
+}
+
+function getSelectedTopics(containerId) {
+  const checks = document.querySelectorAll('#' + containerId + ' input[type=checkbox]:checked');
+  return Array.from(checks).map(c => c.value);
+}
+
+function startCustomGame() {
+  playClick();
+  const topics = getSelectedTopics('custom-topics');
+  if (topics.length === 0) { alert('Select at least one topic!'); return; }
+  customTopics = topics;
+  customTimePerQ = parseInt(document.getElementById('custom-time-slider').value) * 1000;
+  isCustomMode = true;
+  document.getElementById('custom-mode-overlay').classList.remove('active');
+  document.getElementById('startscreen').style.display = 'none';
+  lastDiffName = '';
+  buildLevel();
+}
+
+function customStorageKey(key) {
+  const prefix = currentUser ? 'mathMadness_user_' + currentUser : 'mathMadness_guest';
+  const topicKey = customTopics.slice().sort().join('-');
+  return prefix + '_custom_' + topicKey + '_' + key;
+}
+
+function getCustomHighScore() {
+  return parseInt(localStorage.getItem(customStorageKey('highScore')) || '0', 10);
+}
+
+function saveCustomHighScore(val) {
+  localStorage.setItem(customStorageKey('highScore'), String(val));
+}
+
+function getCustomHistory() {
+  return JSON.parse(localStorage.getItem(customStorageKey('history')) || '[]');
+}
+
+function saveCustomHistory(history) {
+  localStorage.setItem(customStorageKey('history'), JSON.stringify(history));
+}
+
 // ─── ROOM SYSTEM (API-backed — works across browsers) ───────────────────────
 let currentRoom = null;
 let isRoomMode = false;
@@ -3130,7 +3251,7 @@ function getRoomGridSize(diff) {
   return { easy: [2,2], medium: [2,2], hard: [3,3], expert: [3,3], brutal: [4,4] }[diff] || [2,2];
 }
 
-function generateRoomQuestions(numQ, difficulty) {
+function generateRoomQuestions(numQ, difficulty, topics) {
   const lvl = getDiffLevel(difficulty);
   const [rows, cols] = getRoomGridSize(difficulty);
   const questions = [];
@@ -3140,7 +3261,10 @@ function generateRoomQuestions(numQ, difficulty) {
     const eqs = [];
     for (let j = 0; j < total; j++) {
       const isW = (j === wIdx);
+      const _sc = isCustomMode, _st = customTopics;
+      if (topics) { isCustomMode = true; customTopics = topics; }
       const eq = makeEquation(lvl, !isW);
+      isCustomMode = _sc; customTopics = _st;
       eqs.push({ display: eq.display, isWrong: isW });
     }
     questions.push({ equations: eqs, gridRows: rows, gridCols: cols, wrongIdx: wIdx });
@@ -3335,7 +3459,8 @@ function submitHostSetup() {
   const timePerQ = parseInt(document.getElementById('room-time-slider').value);
   const numQ = parseInt(document.getElementById('room-numq-slider').value);
   const code = generateRoomCode();
-  const questions = generateRoomQuestions(numQ, difficulty);
+  const roomTopics = typeof getSelectedTopics === 'function' && document.getElementById('room-topics') ? getSelectedTopics('room-topics') : null;
+  const questions = generateRoomQuestions(numQ, difficulty, roomTopics && roomTopics.length > 0 ? roomTopics : null);
   const room = {
     code, host: currentUser, mode, playStyle,
     settings: { timePerQuestion: timePerQ, difficulty, numQuestions: numQ },

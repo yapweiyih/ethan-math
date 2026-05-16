@@ -1453,7 +1453,6 @@
     High Score: <span id="go-highscore-value">0</span>
     <span id="new-high-badge"></span>
   </div>
-  <p>Better luck next time — the numbers had other plans.</p>
   <div class="go-buttons">
     <button id="restart-btn" onclick="restartGame()">Try Again</button>
     <button id="home-btn" onclick="goHome()" title="Return to Homepage">
@@ -1547,7 +1546,6 @@
   <div id="user-greeting"></div>
   <p>One equation is <span class="tag">WRONG</span>.<br>
      Find it before time runs out!</p>
-  <p style="font-size:0.8rem; color:rgba(255,255,255,0.4);">Wrong answer = game over</p>
   <div class="start-buttons">
     <button class="start-btn-primary" onclick="startGame()">PLAY</button>
   </div>
@@ -1571,7 +1569,7 @@
 <!-- USER MENU OVERLAY -->
 <div id="user-menu-overlay">
   <div id="user-menu-panel">
-    <h2>Account</h2>
+    <h2 id="user-menu-title">Menu</h2>
     <div id="user-menu-content">
       <button class="menu-option" onclick="showChangePassword()">Change Password</button>
       <button class="menu-option danger" onclick="confirmLogout()">Logout</button>
@@ -1628,8 +1626,8 @@
     </div>
     <div class="room-form-group">
       <span class="room-form-label">Select Topics</span>
-      <div style="margin-bottom:8px;"><button class="select-all-btn" onclick="selectAllTopics('custom-topics')">Select All</button> <button class="select-all-btn" onclick="deselectAllTopics('custom-topics')">Deselect All</button></div>
-      <div id="custom-topics" style="display:flex;flex-wrap:wrap;gap:8px;">
+      <div style="margin-bottom:8px;text-align:center;"><button class="select-all-btn" onclick="selectAllTopics('custom-topics')">Select All</button> <button class="select-all-btn" onclick="deselectAllTopics('custom-topics')">Deselect All</button></div>
+      <div id="custom-topics" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
         <label class="topic-chip"><input type="checkbox" value="add" checked> Addition</label>
         <label class="topic-chip"><input type="checkbox" value="sub" checked> Subtraction</label>
         <label class="topic-chip"><input type="checkbox" value="mul"> Multiplication</label>
@@ -1705,7 +1703,7 @@
     
     <div style="text-align:center; margin-top:40px;">
       <button class="room-btn-primary" id="mod-next-btn" style="display:none; width:100%; max-width:300px; margin:0 auto 16px auto;" onclick="modAdvanceQuestion()">Next Question</button>
-      <button class="room-btn-secondary" onclick="leaveRoomFromLobby()">End Game</button>
+      <button class="room-btn-secondary" onclick="confirmEndGame()">End Game</button>
     </div>
   </div>
 </div>
@@ -1915,6 +1913,7 @@ function updateUserGreeting() {
 // ─── USER MENU (HAMBURGER) ──────────────────────────────────────────────────
 function openUserMenu() {
   playClick();
+  document.getElementById('user-menu-title').textContent = 'Menu';
   const content = document.getElementById('user-menu-content');
   content.innerHTML = currentUser
     ? `<button class="menu-option" onclick="showPlayerInfo()">Player Info</button>
@@ -2024,9 +2023,9 @@ function showSuccessPopup() {
 }
 
 function showAccountMenu() {
+  document.getElementById('user-menu-title').textContent = 'Account';
   const content = document.getElementById('user-menu-content');
   content.innerHTML = `
-    <h2 style="font-family:'Orbitron',sans-serif;font-size:1.4rem;color:var(--accent);margin-bottom:0.8em;">Account</h2>
     <button class="menu-option" onclick="showChangePassword()">Change Password</button>
     <button class="menu-option danger" onclick="confirmDeleteAccount()">Delete Account</button>
     <div class="help-buttons" style="margin-top:14px;">
@@ -3656,8 +3655,8 @@ function showHostSetup() {
     </div>
     <div class="room-form-group">
       <span class="room-form-label">Select Topics</span>
-      <div style="margin-bottom:8px;"><button class="select-all-btn" onclick="selectAllTopics('room-topics')">Select All</button> <button class="select-all-btn" onclick="deselectAllTopics('room-topics')">Deselect All</button></div>
-      <div id="room-topics" style="display:flex;flex-wrap:wrap;gap:8px;">
+      <div style="margin-bottom:8px;text-align:center;"><button class="select-all-btn" onclick="selectAllTopics('room-topics')">Select All</button> <button class="select-all-btn" onclick="deselectAllTopics('room-topics')">Deselect All</button></div>
+      <div id="room-topics" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
         <label class="topic-chip"><input type="checkbox" value="add" checked> Addition</label>
         <label class="topic-chip"><input type="checkbox" value="sub" checked> Subtraction</label>
         <label class="topic-chip"><input type="checkbox" value="mul"> Multiplication</label>
@@ -3833,6 +3832,33 @@ function showLobby() {
   renderLobby();
   if (roomPollInterval) clearInterval(roomPollInterval);
   roomPollInterval = setInterval(renderLobby, 1000);
+}
+
+function confirmEndGame() {
+  playClick();
+  const overlay = document.createElement('div');
+  overlay.id = 'end-game-confirm';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `<div style="background:linear-gradient(135deg,#2a0e45,#16294a);border:1.5px solid rgba(255,255,255,0.18);border-radius:18px;padding:28px 32px;text-align:center;width:300px;max-width:85vw;animation:goIn 0.2s ease;">
+    <p style="font-family:'Orbitron',sans-serif;font-size:1.3rem;color:#fff;margin-bottom:0.5em;">End Game?</p>
+    <p style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:1.2em;">This will end the game for all players.</p>
+    <div class="confirm-buttons">
+      <button id="confirm-yes" onclick="doEndGameFromMod()">End Game</button>
+      <button id="confirm-cancel" onclick="document.getElementById('end-game-confirm').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+async function doEndGameFromMod() {
+  playClick();
+  const el = document.getElementById('end-game-confirm');
+  if (el) el.remove();
+  // Mark room as moderator-ended
+  if (currentRoom) {
+    updateRoom(currentRoom, r => r.modEnded = true);
+  }
+  await leaveRoomFromLobby();
 }
 
 async function leaveRoomFromLobby() {
@@ -4237,8 +4263,9 @@ function showRoomResults() {
   if (gameHistory.length > 10) gameHistory.pop();
   saveUserHistory(gameHistory);
 
+  const modEndedMsg = room.modEnded ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:1rem;color:#ff4466;text-align:center;margin-bottom:12px;">Moderator Ended the Game</div>' : '';
   document.getElementById('room-results-panel').innerHTML =
-    '<div class="results-title">Game Over!</div>'
+    '<div class="results-title">Game Over!</div>' + modEndedMsg
     + '<div class="results-winner">' + winnerText + '</div>'
     + sb + teamCard
     + '<div class="results-card"><h3>Your Stats</h3>'

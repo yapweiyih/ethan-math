@@ -1430,7 +1430,7 @@
 <div id="debug-indicator" class="debug-indicator">DEBUG MODE ON</div>
 
 <!-- LIGHTBULB HELP BUTTON -->
-<button id="lightbulb-btn" onclick="openHelp()" title="Get Help">
+<button id="lightbulb-btn" class="hidden" onclick="openHelp()" title="Get Help">
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"/></svg>
 </button>
 
@@ -2374,12 +2374,25 @@ function getBgColors(lvl) {
 function getGridSize(lvl) {
   if (lvl <= 5) return [2,2];
   if (lvl <= 12) return [3,2];
-  return [3,3];
+  if (lvl <= 32) return [3,3];
+  if (lvl <= 52) return [3,4];
+  if (lvl <= 72) return [4,4];
+  return [5,5];
 }
 
 function getTimerDuration(lvl) {
   if (typeof isCustomMode !== 'undefined' && isCustomMode) return customTimePerQ;
-  return 10000;
+  let t = 10000;
+  if (scoreAt5x5 !== null) {
+    let diff = score - scoreAt5x5;
+    if (diff >= 1500) {
+      t -= 500;
+      let extra = diff - 1500;
+      let steps = Math.floor(extra / 1500);
+      t -= steps * 250;
+    }
+  }
+  return Math.max(t, 2000);
 }
 
 function getShakeIntensity(lvl) {
@@ -2501,6 +2514,9 @@ function wrongAns(correct, spread) {
 // ─── UI BUILDERS ─────────────────────────────────────────────────────────────
 function buildLevel() {
   const [rows, cols] = getGridSize(level);
+  if (rows === 5 && cols === 5 && scoreAt5x5 === null) {
+    scoreAt5x5 = score;
+  }
   const total = rows * cols;
   wrongIdx = randInt(0, total - 1);
 
@@ -2657,7 +2673,7 @@ function handleClick(isWrong) {
 
 function handleCorrect() {
   const elapsed = Date.now() - roundStartTime;
-  const basePoints = level * 10;
+  const basePoints = 50;
   
   let speedBonus = 0;
   if (elapsed <= 2000) {
@@ -2783,7 +2799,7 @@ function showGameOver() {
 function restartGame() {
   playClick();
   level = 1; score = 0; lastDiffName = '';
-  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false;
+  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false; scoreAt5x5 = null;
   document.getElementById('lightbulb-btn').classList.remove('hidden');
   document.getElementById('gameover').classList.remove('active');
   document.body.style.background = 'linear-gradient(135deg, #1a0533 0%, #0d1f3c 100%)';
@@ -2803,7 +2819,7 @@ function goHome() {
     saveUserHistory(gameHistory);
   }
   level = 1; score = 0; lastDiffName = '';
-  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false;
+  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false; scoreAt5x5 = null;
   clearInterval(timerInterval);
   clearInterval(polkaSpawner); polkaSpawner = null;
   document.getElementById('gameover').classList.remove('active');
@@ -2817,10 +2833,10 @@ function goHome() {
   document.getElementById('room-hud').classList.remove('active');
   document.getElementById('room-results-overlay').classList.remove('active');
   document.getElementById('room-invite-popup').classList.remove('active');
-  document.getElementById('hud').style.display = '';
-  document.getElementById('timer-wrap').style.display = '';
-  document.getElementById('instruction').style.display = '';
-  document.getElementById('lightbulb-btn').classList.remove('hidden');
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('timer-wrap').style.display = 'none';
+  document.getElementById('instruction').style.display = 'none';
+  document.getElementById('lightbulb-btn').classList.add('hidden');
   document.getElementById('polka-layer').innerHTML = '';
   document.body.classList.remove('vibrating');
   document.body.style.background = '#1a0533';
@@ -2944,6 +2960,7 @@ function closeHistory() {
 let helpTimerInterval = null;
 let helpAnswer = 0;
 let cheatHighlightCorrect = false;
+let scoreAt5x5 = null;
 
 function openHelp() {
   playClick();
@@ -3113,33 +3130,36 @@ const MATH_SYMBOLS = [
   '7+5=12', '15−8=7', '6×9=54', '81÷9=9', '∛8=2',
   'e^{iπ}+1=0', '∫e^xdx=e^x+C', 'lim_{x→0}(sin x)/x=1',
   '∇×E=−∂B/∂t', 'E=mc²', '∮B⋅dl=μ₀I', 'i²=−1',
-  'd/dx(xⁿ)=nxⁿ⁻¹', 'A=πr²', 'V=4/3πr³'
+  'd/dx(xⁿ)=nxⁿ⁻¹', 'A=πr²', 'V=4/3πr³',
+  'F=ma', 'y=mx+c', 'PV=nRT', 'x=−b±√(b²−4ac)/2a',
+  'sin²x+cos²x=1', 'e≈2.718', '∫udv=uv−∫vdu',
+  'd(sin x)/dx=cos x', 'P(A|B)=P(B|A)P(A)/P(B)'
 ];
 let mathBgInterval = null;
 
 function initMathBg() {
   const bg = document.getElementById('math-bg');
   // Spawn initial batch
-  for (let i = 0; i < 15; i++) {
-    setTimeout(() => spawnMathFloat(bg), i * 300);
+  for (let i = 0; i < 35; i++) {
+    setTimeout(() => spawnMathFloat(bg), i * 150);
   }
   // Keep spawning
-  mathBgInterval = setInterval(() => spawnMathFloat(bg), 1500);
+  mathBgInterval = setInterval(() => spawnMathFloat(bg), 800);
 }
 
 function spawnMathFloat(bg) {
-  if (bg.children.length > 25) bg.removeChild(bg.firstChild);
+  if (bg.children.length > 60) bg.removeChild(bg.firstChild);
   const el = document.createElement('div');
   el.className = 'math-float';
   el.textContent = MATH_SYMBOLS[Math.floor(Math.random() * MATH_SYMBOLS.length)];
-  const size = 14 + Math.random() * 28;
+  const size = 16 + Math.random() * 34;
   const dur = 12 + Math.random() * 20;
   el.style.cssText = `
     left: ${Math.random() * 95}%;
     font-size: ${size}px;
     animation-duration: ${dur}s;
     animation-delay: ${-Math.random() * dur}s;
-    opacity: ${0.15 + Math.random() * 0.25};
+    opacity: ${0.25 + Math.random() * 0.35};
   `;
   bg.appendChild(el);
 }

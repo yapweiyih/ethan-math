@@ -3912,9 +3912,9 @@ function showInvitePlayers() {
     + friendsHtml
     + '<hr class="room-divider">'
     + '<div class="room-form-group"><span class="room-form-label">Or share the Room Code</span>'
-    + '<div class="room-code-display" id="room-code-display" style="' + (room.isPublic ? '' : 'display:none;') + '">' + currentRoom + '</div>'
-    + '<button class="room-btn-secondary" onclick="toggleRoomPublic()" id="public-toggle-btn" style="font-size:0.9rem;">'
-    + (room.isPublic ? 'Make Game Private' : 'Make Game Public') + '</button></div>'
+    + '<div class="room-code-display" id="room-code-display">' + currentRoom + '</div>'
+    + '<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:8px;">Share this code with players to join</div>'
+    + '</div>'
     + '<button class="room-btn-primary" onclick="showLobby()">Next →</button>';
   setTimeout(() => {
     const inp = document.getElementById('invite-search-input');

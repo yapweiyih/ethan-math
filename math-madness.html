@@ -160,7 +160,7 @@
     text-align: center;
     cursor: pointer;
     font-family: 'Orbitron', sans-serif;
-    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    font-size: calc(clamp(1rem, 2.5vw, 1.5rem) * var(--font-scale, 1));
     letter-spacing: 0.04em;
     transition: transform 0.12s, background 0.15s, box-shadow 0.15s;
     user-select: none;
@@ -1569,7 +1569,7 @@
 <!-- USER MENU OVERLAY -->
 <div id="user-menu-overlay">
   <div id="user-menu-panel">
-    <h2 id="user-menu-title">Menu</h2>
+    <h2 id="user-menu-title" style="display:none"></h2>
     <div id="user-menu-content">
       <button class="menu-option" onclick="showChangePassword()">Change Password</button>
       <button class="menu-option danger" onclick="confirmLogout()">Logout</button>
@@ -1913,13 +1913,15 @@ function updateUserGreeting() {
 // ─── USER MENU (HAMBURGER) ──────────────────────────────────────────────────
 function openUserMenu() {
   playClick();
-  document.getElementById('user-menu-title').textContent = 'Menu';
+  document.getElementById('user-menu-title').style.display = 'none';
   const content = document.getElementById('user-menu-content');
   content.innerHTML = currentUser
     ? `<button class="menu-option" onclick="showPlayerInfo()">Player Info</button>
+       <button class="menu-option" onclick="showMenuSettings()">Settings</button>
        <button class="menu-option" onclick="showAccountMenu()">Account</button>
        <button class="menu-option danger" onclick="confirmLogout()">Logout</button>`
-    : `<button class="menu-option danger" onclick="confirmLogout()">Switch User</button>`;
+    : `<button class="menu-option" onclick="showMenuSettings()">Settings</button>
+       <button class="menu-option danger" onclick="confirmLogout()">Switch User</button>`;
   document.getElementById('user-menu-overlay').classList.add('active');
 }
 
@@ -2022,7 +2024,38 @@ function showSuccessPopup() {
   document.body.appendChild(popup);
 }
 
+function showMenuSettings() {
+  document.getElementById('user-menu-title').style.display = '';
+  document.getElementById('user-menu-title').textContent = 'Settings';
+  const content = document.getElementById('user-menu-content');
+  const fontVal = fontScale === 0.85 ? 'small' : fontScale === 1.15 ? 'large' : 'medium';
+  content.innerHTML = `
+    <div class="settings-row"><label>Click Volume</label>
+      <input type="range" min="0" max="100" value="${clickVol*100}" oninput="setClickVolume(this.value)" style="-webkit-appearance:none;appearance:none;width:120px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+    </div>
+    <div class="settings-row"><label>Music</label>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="range" min="0" max="100" value="${musicVolume*100}" oninput="setMusicVolume(this.value)" style="-webkit-appearance:none;appearance:none;width:90px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+        <div class="toggle-switch" style="width:42px;height:22px;">
+          <input type="checkbox" ${musicPlaying?'checked':''} onchange="toggleMusic(this.checked)">
+          <span class="toggle-slider" style="border-radius:22px;"><span style="position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform 0.3s;"></span></span>
+        </div>
+      </div>
+    </div>
+    <div class="settings-row"><label>Font Size</label>
+      <div class="room-toggle-group" id="font-size-toggle" style="width:auto;gap:2px;">
+        <button class="room-toggle-opt ${fontVal==='small'?'active':''}" data-val="small" onclick="setFontScale(0.85);showMenuSettings()" style="padding:6px 12px;font-size:0.8rem;">S</button>
+        <button class="room-toggle-opt ${fontVal==='medium'?'active':''}" data-val="medium" onclick="setFontScale(1.0);showMenuSettings()" style="padding:6px 12px;font-size:0.8rem;">M</button>
+        <button class="room-toggle-opt ${fontVal==='large'?'active':''}" data-val="large" onclick="setFontScale(1.15);showMenuSettings()" style="padding:6px 12px;font-size:0.8rem;">L</button>
+      </div>
+    </div>
+    <div class="help-buttons" style="margin-top:14px;">
+      <button class="help-btn-secondary" onclick="openUserMenu()">Back</button>
+    </div>`;
+}
+
 function showAccountMenu() {
+  document.getElementById('user-menu-title').style.display = '';
   document.getElementById('user-menu-title').textContent = 'Account';
   const content = document.getElementById('user-menu-content');
   content.innerHTML = `
@@ -2481,6 +2514,19 @@ function toggleDebugMode(enabled) {
 // ─── AUDIO ──────────────────────────────────────────────────────────────────
 let clickVol = 0.6;
 let audioCtx = null;
+let musicPlaying = false;
+let musicVolume = 0.3;
+let musicInterval = null;
+let musicGain = null;
+let musicStep = 0;
+let fontScale = parseFloat(localStorage.getItem('mathMadness_fontScale') || '1');
+
+// Apply saved font scale on load
+document.documentElement.style.setProperty('--font-scale', fontScale);
+
+const MUSIC_BASS = [130.81,130.81,130.81,130.81, 164.81,164.81,164.81,164.81, 174.61,174.61,174.61,174.61, 196.00,196.00,164.81,164.81];
+const MUSIC_MELODY = [523.25,0,659.25,0, 587.33,0,523.25,0, 466.16,0,523.25,0, 587.33,0,0,0];
+const MUSIC_ARP = [392,523.25,659.25,523.25, 349.23,466.16,587.33,466.16, 349.23,440,523.25,440, 392,523.25,659.25,523.25];
 
 function ensureAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2504,6 +2550,70 @@ function playClick() {
 }
 
 function setClickVolume(v) { clickVol = v / 100; }
+
+function startMusic() {
+  if (musicInterval) return;
+  ensureAudioCtx();
+  if (!audioCtx) return;
+  musicGain = audioCtx.createGain();
+  musicGain.gain.value = musicVolume * 0.2;
+  musicGain.connect(audioCtx.destination);
+  musicStep = 0;
+  musicInterval = setInterval(() => {
+    const t = audioCtx.currentTime;
+    // Bass
+    const bassFreq = MUSIC_BASS[musicStep % MUSIC_BASS.length];
+    const bOsc = audioCtx.createOscillator();
+    const bGain = audioCtx.createGain();
+    bOsc.connect(bGain); bGain.connect(musicGain);
+    bOsc.type = 'sawtooth'; bOsc.frequency.value = bassFreq;
+    bGain.gain.setValueAtTime(0.06, t);
+    bGain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+    bOsc.start(t); bOsc.stop(t + 0.22);
+    // Melody
+    const melFreq = MUSIC_MELODY[musicStep % MUSIC_MELODY.length];
+    if (melFreq > 0) {
+      const mOsc = audioCtx.createOscillator();
+      const mGain = audioCtx.createGain();
+      mOsc.connect(mGain); mGain.connect(musicGain);
+      mOsc.type = 'square'; mOsc.frequency.value = melFreq;
+      mGain.gain.setValueAtTime(0.03, t);
+      mGain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      mOsc.start(t); mOsc.stop(t + 0.18);
+    }
+    // Arpeggio
+    const arpFreq = MUSIC_ARP[musicStep % MUSIC_ARP.length];
+    const aOsc = audioCtx.createOscillator();
+    const aGain = audioCtx.createGain();
+    aOsc.connect(aGain); aGain.connect(musicGain);
+    aOsc.type = 'triangle'; aOsc.frequency.value = arpFreq;
+    aGain.gain.setValueAtTime(0.02, t);
+    aGain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    aOsc.start(t); aOsc.stop(t + 0.12);
+    musicStep++;
+  }, 200);
+  musicPlaying = true;
+}
+
+function stopMusic() {
+  if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
+  musicPlaying = false;
+}
+
+function toggleMusic(on) {
+  if (on) startMusic(); else stopMusic();
+}
+
+function setMusicVolume(v) {
+  musicVolume = v / 100;
+  if (musicGain) musicGain.gain.value = musicVolume * 0.2;
+}
+
+function setFontScale(scale) {
+  fontScale = scale;
+  document.documentElement.style.setProperty('--font-scale', scale);
+  localStorage.setItem('mathMadness_fontScale', String(scale));
+}
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 function getDiffName(lvl) {
@@ -3091,7 +3201,7 @@ function openHistory() {
   }
   
   let totalScore = gameHistory.reduce((sum, g) => sum + g.score, 0);
-  let avg = gameHistory.length > 0 ? (totalScore / gameHistory.length).toFixed(1) : 0;
+  let avg = gameHistory.length > 0 ? Math.round(totalScore / gameHistory.length) : 0;
   let highest = bestGame ? bestGame.score : 0;
   
   historyStats.innerHTML = `Avg (Past 10): <span style="color:#7fffb2">${avg}</span><br>Highest Score: <span style="color:#ffcc00">${highest}</span>`;
@@ -3284,6 +3394,9 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAutoLogin();
   initMathBg();
   updateIncomingBadges();
+  // Auto-start music after first user interaction
+  const startMusicOnce = () => { startMusic(); document.removeEventListener('click', startMusicOnce); };
+  document.addEventListener('click', startMusicOnce);
   // Periodically check for room invites and friend request badges on start screen
   setInterval(() => {
     if (document.getElementById('startscreen').style.display !== 'none' && currentUser) {

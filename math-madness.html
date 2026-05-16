@@ -1670,6 +1670,37 @@
 <!-- ROOM INVITE POPUP -->
 <div id="room-invite-popup"></div>
 
+<!-- MODERATOR DASHBOARD -->
+<div id="mod-dashboard-overlay" style="display:none; position:fixed; inset:0; z-index:400; background:radial-gradient(circle at center, #1a0533, #000); overflow-y:auto; padding:40px 20px;">
+  <div style="max-width:800px; margin:0 auto;">
+    <h1 style="text-align:center; font-family:'Orbitron',sans-serif; color:var(--accent); margin-bottom:10px; font-size:2.5rem; text-shadow:0 0 20px rgba(255,107,255,0.4);">Moderator Dashboard</h1>
+    <div style="text-align:center; font-family:'Share Tech Mono',monospace; color:rgba(255,255,255,0.6); margin-bottom:30px; font-size:1.2rem;" id="mod-status-text">
+      Waiting for players to answer...
+    </div>
+    
+    <div style="display:flex; flex-wrap:wrap; gap:20px; margin-bottom:30px;">
+      <div style="flex:1; min-width:250px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; text-align:center;">
+        <h2 style="font-family:'Orbitron',sans-serif; font-size:1.2rem; margin-bottom:10px; color:rgba(255,255,255,0.8);">Answers Received</h2>
+        <div id="mod-answers-ratio" style="font-family:'Share Tech Mono',monospace; font-size:3rem; color:#7fffb2; text-shadow:0 0 15px rgba(127,255,178,0.3);">0 / 0</div>
+      </div>
+      <div style="flex:1; min-width:250px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; text-align:center;">
+        <h2 style="font-family:'Orbitron',sans-serif; font-size:1.2rem; margin-bottom:10px; color:rgba(255,255,255,0.8);">Timer</h2>
+        <div id="mod-global-timer" style="font-family:'Share Tech Mono',monospace; font-size:3rem; color:#00ffff; text-shadow:0 0 15px rgba(0,255,255,0.3);">--</div>
+      </div>
+    </div>
+    
+    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px;">
+      <h2 style="font-family:'Orbitron',sans-serif; font-size:1.5rem; margin-bottom:20px; color:#fff;">Players</h2>
+      <div id="mod-players-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+    </div>
+    
+    <div style="text-align:center; margin-top:40px;">
+      <button class="room-btn-primary" id="mod-next-btn" style="display:none; width:100%; max-width:300px; margin:0 auto 16px auto;" onclick="modAdvanceQuestion()">Next Question</button>
+      <button class="room-btn-secondary" onclick="leaveRoomFromLobby()">End Game</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const BG_THEMES = [
@@ -3427,6 +3458,7 @@ function showHostSetup() {
       <div class="room-toggle-group" id="room-mode-toggle">
         <button class="room-toggle-opt active" data-val="individual" onclick="toggleRoomOpt(this,'room-mode-toggle')">Individual</button>
         <button class="room-toggle-opt" data-val="team" onclick="toggleRoomOpt(this,'room-mode-toggle')">Team</button>
+        <button class="room-toggle-opt" data-val="1v1" onclick="toggleRoomOpt(this,'room-mode-toggle')">1v1 Duel</button>
       </div>
       <div style="font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:4px;font-family:'Share Tech Mono',monospace;" id="room-mode-desc">
         Each player competes for themselves
@@ -3490,8 +3522,9 @@ function toggleRoomOpt(btn, groupId) {
   group.querySelectorAll('.room-toggle-opt').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   if (groupId === 'room-mode-toggle') {
-    document.getElementById('room-mode-desc').textContent = btn.dataset.val === 'team'
-      ? 'Players split into teams — team with most points wins' : 'Each player competes for themselves';
+    if (btn.dataset.val === 'team') document.getElementById('room-mode-desc').textContent = 'Players split into teams — team with most points wins';
+    else if (btn.dataset.val === '1v1') document.getElementById('room-mode-desc').textContent = 'Head-to-head battle! Host gets to play too.';
+    else document.getElementById('room-mode-desc').textContent = 'Each player competes for themselves';
   }
   if (groupId === 'room-style-toggle') {
     document.getElementById('room-style-desc').textContent = btn.dataset.val === 'live'
@@ -3518,7 +3551,7 @@ function submitHostSetup() {
     code, host: currentUser, mode, playStyle,
     settings: { timePerQuestion: timePerQ, difficulty, numQuestions: numQ },
     isPublic: false,
-    players: [{ username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId, status: 'joined' }],
+    players: (mode === '1v1') ? [{ username: currentUser, displayName: getDisplayName(currentUser), playerId: currentPlayerId, status: 'joined' }] : [],
     invites: [], status: 'waiting', currentQuestion: 0, questions, results: {}
   };
   const rooms = getAllRooms();
@@ -3558,9 +3591,9 @@ function showInvitePlayers() {
     + friendsHtml
     + '<hr class="room-divider">'
     + '<div class="room-form-group"><span class="room-form-label">Or share the Room Code</span>'
-    + '<div class="room-code-display">' + currentRoom + '</div>'
+    + '<div class="room-code-display" id="room-code-display" style="' + (room.isPublic ? '' : 'display:none;') + '">' + currentRoom + '</div>'
     + '<button class="room-btn-secondary" onclick="toggleRoomPublic()" id="public-toggle-btn" style="font-size:0.9rem;">'
-    + (room.isPublic ? 'Public Game' : 'Make Public') + '</button></div>'
+    + (room.isPublic ? 'Make Game Private' : 'Make Game Public') + '</button></div>'
     + '<button class="room-btn-primary" onclick="showLobby()">Next →</button>';
   setTimeout(() => {
     const inp = document.getElementById('invite-search-input');
@@ -3598,7 +3631,9 @@ function toggleRoomPublic() {
   playClick();
   updateRoom(currentRoom, r => r.isPublic = !r.isPublic);
   const room = getRoom(currentRoom);
-  document.getElementById('public-toggle-btn').textContent = room.isPublic ? 'Public Game' : 'Make Public';
+  const isPub = room.isPublic;
+  document.getElementById('public-toggle-btn').textContent = isPub ? 'Make Game Private' : 'Make Game Public';
+  document.getElementById('room-code-display').style.display = isPub ? '' : 'none';
 }
 
 function saveRoomInvite(targetUser, roomCode, fromUser) {
@@ -3652,6 +3687,8 @@ async function leaveRoomFromLobby() {
     else { await api('/api/rooms/' + currentRoom + '/leave', { username: currentUser }); delete _roomCache[currentRoom]; }
   }
   if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  if (typeof modDashboardInterval !== 'undefined' && modDashboardInterval) { clearInterval(modDashboardInterval); modDashboardInterval = null; }
+  document.getElementById('mod-dashboard-overlay').style.display = 'none';
   currentRoom = null; isRoomMode = false; isRoomHost = false;
   closeRoomOverlay();
 }
@@ -3660,11 +3697,108 @@ async function leaveRoomFromLobby() {
 async function hostStartGame() {
   playClick();
   const room = getRoom(currentRoom);
-  if (!room || room.players.length < 2) return;
+  if (!room) return;
+  if (room.mode !== '1v1' && room.players.length < 3) return;
+  if (room.mode === 'team' && room.players.length % 2 !== 0) return;
+  if (room.mode === '1v1' && room.players.length !== 2) return;
+  
   await api('/api/rooms/' + currentRoom + '/start', { host: currentUser });
   await fetchRoom(currentRoom);
   if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
-  startRoomGameAsPlayer();
+  
+  if (room.mode === '1v1') {
+    startRoomGameAsPlayer();
+  } else {
+    showRoomModeratorUI();
+  }
+}
+
+let modDashboardInterval = null;
+
+function showRoomModeratorUI() {
+  document.getElementById('room-overlay').classList.remove('active');
+  document.getElementById('startscreen').style.display = 'none';
+  document.getElementById('mod-dashboard-overlay').style.display = 'block';
+  
+  if (modDashboardInterval) clearInterval(modDashboardInterval);
+  modDashboardInterval = setInterval(updateModDashboard, 1000);
+  updateModDashboard();
+}
+
+async function updateModDashboard() {
+  await fetchRoom(currentRoom);
+  const r = getRoom(currentRoom);
+  if (!r) return;
+  
+  if (r.status === 'finished') {
+    clearInterval(modDashboardInterval);
+    document.getElementById('mod-dashboard-overlay').style.display = 'none';
+    showRoomResults();
+    return;
+  }
+  
+  const qIdx = r.currentQuestion;
+  document.getElementById('mod-status-text').textContent = 'Question ' + (qIdx + 1) + ' / ' + r.questions.length;
+  
+  let answered = 0;
+  let total = r.players.length;
+  let allAnswered = true;
+  
+  let pListHtml = '';
+  
+  r.players.forEach(p => {
+    let hasAnswered = false;
+    let isCorrect = false;
+    let pScore = 0;
+    
+    if (r.results[p.username] && r.results[p.username].answers && r.results[p.username].answers.length > qIdx) {
+      hasAnswered = true;
+      isCorrect = r.results[p.username].answers[qIdx].correct;
+      answered++;
+    } else {
+      allAnswered = false;
+    }
+    
+    if (r.results[p.username]) pScore = r.results[p.username].score;
+    
+    let statusBox = '';
+    if (hasAnswered) {
+      if (isCorrect) statusBox = '<div style="background:rgba(127,255,178,0.2); border:1px solid #7fffb2; color:#7fffb2; padding:4px 12px; border-radius:6px; min-width:80px; text-align:center;">Correct</div>';
+      else statusBox = '<div style="background:rgba(255,68,102,0.2); border:1px solid #ff4466; color:#ff4466; padding:4px 12px; border-radius:6px; min-width:80px; text-align:center;">Wrong</div>';
+    } else {
+      statusBox = '<div style="color:rgba(255,255,255,0.4); border:1px solid transparent; padding:4px 12px; min-width:80px; text-align:center;">Thinking...</div>';
+    }
+    
+    pListHtml += '<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:8px;">'
+      + '<div style="display:flex; align-items:center; gap:12px;">'
+      + '  <div style="font-family:\\'Orbitron\\',sans-serif; font-size:1.1rem; color:#fff;">' + p.displayName + '</div>'
+      + '  <div style="font-family:\\'Share Tech Mono\\',monospace; color:rgba(255,255,255,0.5); font-size:0.9rem;">' + pScore + ' pts</div>'
+      + '</div>'
+      + statusBox
+      + '</div>';
+  });
+  
+  document.getElementById('mod-answers-ratio').textContent = answered + ' / ' + total;
+  document.getElementById('mod-players-list').innerHTML = pListHtml;
+  document.getElementById('mod-global-timer').textContent = r.playStyle === 'live' ? 'Live Mode' : 'Paced Mode';
+  
+  const nextBtn = document.getElementById('mod-next-btn');
+  if (r.playStyle === 'live' && allAnswered && total > 0) {
+    nextBtn.style.display = 'block';
+  } else {
+    nextBtn.style.display = 'none';
+  }
+}
+
+function modAdvanceQuestion() {
+  playClick();
+  document.getElementById('mod-next-btn').style.display = 'none';
+  const r = getRoom(currentRoom);
+  if (r.currentQuestion + 1 >= r.questions.length) {
+    api('/api/rooms/' + currentRoom + '/finish');
+  } else {
+    api('/api/rooms/' + currentRoom + '/advance', { nextQuestion: r.currentQuestion + 1 });
+  }
 }
 
 function startRoomGameAsPlayer() {
@@ -3761,8 +3895,8 @@ function advanceRoomQuestion() {
   const room = getRoom(currentRoom);
   if (!room) return;
   const nextQ = roomCurrentQ + 1;
-  if (room.playStyle === 'live' && isRoomHost) { showHostLiveControl(nextQ); }
-  else if (room.playStyle === 'live' && !isRoomHost) { showWaitingForHost(); }
+  if (room.playStyle === 'live' && isRoomHost && room.mode === '1v1') { showHostLiveControl(nextQ); }
+  else if (room.playStyle === 'live') { showWaitingForHost(); }
   else { setTimeout(() => loadRoomQuestion(nextQ), 600); }
 }
 

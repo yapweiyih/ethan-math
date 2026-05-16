@@ -3853,7 +3853,7 @@ async function hostStartGame() {
   playClick();
   const room = getRoom(currentRoom);
   if (!room) return;
-  if (room.mode !== '1v1' && room.players.length < 3) return;
+  if (room.mode !== '1v1' && room.players.length < 2) return;
   if (room.mode === 'team' && room.players.length % 2 !== 0) return;
   if (room.mode === '1v1' && room.players.length !== 2) return;
   

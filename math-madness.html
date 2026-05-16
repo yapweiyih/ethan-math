@@ -107,6 +107,7 @@
   }
   #settings-toggle:hover { transform: scale(1.15) rotate(30deg); background: rgba(255,255,255,0.22); }
   #settings-toggle svg { width: 22px; height: 22px; fill: #fff; }
+  body { font-size: calc(1rem * var(--font-scale, 1)); }
   #score-display {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.2rem;
@@ -160,7 +161,7 @@
     text-align: center;
     cursor: pointer;
     font-family: 'Orbitron', sans-serif;
-    font-size: calc(clamp(1rem, 2.5vw, 1.5rem) * var(--font-scale, 1));
+    font-size: calc(clamp(1rem, 2.5vw, 1.5rem) * var(--font-scale, 1)) !important;
     letter-spacing: 0.04em;
     transition: transform 0.12s, background 0.15s, box-shadow 0.15s;
     user-select: none;
@@ -2035,11 +2036,8 @@ function showMenuSettings() {
     </div>
     <div class="settings-row"><label>Music</label>
       <div style="display:flex;align-items:center;gap:10px;">
-        <input type="range" min="0" max="100" value="${musicVolume*100}" oninput="setMusicVolume(this.value)" style="-webkit-appearance:none;appearance:none;width:90px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
-        <div class="toggle-switch" style="width:42px;height:22px;">
-          <input type="checkbox" ${musicPlaying?'checked':''} onchange="toggleMusic(this.checked)">
-          <span class="toggle-slider" style="border-radius:22px;"><span style="position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform 0.3s;"></span></span>
-        </div>
+        <input type="range" min="0" max="100" value="${Math.round(musicVolume*100)}" oninput="setMusicVolume(this.value)" style="-webkit-appearance:none;appearance:none;width:90px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+        <button onclick="toggleMusic(!musicPlaying);showMenuSettings()" style="font-family:'Orbitron',sans-serif;font-size:0.75rem;padding:5px 12px;border:1.5px solid ${musicPlaying?'#7fffb2':'rgba(255,255,255,0.3)'};border-radius:8px;background:${musicPlaying?'rgba(127,255,178,0.15)':'rgba(255,255,255,0.06)'};color:${musicPlaying?'#7fffb2':'rgba(255,255,255,0.5)'};cursor:pointer;">${musicPlaying?'ON':'OFF'}</button>
       </div>
     </div>
     <div class="settings-row"><label>Font Size</label>
@@ -2524,9 +2522,38 @@ let fontScale = parseFloat(localStorage.getItem('mathMadness_fontScale') || '1')
 // Apply saved font scale on load
 document.documentElement.style.setProperty('--font-scale', fontScale);
 
-const MUSIC_BASS = [130.81,130.81,130.81,130.81, 164.81,164.81,164.81,164.81, 174.61,174.61,174.61,174.61, 196.00,196.00,164.81,164.81];
-const MUSIC_MELODY = [523.25,0,659.25,0, 587.33,0,523.25,0, 466.16,0,523.25,0, 587.33,0,0,0];
-const MUSIC_ARP = [392,523.25,659.25,523.25, 349.23,466.16,587.33,466.16, 349.23,440,523.25,440, 392,523.25,659.25,523.25];
+// Extended music patterns (~80 steps = ~16s loop, feels like longer track)
+const MUSIC_BASS = [
+  130.81,130.81,130.81,130.81, 130.81,130.81,130.81,130.81,
+  164.81,164.81,164.81,164.81, 164.81,164.81,164.81,164.81,
+  174.61,174.61,174.61,174.61, 174.61,174.61,196.00,196.00,
+  196.00,196.00,164.81,164.81, 146.83,146.83,146.83,146.83,
+  130.81,130.81,146.83,146.83, 164.81,164.81,174.61,174.61,
+  196.00,196.00,196.00,196.00, 220.00,220.00,196.00,196.00,
+  174.61,174.61,164.81,164.81, 146.83,146.83,130.81,130.81,
+  130.81,130.81,164.81,164.81, 196.00,196.00,164.81,164.81,
+  146.83,146.83,174.61,174.61, 196.00,196.00,220.00,220.00,
+  196.00,196.00,174.61,174.61, 164.81,164.81,130.81,130.81
+];
+const MUSIC_MELODY = [
+  523.25,0,659.25,0, 587.33,0,523.25,0, 0,0,466.16,0, 523.25,0,587.33,0,
+  659.25,0,0,0, 587.33,0,523.25,0, 466.16,0,523.25,0, 0,0,0,0,
+  392.00,0,440.00,0, 523.25,0,587.33,0, 659.25,0,587.33,0, 523.25,0,0,0,
+  440.00,0,392.00,0, 349.23,0,392.00,0, 440.00,0,523.25,0, 587.33,0,0,0,
+  523.25,0,0,0, 659.25,0,0,0, 587.33,0,523.25,0, 466.16,0,392.00,0
+];
+const MUSIC_ARP = [
+  392,523.25,659.25,523.25, 349.23,466.16,587.33,466.16,
+  349.23,440,523.25,440, 392,523.25,659.25,523.25,
+  329.63,440,523.25,440, 349.23,466.16,587.33,466.16,
+  392,523.25,659.25,523.25, 440,523.25,659.25,523.25,
+  349.23,440,523.25,440, 329.63,392,466.16,392,
+  349.23,466.16,587.33,466.16, 392,523.25,659.25,523.25,
+  440,587.33,659.25,587.33, 392,523.25,659.25,523.25,
+  349.23,466.16,587.33,466.16, 329.63,440,523.25,440,
+  392,523.25,659.25,523.25, 349.23,466.16,587.33,466.16,
+  329.63,392,466.16,392, 349.23,440,523.25,440
+];
 
 function ensureAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2550,6 +2577,32 @@ function playClick() {
 }
 
 function setClickVolume(v) { clickVol = v / 100; }
+
+function playLoseSound() {
+  try {
+    ensureAudioCtx();
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Descending tone sequence
+    [[400,0],[300,0.12],[200,0.24],[120,0.4]].forEach(([freq, delay]) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sawtooth'; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.12, t + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.2);
+      osc.start(t + delay); osc.stop(t + delay + 0.2);
+    });
+    // Low buzz
+    const bOsc = audioCtx.createOscillator();
+    const bGain = audioCtx.createGain();
+    bOsc.connect(bGain); bGain.connect(audioCtx.destination);
+    bOsc.type = 'square'; bOsc.frequency.value = 80;
+    bGain.gain.setValueAtTime(0.08, t + 0.5);
+    bGain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+    bOsc.start(t + 0.5); bOsc.stop(t + 1.2);
+  } catch(e) {}
+}
 
 function startMusic() {
   if (musicInterval) return;
@@ -3001,6 +3054,7 @@ function handleWrong() {
     correctCard.classList.add('highlight-correct');
   }
   
+  playLoseSound();
   setTimeout(() => {
     flashScreen('wrong', 300, showGameOver);
   }, 1000);

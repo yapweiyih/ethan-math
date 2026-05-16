@@ -286,10 +286,9 @@
     border: none; border-radius: 50px;
     background: #fff; color: #cc0020;
     cursor: pointer;
-    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: transform 0.1s;
   }
-  #restart-btn:hover { transform: scale(1.06); box-shadow: 0 6px 40px rgba(0,0,0,0.4); }
+  #restart-btn:hover { transform: scale(1.06); }
   #home-btn {
     width: 52px; height: 52px;
     border: none; border-radius: 50%;
@@ -298,7 +297,6 @@
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: transform 0.12s, background 0.15s;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
   }
   #home-btn:hover {
     transform: scale(1.1);
@@ -506,7 +504,6 @@
   .auth-tab.active {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 0 16px rgba(255,107,255,0.4);
   }
   .auth-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
   .auth-input {
@@ -557,7 +554,6 @@
     border: none; border-radius: 50px;
     background: var(--accent); color: #fff;
     cursor: pointer;
-    box-shadow: 0 0 24px rgba(255,107,255,0.4);
     transition: transform 0.15s;
     margin-top: 4px;
   }
@@ -669,7 +665,6 @@
     border-radius: 50%;
     background: var(--accent);
     cursor: pointer;
-    box-shadow: 0 0 8px var(--accent);
   }
 
   /* TOGGLE SWITCH */
@@ -769,32 +764,29 @@
   .confirm-buttons button:hover { transform: scale(1.08); }
   #confirm-yes {
     background: #ff4466; color: #fff;
-    box-shadow: 0 2px 16px rgba(255,68,102,0.4);
   }
   #confirm-cancel {
     background: rgba(255,255,255,0.15); color: #fff;
-    border: 1px solid rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.25) !important;
   }
 
   .highlight-correct {
     background: rgba(127, 255, 178, 0.4) !important;
     border: 2px solid #7fffb2 !important;
     transform: scale(1.1) !important;
-    box-shadow: 0 0 20px #7fffb2 !important;
     z-index: 10;
   }
 
   /* DEBUG MODE HIGHLIGHT (always visible, subtle) */
   .debug-highlight {
-    box-shadow: 0 0 12px rgba(127,255,178,0.5), inset 0 0 8px rgba(127,255,178,0.15) !important;
     border: 2px dashed #7fffb2 !important;
   }
 
   /* SPEED BONUS POPUP */
   .speed-bonus {
     position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-    font-family: 'Orbitron', sans-serif; font-size: 1.6rem;
-    color: #7fffb2; text-shadow: 0 0 16px rgba(127,255,178,0.6);
+    padding: 10px; font-family: 'Orbitron', sans-serif; font-size: 1.6rem;
+    color: #7fffb2;
     z-index: 150; pointer-events: none;
     animation: bonusFly 1.2s ease forwards;
   }
@@ -809,10 +801,9 @@
     width: 50px; height: 50px; border: none; border-radius: 50%;
     background: rgba(255,215,0,0.2); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
-    box-shadow: 0 0 16px rgba(255,215,0,0.2);
+    transition: transform 0.15s, background 0.15s;
   }
-  #lightbulb-btn:hover { transform: scale(1.15); background: rgba(255,215,0,0.35); box-shadow: 0 0 24px rgba(255,215,0,0.4); }
+  #lightbulb-btn:hover { transform: scale(1.15); background: rgba(255,215,0,0.35); }
   #lightbulb-btn svg { width: 26px; height: 26px; fill: #ffd700; }
   #lightbulb-btn.hidden { display: none; }
 
@@ -845,10 +836,10 @@
     align-items: center; font-family: 'Share Tech Mono', monospace;
   }
   .history-item.best {
-    border: 1px solid #ffcc00; box-shadow: 0 0 8px rgba(255,204,0,0.3); background: rgba(255,204,0,0.1);
+    border: 1px solid #ffcc00; background: rgba(255,204,0,0.1);
   }
   .history-item.room {
-    border: 1px solid #4285F4; box-shadow: 0 0 8px rgba(66,133,244,0.3); background: rgba(66,133,244,0.12);
+    border: 1px solid #4285F4; background: rgba(66,133,244,0.12);
   }
   .history-item .score { font-size: 1.2rem; font-weight: bold; color: #fff; }
   .history-item .date { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
@@ -869,7 +860,6 @@
   #help-panel h2 {
     font-family: 'Orbitron', sans-serif; font-size: 1.6rem;
     color: var(--accent); margin-bottom: 0.8em;
-    text-shadow: 0 0 14px var(--accent);
   }
   #help-panel p { font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-bottom: 1em; line-height: 1.5; }
   #help-panel .eq-display {
@@ -896,7 +886,7 @@
     cursor: pointer; transition: transform 0.12s;
   }
   .help-buttons button:hover { transform: scale(1.08); }
-  .help-btn-primary { background: var(--accent); color: #fff; box-shadow: 0 2px 12px rgba(255,107,255,0.4); }
+  .help-btn-primary { background: var(--accent); color: #fff; }
   .help-btn-secondary { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25) !important; }
   .help-choice-btn {
     font-family: 'Orbitron', sans-serif; font-size: 1rem;
@@ -1018,7 +1008,6 @@
   }
   .friends-tab.active {
     background: var(--accent); color: #fff;
-    box-shadow: 0 0 16px rgba(255,107,255,0.4);
   }
   .friends-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
   .friends-content {
@@ -1120,17 +1109,16 @@
   .mode-panel h2 {
     font-family:'Orbitron',sans-serif; font-size:1.8rem;
     color:var(--accent); margin-bottom:0.8em;
-    text-shadow:0 0 14px var(--accent);
   }
   .mode-card {
     font-family:'Orbitron',sans-serif; font-size:1.3rem;
     padding:20px; border:1.5px solid rgba(255,255,255,0.2);
     border-radius:14px; background:rgba(255,255,255,0.06);
     color:rgba(255,255,255,0.85); cursor:pointer; width:100%;
-    margin-bottom:12px; transition:transform 0.12s, background 0.15s, box-shadow 0.15s;
+    margin-bottom:12px; transition:transform 0.12s, background 0.15s;
     display:flex; align-items:center; gap:14px; text-align:left;
   }
-  .mode-card:hover { transform:scale(1.04); background:rgba(255,255,255,0.12); box-shadow:0 0 20px rgba(255,107,255,0.2); }
+  .mode-card:hover { transform:scale(1.04); background:rgba(255,255,255,0.12); }
   .mode-card-icon { font-size:2rem; }
   .mode-card-desc { font-size:0.8rem; color:rgba(255,255,255,0.45); font-family:'Share Tech Mono',monospace; margin-top:4px; }
 
@@ -1180,7 +1168,6 @@
   }
   .room-toggle-opt.active {
     background:var(--accent); color:#fff;
-    box-shadow:0 0 12px rgba(255,107,255,0.4);
   }
   .room-input {
     width:100%; font-family:'Share Tech Mono',monospace; font-size:0.9rem;
@@ -1199,11 +1186,12 @@
   }
   .room-slider-wrap input[type=range]::-webkit-slider-thumb {
     -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
-    background:var(--accent); cursor:pointer; box-shadow:0 0 8px var(--accent);
+    background:var(--accent); cursor:pointer;
   }
   .room-slider-val {
-    font-family:'Share Tech Mono',monospace; font-size:0.85rem;
-    color:#ffd86b; min-width:40px; text-align:right;
+    font-family: 'Share Tech Mono', monospace; font-size: 1.6rem;
+    color: var(--accent);
+    text-shadow: 0 0 14px var(--accent);
   }
   .room-btn-primary {
     font-family:'Orbitron',sans-serif; font-size:1.3rem;
@@ -1307,8 +1295,7 @@
   }
   .results-title {
     font-family:'Orbitron',sans-serif; font-size:2.2rem;
-    color:var(--accent); text-align:center; margin-bottom:4px;
-    text-shadow:0 0 20px var(--accent);
+    color:var(--accent); margin-bottom:12px; text-shadow:0 0 20px var(--accent);
   }
   .results-winner {
     font-family:'Orbitron',sans-serif; font-size:1.4rem;
@@ -1348,7 +1335,6 @@
     font-family:'Orbitron',sans-serif; font-size:1.3rem;
     padding:14px 40px; border:none; border-radius:50px;
     background:#ff4466; color:#fff; cursor:pointer;
-    box-shadow:0 4px 20px rgba(255,68,102,0.4);
     transition:transform 0.15s; width:100%; margin-top:14px;
   }
   .results-leave-btn:hover { transform:scale(1.05); }
@@ -1360,7 +1346,6 @@
     border:2px solid var(--accent); border-radius:20px;
     padding:24px 28px; width:340px; max-width:90vw;
     text-align:center; animation:goIn 0.3s ease;
-    box-shadow:0 0 40px rgba(255,107,255,0.3);
   }
   #room-invite-popup.active { display:block; }
   .invite-popup-title {
@@ -1442,7 +1427,7 @@
 </div>
 
 <div id="gameover">
-  <h1>GAME OVER</h1>
+  <h1 style="font-family: 'Orbitron', sans-serif; font-size: 5rem; color: #fff; text-shadow: 0 0 40px rgba(255,255,255,0.6); margin-bottom: 0.2em;">GAME OVER</h1>
   <div id="go-score">Score: 0</div>
   <div id="go-highscore-wrap">
     High Score: <span id="go-highscore-value">0</span>
@@ -1511,7 +1496,7 @@
 
 <!-- AUTH SCREEN -->
 <div id="auth-screen">
-  <h1>MathError</h1>
+  <h1 style="font-family: 'Orbitron', sans-serif; font-size: clamp(2.5rem, 9vw, 5rem); color: var(--accent); text-shadow: 0 0 40px var(--accent); margin-bottom: 0.4em;">MathError</h1>
   <div id="auth-box">
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
@@ -1538,7 +1523,7 @@
 
 <div id="startscreen" style="display:none;">
   <div id="player-id-badge">ID: <span id="player-id-display">----</span></div>
-  <h1>MathError</h1>
+  <h1 style="font-family: 'Orbitron', sans-serif; font-size: clamp(2.5rem, 9vw, 6rem); color: var(--accent); text-shadow: 0 0 40px var(--accent); margin-bottom: 0.2em;">MathError</h1>
   <div id="user-greeting"></div>
   <p>One equation is <span class="tag">WRONG</span>.<br>
      Find it before time runs out!</p>
@@ -1681,11 +1666,11 @@
     <div style="display:flex; flex-wrap:wrap; gap:20px; margin-bottom:30px;">
       <div style="flex:1; min-width:250px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; text-align:center;">
         <h2 style="font-family:'Orbitron',sans-serif; font-size:1.2rem; margin-bottom:10px; color:rgba(255,255,255,0.8);">Answers Received</h2>
-        <div id="mod-answers-ratio" style="font-family:'Share Tech Mono',monospace; font-size:3rem; color:#7fffb2; text-shadow:0 0 15px rgba(127,255,178,0.3);">0 / 0</div>
+        <div id="mod-answers-ratio" style="font-family:'Share Tech Mono',monospace; font-size:3rem; color:#7fffb2;">0 / 0</div>
       </div>
       <div style="flex:1; min-width:250px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; text-align:center;">
         <h2 style="font-family:'Orbitron',sans-serif; font-size:1.2rem; margin-bottom:10px; color:rgba(255,255,255,0.8);">Timer</h2>
-        <div id="mod-global-timer" style="font-family:'Share Tech Mono',monospace; font-size:3rem; color:#00ffff; text-shadow:0 0 15px rgba(0,255,255,0.3);">--</div>
+        <div id="mod-global-timer" style="font-family:'Share Tech Mono',monospace; font-size:3rem; color:#00ffff;">--</div>
       </div>
     </div>
     
@@ -1812,6 +1797,7 @@ function switchAuthTab(mode) {
 }
 
 function handleAuth() {
+  playClick();
   const username = document.getElementById('auth-username').value.trim();
   const password = document.getElementById('auth-password').value;
   const errorEl = document.getElementById('auth-error');
@@ -1865,12 +1851,14 @@ function loginSuccess() {
 }
 
 function playAsGuest() {
+  playClick();
   currentUser = null;
   currentPlayerId = null;
   localStorage.removeItem('mathMadness_currentUser');
   loadUserData();
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('startscreen').style.display = '';
+  document.getElementById('lightbulb-btn').classList.add('hidden');
   updateUserGreeting();
   updatePlayerIdBadge();
 }
@@ -1880,6 +1868,7 @@ function logout() {
   localStorage.removeItem('mathMadness_currentUser');
   document.getElementById('startscreen').style.display = 'none';
   document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('lightbulb-btn').classList.add('hidden');
   document.getElementById('auth-username').value = '';
   document.getElementById('auth-password').value = '';
   document.getElementById('auth-error').textContent = '';
@@ -1985,12 +1974,13 @@ function submitChangePassword() {
   content.innerHTML = `
     <p style="font-family:'Orbitron',sans-serif;font-size:1.3rem;color:#fff;margin-bottom:1em;">Confirm password change?</p>
     <div class="help-buttons">
-      <button class="help-btn-primary" onclick="doChangePassword('${newPw.replace(/'/g,"\\'")}')">Yes, Change</button>
+      <button class="help-btn-primary" onclick="doChangePassword()">Yes, Change</button>
       <button class="help-btn-secondary" onclick="showChangePassword()">Cancel</button>
     </div>`;
 }
 
-function doChangePassword(newPw) {
+function doChangePassword() {
+  const newPw = document.getElementById('chg-new-pw').value;
   const users = getUsers();
   users[currentUser] = newPw;
   saveUsers(users);
@@ -2219,15 +2209,12 @@ function sendFriendRequest() {
   const myData = getUserFriends(currentUser);
   if (myData.friends.includes(targetUser)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Already friends!'; return; }
   if (myData.outgoing.includes(targetUser)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Request already sent.'; return; }
-  // Check if they already sent us a request — auto-accept
   if (myData.incoming.includes(targetUser)) {
     acceptFriend(targetUser);
     return;
   }
-  // Add to my outgoing
   myData.outgoing.push(targetUser);
   saveUserFriends(currentUser, myData);
-  // Add to their incoming
   const theirData = getUserFriends(targetUser);
   if (!theirData.incoming.includes(currentUser)) theirData.incoming.push(currentUser);
   saveUserFriends(targetUser, theirData);
@@ -2240,12 +2227,9 @@ function sendFriendRequest() {
 function acceptFriend(fromUser) {
   playClick();
   const myData = getUserFriends(currentUser);
-  // Remove from my incoming
   myData.incoming = myData.incoming.filter(u => u !== fromUser);
-  // Add to friends
   if (!myData.friends.includes(fromUser)) myData.friends.push(fromUser);
   saveUserFriends(currentUser, myData);
-  // Update their data
   const theirData = getUserFriends(fromUser);
   theirData.outgoing = theirData.outgoing.filter(u => u !== currentUser);
   if (!theirData.friends.includes(currentUser)) theirData.friends.push(currentUser);
@@ -2294,64 +2278,6 @@ function togglePasswordVisibility() {
   }
 }
 
-// ─── PER-USER DATA ──────────────────────────────────────────────────────────
-function storageKey(key) {
-  const prefix = currentUser ? `mathMadness_user_${currentUser}` : 'mathMadness_guest';
-  return `${prefix}_${key}`;
-}
-
-function loadUserData() {
-  highScore = parseInt(localStorage.getItem(storageKey('highScore')) || '0', 10);
-}
-
-function saveHighScore() {
-  localStorage.setItem(storageKey('highScore'), String(highScore));
-}
-
-function getUserHistory() {
-  return JSON.parse(localStorage.getItem(storageKey('history')) || '[]');
-}
-
-function saveUserHistory(history) {
-  localStorage.setItem(storageKey('history'), JSON.stringify(history));
-}
-
-function getUserBestGame() {
-  return JSON.parse(localStorage.getItem(storageKey('bestGame')) || 'null');
-}
-
-function saveUserBestGame(best) {
-  localStorage.setItem(storageKey('bestGame'), JSON.stringify(best));
-}
-
-// ─── CHECK AUTO-LOGIN ───────────────────────────────────────────────────────
-function checkAutoLogin() {
-  const saved = localStorage.getItem('mathMadness_currentUser');
-  if (saved) {
-    const users = getUsers();
-    if (users[saved]) {
-      currentUser = saved;
-      currentPlayerId = getPlayerIdForUser(saved);
-      loadUserData();
-      document.getElementById('auth-screen').classList.add('hidden');
-      document.getElementById('startscreen').style.display = '';
-      updateUserGreeting();
-      updatePlayerIdBadge();
-      return;
-    }
-  }
-  // Show auth screen
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('startscreen').style.display = 'none';
-}
-
-// ─── DEBUG MODE ─────────────────────────────────────────────────────────────
-function toggleDebugMode(enabled) {
-  debugMode = enabled;
-  document.getElementById('debug-indicator').classList.toggle('active', enabled);
-  applyDebugHighlight();
-}
-
 function applyDebugHighlight() {
   // Remove any existing debug highlights
   document.querySelectorAll('.eq-card.debug-highlight').forEach(c => c.classList.remove('debug-highlight'));
@@ -2367,6 +2293,56 @@ function applyDebugHighlight() {
   }
 }
 
+// ─── PER-USER DATA ──────────────────────────────────────────────────────────
+function storageKey(key) {
+  const prefix = currentUser ? `mathMadness_user_${currentUser}` : 'mathMadness_guest';
+  return `${prefix}_${key}`;
+}
+function loadUserData() {
+  highScore = parseInt(localStorage.getItem(storageKey('highScore')) || '0', 10);
+}
+function saveHighScore() {
+  localStorage.setItem(storageKey('highScore'), String(highScore));
+}
+function getUserHistory() {
+  return JSON.parse(localStorage.getItem(storageKey('history')) || '[]');
+}
+function saveUserHistory(history) {
+  localStorage.setItem(storageKey('history'), JSON.stringify(history));
+}
+function getUserBestGame() {
+  return JSON.parse(localStorage.getItem(storageKey('bestGame')) || 'null');
+}
+function saveUserBestGame(best) {
+  localStorage.setItem(storageKey('bestGame'), JSON.stringify(best));
+}
+// ─── CHECK AUTO-LOGIN ───────────────────────────────────────────────────────
+function checkAutoLogin() {
+  const saved = localStorage.getItem('mathMadness_currentUser');
+  if (saved) {
+    const users = getUsers();
+    if (users[saved]) {
+      currentUser = saved;
+      currentPlayerId = getPlayerIdForUser(saved);
+      loadUserData();
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('startscreen').style.display = '';
+      document.getElementById('lightbulb-btn').classList.add('hidden');
+      updateUserGreeting();
+      updatePlayerIdBadge();
+      return;
+    }
+  }
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('startscreen').style.display = 'none';
+}
+// ─── DEBUG MODE ─────────────────────────────────────────────────────────────
+function toggleDebugMode(enabled) {
+  debugMode = enabled;
+  document.getElementById('debug-indicator').classList.toggle('active', enabled);
+  applyDebugHighlight();
+}
+
 // ─── AUDIO ──────────────────────────────────────────────────────────────────
 let clickVol = 0.6;
 let audioCtx = null;
@@ -2376,14 +2352,20 @@ function ensureAudioCtx() {
 }
 
 function playClick() {
-  ensureAudioCtx();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.type = 'sine'; osc.frequency.value = 880;
-  gain.gain.setValueAtTime(clickVol * 0.3, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-  osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+  try {
+    ensureAudioCtx();
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.05);
+    gain.gain.setValueAtTime(clickVol * 0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+  } catch(e) { console.error(e); }
 }
 
 function setClickVolume(v) { clickVol = v / 100; }
@@ -2830,7 +2812,7 @@ function showGameOver() {
 function restartGame() {
   playClick();
   level = 1; score = 0; lastDiffName = '';
-  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false; scoreAt5x5 = null;
+  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; // cheatHighlightCorrect persists
   document.getElementById('lightbulb-btn').classList.remove('hidden');
   document.getElementById('gameover').classList.remove('active');
   document.body.style.background = 'linear-gradient(135deg, #1a0533 0%, #0d1f3c 100%)';
@@ -2896,6 +2878,7 @@ function startClassicMode() {
   playClick();
   document.getElementById('mode-select-overlay').classList.remove('active');
   document.getElementById('startscreen').style.display = 'none';
+  document.getElementById('lightbulb-btn').classList.remove('hidden');
   lastDiffName = '';
   buildLevel();
 }
@@ -3050,7 +3033,7 @@ function startHelpChallenge() {
     fill.style.width = Math.max(0, helpLeft/8000*100) + '%';
     if (helpLeft <= 0) {
       clearInterval(helpTimerInterval);
-      helpFailed('Time\'s up! Answer: ' + helpAnswer);
+      helpFailed("Time's up! Answer: " + helpAnswer);
     }
   }, 50);
 }
@@ -3578,7 +3561,7 @@ function showInvitePlayers() {
     });
     friendsHtml += '</div>';
   } else {
-    friendsHtml = '<div style="text-align:center;color:rgba(255,255,255,0.35);font-family:\'Share Tech Mono\',monospace;font-size:0.8rem;margin:14px 0;">No friends yet — share the room code!</div>';
+    friendsHtml = `<div style="text-align:center;color:rgba(255,255,255,0.35);font-family:'Share Tech Mono',monospace;font-size:0.8rem;margin:14px 0;">No friends yet — share the room code!</div>`;
   }
   const panel = document.getElementById('room-panel');
   panel.innerHTML = '<div class="room-header">'
@@ -3664,7 +3647,7 @@ function showLobby() {
       + (isRoomHost ? '<button class="room-back-btn" onclick="showInvitePlayers()"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg></button>' : '<div style="width:28px"></div>')
       + '<h2>Waiting Room</h2><div style="width:28px"></div></div>'
       + '<div class="room-code-display" style="font-size:1.4rem;margin-bottom:6px;">' + currentRoom + '</div>'
-      + '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.7rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;">' + desc + '</p>'
+      + `<p style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;">${desc}</p>`
       + '<span class="room-form-label" style="text-align:center;display:block;">Players (' + r.players.length + ')</span>'
       + '<div class="lobby-players">' + chips + '</div>'
       + '<div class="lobby-status">'
@@ -3771,8 +3754,8 @@ async function updateModDashboard() {
     
     pListHtml += '<div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:8px;">'
       + '<div style="display:flex; align-items:center; gap:12px;">'
-      + '  <div style="font-family:\\'Orbitron\\',sans-serif; font-size:1.1rem; color:#fff;">' + p.displayName + '</div>'
-      + '  <div style="font-family:\\'Share Tech Mono\\',monospace; color:rgba(255,255,255,0.5); font-size:0.9rem;">' + pScore + ' pts</div>'
+      + '  <div style="font-family:\'Orbitron\',sans-serif; font-size:1.1rem; color:#fff;">' + p.displayName + '</div>'
+      + '  <div style="font-family:\'Share Tech Mono\',monospace; color:rgba(255,255,255,0.5); font-size:0.9rem;">' + pScore + ' pts</div>'
       + '</div>'
       + statusBox
       + '</div>';
@@ -3956,7 +3939,7 @@ function showWaitingForResults() {
   document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
     + '<div style="font-family:\'Orbitron\',sans-serif;font-size:1.5rem;color:rgba(255,255,255,0.6);margin-bottom:8px;">You finished!</div>'
     + '<div style="font-family:\'Orbitron\',sans-serif;font-size:1.1rem;color:#ffd86b;margin-bottom:8px;">Score: ' + roomScore + '</div>'
-    + '<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);"><span class="lobby-waiting-dots">Waiting for other players</span></div>'
+    + `<div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);"><span class="lobby-waiting-dots">Waiting for other players</span></div>`
     + '</div>';
   roomPollInterval = setInterval(async () => {
     await fetchRoom(currentRoom);
@@ -3973,7 +3956,7 @@ function showWaitingForResultsHost() {
   document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
     + '<div style="font-family:\'Orbitron\',sans-serif;font-size:1.5rem;color:rgba(255,255,255,0.6);margin-bottom:8px;">You finished!</div>'
     + '<div style="font-family:\'Orbitron\',sans-serif;font-size:1.1rem;color:#ffd86b;margin-bottom:8px;">Score: ' + roomScore + '</div>'
-    + '<div id="host-wait-count" style="font-family:\'Share Tech Mono\',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:16px;">' + finished + '/' + room.players.length + ' players done</div>'
+    + `<div id="host-wait-count" style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:16px;">${finished}/${room.players.length} players done</div>`
     + '<button class="room-btn-primary" style="max-width:300px;margin:0 auto;" onclick="forceEndRoomGame()">End Game Now</button>'
     + '</div>';
   roomPollInterval = setInterval(async () => {

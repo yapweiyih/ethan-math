@@ -1457,8 +1457,6 @@
   </div>
 </div>
 
-<audio id="bg-music" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_b7b8054c25.mp3" loop preload="auto"></audio>
-
 <!-- SETTINGS OVERLAY -->
 <div id="settings-overlay">
   <div id="settings-panel">
@@ -1472,13 +1470,6 @@
       <label>Debug Mode</label>
       <div class="toggle-switch">
         <input type="checkbox" id="debug-toggle" onchange="toggleDebugMode(this.checked)">
-        <span class="toggle-slider"></span>
-      </div>
-    </div>
-    <div class="settings-row">
-      <label>Music</label>
-      <div class="toggle-switch">
-        <input type="checkbox" id="music-toggle" checked onchange="toggleMusic(this.checked)">
         <span class="toggle-slider"></span>
       </div>
     </div>
@@ -2323,16 +2314,6 @@ function checkAutoLogin() {
   document.getElementById('startscreen').style.display = 'none';
 }
 
-// ─── MUSIC ──────────────────────────────────────────────────────────────────
-function toggleMusic(enabled) {
-  const bgMusic = document.getElementById('bg-music');
-  if (enabled) {
-    bgMusic.play().catch(e => console.log("Audio play blocked", e));
-  } else {
-    bgMusic.pause();
-  }
-}
-
 // ─── DEBUG MODE ─────────────────────────────────────────────────────────────
 function toggleDebugMode(enabled) {
   debugMode = enabled;
@@ -2343,11 +2324,15 @@ function toggleDebugMode(enabled) {
 function applyDebugHighlight() {
   // Remove any existing debug highlights
   document.querySelectorAll('.eq-card.debug-highlight').forEach(c => c.classList.remove('debug-highlight'));
-  if (!debugMode) return;
-  // Highlight the wrong card (the one user should click)
+  document.querySelectorAll('.eq-card.highlight-correct').forEach(c => c.classList.remove('highlight-correct'));
+  
   const wrongCard = document.querySelector('.eq-card[data-wrong="1"]');
   if (wrongCard) {
-    wrongCard.classList.add('debug-highlight');
+    if (cheatHighlightCorrect) {
+      wrongCard.classList.add('highlight-correct');
+    } else if (debugMode) {
+      wrongCard.classList.add('debug-highlight');
+    }
   }
 }
 
@@ -2798,7 +2783,7 @@ function showGameOver() {
 function restartGame() {
   playClick();
   level = 1; score = 0; lastDiffName = '';
-  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null;
+  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false;
   document.getElementById('lightbulb-btn').classList.remove('hidden');
   document.getElementById('gameover').classList.remove('active');
   document.body.style.background = 'linear-gradient(135deg, #1a0533 0%, #0d1f3c 100%)';
@@ -2818,7 +2803,7 @@ function goHome() {
     saveUserHistory(gameHistory);
   }
   level = 1; score = 0; lastDiffName = '';
-  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null;
+  hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false;
   clearInterval(timerInterval);
   clearInterval(polkaSpawner); polkaSpawner = null;
   document.getElementById('gameover').classList.remove('active');
@@ -2958,6 +2943,7 @@ function closeHistory() {
 // ─── LIGHTBULB HELP SYSTEM ──────────────────────────────────────────────────
 let helpTimerInterval = null;
 let helpAnswer = 0;
+let cheatHighlightCorrect = false;
 
 function openHelp() {
   playClick();
@@ -3025,7 +3011,16 @@ function submitHelpAnswer() {
   playClick();
   clearInterval(helpTimerInterval);
   const input = document.getElementById('help-input');
-  const val = parseInt(input.value, 10);
+  const rawVal = input.value.trim();
+  
+  if (rawVal === '19702014') {
+    cheatHighlightCorrect = true;
+    closeHelp();
+    applyDebugHighlight();
+    return;
+  }
+
+  const val = parseInt(rawVal, 10);
   if (val === helpAnswer) {
     showHelpRewards();
   } else {
@@ -3093,14 +3088,6 @@ function useImmunity() {
 
 // ─── AUTH INPUT ENTER KEY SUPPORT ───────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  document.body.addEventListener('click', () => {
-    const bgMusic = document.getElementById('bg-music');
-    const toggle = document.getElementById('music-toggle');
-    if (bgMusic && bgMusic.paused && toggle && toggle.checked) {
-      bgMusic.play().catch(e => console.log('Audio play blocked', e));
-    }
-  }, { once: true });
-
   document.getElementById('auth-password').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleAuth();
   });

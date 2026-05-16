@@ -1389,6 +1389,26 @@
   }
   .topic-chip input { accent-color:var(--accent); }
 
+  /* NOTIFICATION BADGE */
+  .notif-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #ff2244; color: #fff;
+    font-family: 'Orbitron', sans-serif; font-size: 0.55rem; font-weight: bold;
+    position: relative; top: -8px; margin-left: 2px;
+    line-height: 1; flex-shrink: 0;
+  }
+
+  /* SELECT ALL BUTTON */
+  .select-all-btn {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
+    padding: 5px 12px; border: 1px solid rgba(255,107,255,0.4);
+    border-radius: 8px; background: rgba(255,107,255,0.1);
+    color: var(--accent); cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .select-all-btn:hover { background: rgba(255,107,255,0.25); transform: scale(1.05); }
+
 </style>
 </head>
 <body>
@@ -1532,9 +1552,9 @@
     <button class="start-btn-primary" onclick="startGame()">PLAY</button>
   </div>
   <div class="start-secondary-row">
-    <button class="start-btn-secondary" onclick="openFriends()" title="Friends">
+    <button class="start-btn-secondary" onclick="openFriends()" title="Friends" id="friends-start-btn">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      Friends
+      Friends<span class="notif-badge" id="friends-start-badge" style="display:none">!</span>
     </button>
     <button class="start-btn-secondary" onclick="openHistory()" title="History">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
@@ -1572,7 +1592,7 @@
     </div>
     <div class="friends-tabs">
       <button class="friends-tab active" id="friends-tab-list" onclick="switchFriendsTab('list')">Friends</button>
-      <button class="friends-tab" id="friends-tab-requests" onclick="switchFriendsTab('requests')">Requests</button>
+      <button class="friends-tab" id="friends-tab-requests" onclick="switchFriendsTab('requests')">Requests<span class="notif-badge" id="requests-tab-badge" style="display:none">!</span></button>
     </div>
     <div class="friends-content" id="friends-content"></div>
   </div>
@@ -1608,6 +1628,7 @@
     </div>
     <div class="room-form-group">
       <span class="room-form-label">Select Topics</span>
+      <div style="margin-bottom:8px;"><button class="select-all-btn" onclick="selectAllTopics('custom-topics')">Select All</button> <button class="select-all-btn" onclick="deselectAllTopics('custom-topics')">Deselect All</button></div>
       <div id="custom-topics" style="display:flex;flex-wrap:wrap;gap:8px;">
         <label class="topic-chip"><input type="checkbox" value="add" checked> Addition</label>
         <label class="topic-chip"><input type="checkbox" value="sub" checked> Subtraction</label>
@@ -1644,6 +1665,9 @@
   </div>
   <div class="room-hud-right">
     <span class="room-hud-timer" id="room-hud-timer">10s</span>
+    <button onclick="openSettings()" title="Settings" style="width:36px;height:36px;border:none;border-radius:50%;background:rgba(255,255,255,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,background 0.15s;">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;fill:#fff;"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
+    </button>
   </div>
 </div>
 
@@ -1848,6 +1872,7 @@ function loginSuccess() {
   document.getElementById('startscreen').style.display = '';
   updateUserGreeting();
   updatePlayerIdBadge();
+  updateIncomingBadges();
 }
 
 function playAsGuest() {
@@ -1893,7 +1918,7 @@ function openUserMenu() {
   const content = document.getElementById('user-menu-content');
   content.innerHTML = currentUser
     ? `<button class="menu-option" onclick="showPlayerInfo()">Player Info</button>
-       <button class="menu-option" onclick="showChangePassword()">Change Password</button>
+       <button class="menu-option" onclick="showAccountMenu()">Account</button>
        <button class="menu-option danger" onclick="confirmLogout()">Logout</button>`
     : `<button class="menu-option danger" onclick="confirmLogout()">Switch User</button>`;
   document.getElementById('user-menu-overlay').classList.add('active');
@@ -1996,6 +2021,66 @@ function showSuccessPopup() {
     <p>Your password has been updated successfully.</p>
     <button onclick="this.parentElement.remove()">OK</button>`;
   document.body.appendChild(popup);
+}
+
+function showAccountMenu() {
+  const content = document.getElementById('user-menu-content');
+  content.innerHTML = `
+    <h2 style="font-family:'Orbitron',sans-serif;font-size:1.4rem;color:var(--accent);margin-bottom:0.8em;">Account</h2>
+    <button class="menu-option" onclick="showChangePassword()">Change Password</button>
+    <button class="menu-option danger" onclick="confirmDeleteAccount()">Delete Account</button>
+    <div class="help-buttons" style="margin-top:14px;">
+      <button class="help-btn-secondary" onclick="openUserMenu()">Back</button>
+    </div>`;
+}
+
+function confirmDeleteAccount() {
+  const content = document.getElementById('user-menu-content');
+  content.innerHTML = `
+    <p style="font-family:'Orbitron',sans-serif;font-size:1.2rem;color:#ff4466;margin-bottom:0.5em;">⚠ Delete Account?</p>
+    <p style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:1em;line-height:1.5;">
+      This will permanently delete your account and all game data. This cannot be undone.
+    </p>
+    <div class="help-buttons">
+      <button class="help-btn-primary" style="background:#ff4466" onclick="doDeleteAccount()">Delete Forever</button>
+      <button class="help-btn-secondary" onclick="showAccountMenu()">Cancel</button>
+    </div>`;
+}
+
+function doDeleteAccount() {
+  if (!currentUser) return;
+  const uname = currentUser;
+  const users = getUsers();
+  delete users[uname];
+  saveUsers(users);
+  const ids = JSON.parse(localStorage.getItem('mathMadness_playerIds') || '{}');
+  delete ids[uname];
+  localStorage.setItem('mathMadness_playerIds', JSON.stringify(ids));
+  const names = JSON.parse(localStorage.getItem('mathMadness_displayNames') || '{}');
+  delete names[uname];
+  localStorage.setItem('mathMadness_displayNames', JSON.stringify(names));
+  const fdata = getFriendData();
+  if (fdata[uname]) {
+    (fdata[uname].friends || []).forEach(f => {
+      if (fdata[f]) fdata[f].friends = (fdata[f].friends || []).filter(u => u !== uname);
+    });
+    (fdata[uname].outgoing || []).forEach(f => {
+      if (fdata[f]) fdata[f].incoming = (fdata[f].incoming || []).filter(u => u !== uname);
+    });
+    (fdata[uname].incoming || []).forEach(f => {
+      if (fdata[f]) fdata[f].outgoing = (fdata[f].outgoing || []).filter(u => u !== uname);
+    });
+    delete fdata[uname];
+    saveFriendData(fdata);
+  }
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.includes('mathMadness_user_' + uname)) keysToRemove.push(key);
+  }
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+  closeUserMenu();
+  logout();
 }
 
 // ─── PLAYER INFO ────────────────────────────────────────────────────────────
@@ -2128,18 +2213,20 @@ function renderFriendsList(container) {
   fdata.friends.forEach(friendUser => {
     const dname = getDisplayName(friendUser);
     const pid = getPlayerIdForUser(friendUser);
-    html += `<div class="friend-item">
+      html += `<div class="friend-item">
       <div><div class="friend-name">${dname}</div><div class="friend-id">ID: ${pid}</div></div>
-      <button class="friend-action-btn friend-remove" onclick="removeFriend('${friendUser}')">Remove</button>
+      <button class="friend-action-btn friend-remove" onclick="confirmRemoveFriend('${friendUser}')">Remove</button>
     </div>`;
   });
   container.innerHTML = html;
 }
 
 function renderRequestsTab(container) {
+  const _fdata = getUserFriends(currentUser);
+  const _hasIncoming = _fdata.incoming && _fdata.incoming.length > 0;
   let html = `<div class="request-subtabs">
     <button class="request-subtab ${requestSubTab === 'add' ? 'active' : ''}" onclick="switchRequestSubTab('add')">Add</button>
-    <button class="request-subtab ${requestSubTab === 'incoming' ? 'active' : ''}" onclick="switchRequestSubTab('incoming')">Incoming</button>
+    <button class="request-subtab ${requestSubTab === 'incoming' ? 'active' : ''}" onclick="switchRequestSubTab('incoming')">Incoming${_hasIncoming ? '<span class="notif-badge">!</span>' : ''}</button>
   </div>`;
   if (requestSubTab === 'add') {
     html += renderAddSection();
@@ -2235,6 +2322,7 @@ function acceptFriend(fromUser) {
   if (!theirData.friends.includes(currentUser)) theirData.friends.push(currentUser);
   saveUserFriends(fromUser, theirData);
   renderFriendsContent();
+  updateIncomingBadges();
 }
 
 function declineFriend(fromUser) {
@@ -2246,10 +2334,25 @@ function declineFriend(fromUser) {
   theirData.outgoing = theirData.outgoing.filter(u => u !== currentUser);
   saveUserFriends(fromUser, theirData);
   renderFriendsContent();
+  updateIncomingBadges();
 }
 
-function removeFriend(friendUser) {
+function confirmRemoveFriend(friendUser) {
   playClick();
+  const dname = getDisplayName(friendUser);
+  document.getElementById('confirm-box').innerHTML = `
+    <p>Remove <span style="color:#ffd86b">${dname}</span> from friends?</p>
+    <div class="confirm-buttons">
+      <button id="confirm-yes" onclick="doRemoveFriend('${friendUser}')">Remove</button>
+      <button id="confirm-cancel" onclick="cancelRemoveFriend()">Cancel</button>
+    </div>`;
+  document.getElementById('confirm-overlay').classList.add('active');
+}
+
+function doRemoveFriend(friendUser) {
+  playClick();
+  document.getElementById('confirm-overlay').classList.remove('active');
+  restoreConfirmBox();
   const myData = getUserFriends(currentUser);
   myData.friends = myData.friends.filter(u => u !== friendUser);
   saveUserFriends(currentUser, myData);
@@ -2257,6 +2360,39 @@ function removeFriend(friendUser) {
   theirData.friends = theirData.friends.filter(u => u !== currentUser);
   saveUserFriends(friendUser, theirData);
   renderFriendsContent();
+  updateIncomingBadges();
+}
+
+function cancelRemoveFriend() {
+  playClick();
+  document.getElementById('confirm-overlay').classList.remove('active');
+  restoreConfirmBox();
+}
+
+function restoreConfirmBox() {
+  document.getElementById('confirm-box').innerHTML = `
+    <p>Return to homepage?<br><span style="font-size:0.9rem;color:rgba(255,255,255,0.55);">Your progress will be lost.</span></p>
+    <div class="confirm-buttons">
+      <button id="confirm-yes" onclick="confirmYes()">Yes</button>
+      <button id="confirm-cancel" onclick="confirmCancel()">Cancel</button>
+    </div>`;
+}
+
+// ─── NOTIFICATION BADGES ────────────────────────────────────────────────────
+function updateIncomingBadges() {
+  if (!currentUser) {
+    const fb = document.getElementById('friends-start-badge');
+    if (fb) fb.style.display = 'none';
+    const rb = document.getElementById('requests-tab-badge');
+    if (rb) rb.style.display = 'none';
+    return;
+  }
+  const fdata = getUserFriends(currentUser);
+  const hasIncoming = fdata.incoming && fdata.incoming.length > 0;
+  const fb = document.getElementById('friends-start-badge');
+  if (fb) fb.style.display = hasIncoming ? '' : 'none';
+  const rb = document.getElementById('requests-tab-badge');
+  if (rb) rb.style.display = hasIncoming ? '' : 'none';
 }
 
 // ─── PASSWORD VISIBILITY TOGGLE ─────────────────────────────────────────────
@@ -2888,6 +3024,7 @@ function openSettings() {
   playClick();
   gamePaused = true;
   clearInterval(timerInterval);
+  if (isRoomMode) clearInterval(roomTimerInterval);
   // Sync debug toggle with current state
   document.getElementById('debug-toggle').checked = debugMode;
   document.getElementById('settings-overlay').classList.add('active');
@@ -2899,8 +3036,28 @@ function closeSettings() {
   gamePaused = false;
   if (!document.getElementById('gameover').classList.contains('active') &&
       document.getElementById('startscreen').style.display === 'none') {
-    resumeTimer();
+    if (isRoomMode && roomTimeLeft > 0 && !roomLiveWaiting) {
+      resumeRoomTimer();
+    } else if (!isRoomMode) {
+      resumeTimer();
+    }
   }
+}
+
+function resumeRoomTimer() {
+  const bar = document.getElementById('timer-bar');
+  const timerEl = document.getElementById('room-hud-timer');
+  if (roomTimerInterval) clearInterval(roomTimerInterval);
+  roomTimerInterval = setInterval(() => {
+    roomTimeLeft -= 50;
+    const pct = Math.max(0, roomTimeLeft / roomTimeTotal * 100);
+    bar.style.transition = 'width 50ms linear'; bar.style.width = pct + '%';
+    const rv = Math.round(255 * (1 - pct / 100));
+    const gv = Math.round(200 * (pct / 100));
+    bar.style.background = 'rgb(' + (rv + 100) + ',' + (gv + 55) + ',80)';
+    timerEl.textContent = Math.ceil(Math.max(0, roomTimeLeft) / 1000) + 's';
+    if (roomTimeLeft <= 0) { clearInterval(roomTimerInterval); handleRoomTimeout(); }
+  }, 50);
 }
 
 function confirmGoHome() {
@@ -3127,10 +3284,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   checkAutoLogin();
   initMathBg();
-  // Periodically check for room invites on start screen
+  updateIncomingBadges();
+  // Periodically check for room invites and friend request badges on start screen
   setInterval(() => {
     if (document.getElementById('startscreen').style.display !== 'none' && currentUser) {
       checkRoomInvites();
+      updateIncomingBadges();
     }
   }, 3000);
 });
@@ -3201,6 +3360,16 @@ function getSelectedTopics(containerId) {
   return Array.from(checks).map(c => c.value);
 }
 
+function selectAllTopics(containerId) {
+  playClick();
+  document.querySelectorAll('#' + containerId + ' input[type=checkbox]').forEach(c => c.checked = true);
+}
+
+function deselectAllTopics(containerId) {
+  playClick();
+  document.querySelectorAll('#' + containerId + ' input[type=checkbox]').forEach(c => c.checked = false);
+}
+
 function startCustomGame() {
   playClick();
   const topics = getSelectedTopics('custom-topics');
@@ -3246,6 +3415,8 @@ let roomCurrentQ = 0;
 let roomScore = 0;
 let roomAnswers = [];
 let roomLiveWaiting = false;
+let roomTimeLeft = 0;
+let roomTimeTotal = 0;
 let _roomCache = {};
 
 // --- Room Data (API-backed) ---
@@ -3485,6 +3656,7 @@ function showHostSetup() {
     </div>
     <div class="room-form-group">
       <span class="room-form-label">Select Topics</span>
+      <div style="margin-bottom:8px;"><button class="select-all-btn" onclick="selectAllTopics('room-topics')">Select All</button> <button class="select-all-btn" onclick="deselectAllTopics('room-topics')">Deselect All</button></div>
       <div id="room-topics" style="display:flex;flex-wrap:wrap;gap:8px;">
         <label class="topic-chip"><input type="checkbox" value="add" checked> Addition</label>
         <label class="topic-chip"><input type="checkbox" value="sub" checked> Subtraction</label>
@@ -3827,21 +3999,22 @@ function loadRoomQuestion(qIdx) {
   document.getElementById('timer-wrap').style.display = '';
   bar.style.transition = 'none'; bar.style.width = '100%'; bar.style.background = '#7fffb2';
   if (roomTimerInterval) clearInterval(roomTimerInterval);
-  let timeLeft = timeMs;
+  roomTimeTotal = timeMs;
+  roomTimeLeft = timeMs;
   roomTimerInterval = setInterval(() => {
-    timeLeft -= 50;
-    const pct = Math.max(0, timeLeft / timeMs * 100);
+    roomTimeLeft -= 50;
+    const pct = Math.max(0, roomTimeLeft / roomTimeTotal * 100);
     bar.style.transition = 'width 50ms linear'; bar.style.width = pct + '%';
     const rv = Math.round(255 * (1 - pct / 100));
     const gv = Math.round(200 * (pct / 100));
     bar.style.background = 'rgb(' + (rv + 100) + ',' + (gv + 55) + ',80)';
-    timerEl.textContent = Math.ceil(Math.max(0, timeLeft) / 1000) + 's';
-    if (timeLeft <= 0) { clearInterval(roomTimerInterval); handleRoomTimeout(); }
+    timerEl.textContent = Math.ceil(Math.max(0, roomTimeLeft) / 1000) + 's';
+    if (roomTimeLeft <= 0) { clearInterval(roomTimerInterval); handleRoomTimeout(); }
   }, 50);
 }
 
 function handleRoomClick(isWrong, card) {
-  if (roomLiveWaiting) return;
+  if (roomLiveWaiting || gamePaused) return;
   clearInterval(roomTimerInterval);
   document.querySelectorAll('.eq-card').forEach(c => c.style.pointerEvents = 'none');
   const room = getRoom(currentRoom);

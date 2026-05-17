@@ -1,0 +1,7 @@
+changes:
+1) create a "confirm' page when player clicks "remove friend"
+2) in hamburger menu, add:
+(i) put "delete account"  and "change password" in "account"
+(ii) put an exclamation mark in a small red circle above "Friends" and "requests" and "incoming" when their is an iincoming request
+3) add a select all button in "select topics" 
+4) in private rooms, ther is no settings icon in the game. add the "settings" icon as well

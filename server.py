@@ -44,6 +44,8 @@ class AnswerData(BaseModel):
     correct: bool
     score: int
     timeout: bool = False
+    selectedIdx: int = -1
+    timeTaken: float = 0
 
 
 class InviteData(BaseModel):
@@ -207,7 +209,13 @@ def submit_answer(code: str, data: AnswerData) -> dict:
     else:
         res["wrong"] += 1
     res["answers"].append(
-        {"q": data.qIndex, "correct": data.correct, "timeout": data.timeout}
+        {
+            "q": data.qIndex,
+            "correct": data.correct,
+            "timeout": data.timeout,
+            "selectedIdx": data.selectedIdx,
+            "timeTaken": data.timeTaken,
+        }
     )
     return {"ok": True}
 
@@ -218,7 +226,17 @@ def advance_question(code: str, data: AdvancePayload) -> dict:
     if code not in rooms:
         return {"error": "not_found"}
     rooms[code]["currentQuestion"] = data.nextQuestion
+    rooms[code]["phase"] = "answering"
     return {"ok": True, "currentQuestion": data.nextQuestion}
+
+
+@app.post("/api/rooms/{code}/set-phase")
+def set_phase(code: str, data: dict) -> dict:
+    """Set the current phase of the room (answering/review)."""
+    if code not in rooms:
+        return {"error": "not_found"}
+    rooms[code]["phase"] = data.get("phase", "answering")
+    return {"ok": True}
 
 
 @app.post("/api/rooms/{code}/finish")

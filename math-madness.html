@@ -1991,7 +1991,7 @@ let requestSubTab = 'add'; // 'add' or 'incoming'
 function generatePlayerId() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let id = '';
-  for (let i = 0; i < 8; i++) id += chars[Math.floor(Math.random() * chars.length)];
+  for (let i = 0; i < 5; i++) id += chars[Math.floor(Math.random() * chars.length)];
   return id;
 }
 
@@ -3873,7 +3873,8 @@ function updateRoom(code, fn) {
 function generateRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
-  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  for (let i = 0; i < 4; i++) code += letters[Math.floor(Math.random() * letters.length)];
   return code;
 }
 
@@ -3956,9 +3957,9 @@ function showJoinRoom() {
       <div style="width:28px"></div>
     </div>
     <p style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:16px;">
-      Enter the 6-character room code
+      Enter the 4-character room code
     </p>
-    <input class="room-input" type="text" id="join-room-code" placeholder="Room Code" maxlength="6" autocomplete="off"
+    <input class="room-input" type="text" id="join-room-code" placeholder="Room Code" maxlength="4" autocomplete="off"
       style="text-align:center;font-size:1.4rem;letter-spacing:0.15em;text-transform:uppercase;">
     <div id="join-room-error" style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#ff4466;min-height:1.2em;margin:8px 0;text-align:center;"></div>
     <button class="room-btn-primary" onclick="submitJoinRoom()">Join</button>`;
@@ -3973,7 +3974,7 @@ async function submitJoinRoom() {
   playClick();
   const code = document.getElementById('join-room-code').value.trim().toUpperCase();
   const err = document.getElementById('join-room-error');
-  if (!code || code.length < 6) { err.textContent = 'Enter a valid 6-character code.'; return; }
+  if (!code || code.length < 4) { err.textContent = 'Enter a valid 4-character code.'; return; }
   const room = await fetchRoom(code);
   if (!room) { err.textContent = 'Room not found. Check the code.'; return; }
   if (room.status !== 'waiting') { err.textContent = 'This room has already started or ended.'; return; }
@@ -4561,7 +4562,14 @@ async function modFinishGame() {
   await api('/api/rooms/' + currentRoom + '/end');
   await fetchRoom(currentRoom);
   document.getElementById('mod-dashboard-overlay').style.display = 'none';
-  showRoomResults();
+  // Show "Game Successfully Hosted!" instead of results for moderator
+  document.getElementById('room-results-panel').innerHTML =
+    '<div style="text-align:center;padding:40px 20px;">'
+    + '<h1 style="font-family:\'Orbitron\',sans-serif;font-size:2.5rem;color:#7fffb2;text-shadow:0 0 20px rgba(127,255,178,0.4);margin-bottom:0.5em;">Game Successfully Hosted!</h1>'
+    + '<p style="font-family:\'Share Tech Mono\',monospace;font-size:1rem;color:rgba(255,255,255,0.6);margin-bottom:2em;">All questions completed. Great game!</p>'
+    + '<button class="results-leave-btn" onclick="leaveRoom()">Return to Homepage</button>'
+    + '</div>';
+  document.getElementById('room-results-overlay').classList.add('active');
 }
 
 function clearAllModIntervals() {

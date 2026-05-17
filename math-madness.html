@@ -1759,7 +1759,7 @@
       <button class="auth-submit" id="auth-submit-btn" onclick="handleAuth()">Login</button>
     </div>
     <div class="auth-disclaimer">
-      <strong>Disclaimer:</strong> Do NOT use real personal information, real passwords, or sensitive data. This is a fun game — use a made-up username and a simple password. Data is stored locally in your browser only.
+      <strong>Disclaimer:</strong> Do NOT use real personal information, real passwords, or sensitive data. This is a fun game — use a made-up username and a simple password. Your account is saved on the server so you can log in from any device.
     </div>
     <div class="auth-guest" onclick="playAsGuest()">Play as Guest</div>
   </div>
@@ -1996,15 +1996,18 @@ function generatePlayerId() {
 }
 
 function getPlayerIdForUser(username) {
+  // Read from localStorage cache (set on login/register from server)
   const ids = JSON.parse(localStorage.getItem('mathMadness_playerIds') || '{}');
-  if (!ids[username]) {
-    ids[username] = generatePlayerId();
-    localStorage.setItem('mathMadness_playerIds', JSON.stringify(ids));
-  }
-  return ids[username];
+  return ids[username] || null;
 }
 
-function getUsernameByPlayerId(pid) {
+async function getUsernameByPlayerId(pid) {
+  // Try server lookup first (works cross-browser), fall back to localStorage
+  try {
+    const res = await fetch('/api/auth/lookup/' + encodeURIComponent(pid));
+    const data = await res.json();
+    if (data.ok) return data.username;
+  } catch (e) { /* fall through to localStorage */ }
   const ids = JSON.parse(localStorage.getItem('mathMadness_playerIds') || '{}');
   for (const [user, id] of Object.entries(ids)) {
     if (id === pid.toUpperCase()) return user;
@@ -2013,13 +2016,31 @@ function getUsernameByPlayerId(pid) {
 }
 
 function getDisplayName(username) {
+  // Read from localStorage cache (set on login/register from server)
   const names = JSON.parse(localStorage.getItem('mathMadness_displayNames') || '{}');
   return names[username] || username;
 }
 
 function setDisplayName(username, name) {
+  // Update localStorage cache
   const names = JSON.parse(localStorage.getItem('mathMadness_displayNames') || '{}');
   names[username] = name;
+  localStorage.setItem('mathMadness_displayNames', JSON.stringify(names));
+  // Also persist to server
+  fetch('/api/auth/display-name', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ username, displayName: name })
+  }).catch(() => {});
+}
+
+// Cache server profile data into localStorage for fast synchronous reads
+function cacheProfile(username, displayName, playerId) {
+  const ids = JSON.parse(localStorage.getItem('mathMadness_playerIds') || '{}');
+  ids[username] = playerId;
+  localStorage.setItem('mathMadness_playerIds', JSON.stringify(ids));
+  const names = JSON.parse(localStorage.getItem('mathMadness_displayNames') || '{}');
+  names[username] = displayName;
   localStorage.setItem('mathMadness_displayNames', JSON.stringify(names));
 }
 
@@ -2052,7 +2073,7 @@ function switchAuthTab(mode) {
   document.getElementById('auth-username').focus();
 }
 
-function handleAuth() {
+async function handleAuth() {
   playClick();
   const username = document.getElementById('auth-username').value.trim();
   const password = document.getElementById('auth-password').value;
@@ -2071,28 +2092,30 @@ function handleAuth() {
     return;
   }
 
-  const users = getUsers();
-
-  if (authMode === 'register') {
-    if (users[username]) {
-      errorEl.textContent = 'Username already exists. Try logging in.';
+  const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (data.error) {
+      const msgs = {
+        exists: 'Username already exists. Try logging in.',
+        not_found: 'Username not found. Register first.',
+        wrong_password: 'Wrong password. Try again.'
+      };
+      errorEl.textContent = msgs[data.error] || 'Something went wrong.';
       return;
     }
-    users[username] = password;
-    saveUsers(users);
-    currentUser = username;
+    // Cache profile data locally for fast synchronous reads
+    cacheProfile(data.username, data.displayName, data.playerId);
+    currentUser = data.username;
+    currentPlayerId = data.playerId;
     loginSuccess();
-  } else {
-    if (!users[username]) {
-      errorEl.textContent = 'Username not found. Register first.';
-      return;
-    }
-    if (users[username] !== password) {
-      errorEl.textContent = 'Wrong password. Try again.';
-      return;
-    }
-    currentUser = username;
-    loginSuccess();
+  } catch (e) {
+    errorEl.textContent = 'Server unavailable. Please try again.';
   }
 }
 
@@ -2205,17 +2228,13 @@ function toggleChgPwEye(inputId, btn) {
   }
 }
 
-function submitChangePassword() {
+async function submitChangePassword() {
   const oldPw = document.getElementById('chg-old-pw').value;
   const newPw = document.getElementById('chg-new-pw').value;
   const confirmPw = document.getElementById('chg-confirm-pw').value;
   const errEl = document.getElementById('chg-pw-error');
 
-  const users = getUsers();
-  if (users[currentUser] !== oldPw) {
-    errEl.textContent = 'Old password is incorrect.';
-    return;
-  }
+  if (!oldPw) { errEl.textContent = 'Enter your old password.'; return; }
   if (newPw.length < 3) {
     errEl.textContent = 'New password must be at least 3 characters.';
     return;
@@ -2229,23 +2248,27 @@ function submitChangePassword() {
     return;
   }
 
-  // Show confirm before saving
-  const content = document.getElementById('user-menu-content');
-  content.innerHTML = `
-    <p style="font-family:'Orbitron',sans-serif;font-size:1.3rem;color:#fff;margin-bottom:1em;">Confirm password change?</p>
-    <div class="help-buttons">
-      <button class="help-btn-primary" onclick="doChangePassword()">Yes, Change</button>
-      <button class="help-btn-secondary" onclick="showChangePassword()">Cancel</button>
-    </div>`;
-}
-
-function doChangePassword() {
-  const newPw = document.getElementById('chg-new-pw').value;
-  const users = getUsers();
-  users[currentUser] = newPw;
-  saveUsers(users);
-  document.getElementById('user-menu-overlay').classList.remove('active');
-  showSuccessPopup();
+  // Verify old password with server first
+  try {
+    const res = await fetch('/api/auth/password', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username: currentUser, oldPassword: oldPw, newPassword: newPw })
+    });
+    const data = await res.json();
+    if (data.error === 'wrong_password') {
+      errEl.textContent = 'Old password is incorrect.';
+      return;
+    }
+    if (data.error) {
+      errEl.textContent = 'Something went wrong.';
+      return;
+    }
+    document.getElementById('user-menu-overlay').classList.remove('active');
+    showSuccessPopup();
+  } catch (e) {
+    errEl.textContent = 'Server unavailable.';
+  }
 }
 
 function showSuccessPopup() {
@@ -2310,12 +2333,11 @@ function confirmDeleteAccount() {
     </div>`;
 }
 
-function doDeleteAccount() {
+async function doDeleteAccount() {
   if (!currentUser) return;
   const uname = currentUser;
-  const users = getUsers();
-  delete users[uname];
-  saveUsers(users);
+  // Delete from server
+  try { await fetch('/api/auth/user/' + encodeURIComponent(uname), { method: 'DELETE' }); } catch(e) {}
   const ids = JSON.parse(localStorage.getItem('mathMadness_playerIds') || '{}');
   delete ids[uname];
   localStorage.setItem('mathMadness_playerIds', JSON.stringify(ids));
@@ -2547,14 +2569,14 @@ function renderIncomingSection() {
   return html;
 }
 
-function sendFriendRequest() {
+async function sendFriendRequest() {
   playClick();
   const input = document.getElementById('add-friend-input');
   const msg = document.getElementById('add-friend-msg');
   const pid = input.value.trim().toUpperCase();
   if (!pid) { msg.className = 'add-friend-msg error'; msg.textContent = 'Enter a player ID.'; return; }
   if (pid === currentPlayerId) { msg.className = 'add-friend-msg error'; msg.textContent = "You can't add yourself!"; return; }
-  const targetUser = getUsernameByPlayerId(pid);
+  const targetUser = await getUsernameByPlayerId(pid);
   if (!targetUser) { msg.className = 'add-friend-msg error'; msg.textContent = 'Player not found.'; return; }
   const myData = getUserFriends(currentUser);
   if (myData.friends.includes(targetUser)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Already friends!'; return; }
@@ -2716,20 +2738,43 @@ function saveUserBestGame(best) {
   localStorage.setItem(storageKey('bestGame'), JSON.stringify(best));
 }
 // ─── CHECK AUTO-LOGIN ───────────────────────────────────────────────────────
-function checkAutoLogin() {
+async function checkAutoLogin() {
   const saved = localStorage.getItem('mathMadness_currentUser');
   if (saved) {
-    const users = getUsers();
-    if (users[saved]) {
-      currentUser = saved;
-      currentPlayerId = getPlayerIdForUser(saved);
-      loadUserData();
-      document.getElementById('auth-screen').classList.add('hidden');
-      document.getElementById('startscreen').style.display = '';
-      document.getElementById('lightbulb-btn').classList.add('hidden');
-      updateUserGreeting();
-      updatePlayerIdBadge();
-      return;
+    // Verify with server first, fall back to localStorage cache
+    try {
+      const res = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username: saved })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        cacheProfile(data.username, data.displayName, data.playerId);
+        currentUser = data.username;
+        currentPlayerId = data.playerId;
+        loadUserData();
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('startscreen').style.display = '';
+        document.getElementById('lightbulb-btn').classList.add('hidden');
+        updateUserGreeting();
+        updatePlayerIdBadge();
+        return;
+      }
+    } catch (e) {
+      // Server unavailable — try localStorage cache
+      const cachedId = getPlayerIdForUser(saved);
+      if (cachedId) {
+        currentUser = saved;
+        currentPlayerId = cachedId;
+        loadUserData();
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('startscreen').style.display = '';
+        document.getElementById('lightbulb-btn').classList.add('hidden');
+        updateUserGreeting();
+        updatePlayerIdBadge();
+        return;
+      }
     }
   }
   document.getElementById('auth-screen').classList.remove('hidden');
@@ -4152,14 +4197,14 @@ function showInvitePlayers() {
   }, 100);
 }
 
-function inviteByPlayerId() {
+async function inviteByPlayerId() {
   playClick();
   const inp = document.getElementById('invite-search-input');
   const msg = document.getElementById('invite-search-msg');
   const pid = inp.value.trim().toUpperCase();
   if (!pid) { msg.className = 'add-friend-msg error'; msg.textContent = 'Enter a player ID.'; return; }
   if (pid === currentPlayerId) { msg.className = 'add-friend-msg error'; msg.textContent = "Can't invite yourself!"; return; }
-  const target = getUsernameByPlayerId(pid);
+  const target = await getUsernameByPlayerId(pid);
   if (!target) { msg.className = 'add-friend-msg error'; msg.textContent = 'Player not found.'; return; }
   const room = getRoom(currentRoom);
   if (room.players.find(p => p.username === target)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Already in room.'; return; }

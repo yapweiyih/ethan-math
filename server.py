@@ -3,10 +3,14 @@
 Serves the game HTML and provides API endpoints for real-time
 room management across different browsers/devices.
 Room data is stored in server memory (not localStorage).
+User accounts are persisted in SQLite.
 """
 
 import os
+import sqlite3
 import time
+from contextlib import contextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -15,6 +19,46 @@ from pydantic import BaseModel
 import uvicorn
 
 app = FastAPI(title="MathError Server")
+
+# ─── SQLite database for persistent user accounts ───────────────────────────
+DB_PATH = Path(__file__).parent / "mathdata.db"
+
+
+@contextmanager
+def get_db():
+    """Context manager for SQLite connections with WAL mode."""
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    try:
+        yield conn
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def init_db() -> None:
+    """Create the users table if it doesn't exist."""
+    with get_db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                username     TEXT PRIMARY KEY,
+                password     TEXT NOT NULL,
+                display_name TEXT NOT NULL DEFAULT '',
+                player_id    TEXT NOT NULL
+            )
+        """)
+
+
+def generate_player_id() -> str:
+    """Generate a 5-character alphanumeric player ID."""
+    import random
+    chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    return "".join(random.choice(chars) for _ in range(5))
+
+
+# Initialize database on startup
+init_db()
 
 # ─── In-memory storage (shared across all clients) ──────────────────────────
 rooms: dict[str, dict] = {}
@@ -305,6 +349,143 @@ def clear_invite(username: str, code: str) -> dict:
             i for i in invites[username] if i["roomCode"] != code
         ]
     return {"ok": True}
+
+
+# ─── Auth Endpoints (persistent accounts in SQLite) ─────────────────────────
+class AuthPayload(BaseModel):
+    """Payload for login/register."""
+
+    username: str
+    password: str
+
+
+class PasswordChangePayload(BaseModel):
+    """Payload for changing password."""
+
+    username: str
+    oldPassword: str
+    newPassword: str
+
+
+class DisplayNamePayload(BaseModel):
+    """Payload for updating display name."""
+
+    username: str
+    displayName: str
+
+
+@app.post("/api/auth/register")
+def auth_register(data: AuthPayload) -> dict:
+    """Register a new account. Returns profile on success."""
+    with get_db() as conn:
+        existing = conn.execute(
+            "SELECT username FROM users WHERE username = ?", (data.username,)
+        ).fetchone()
+        if existing:
+            return {"error": "exists"}
+        pid = generate_player_id()
+        conn.execute(
+            "INSERT INTO users (username, password, display_name, player_id) VALUES (?, ?, ?, ?)",
+            (data.username, data.password, data.username, pid),
+        )
+        return {
+            "ok": True,
+            "username": data.username,
+            "displayName": data.username,
+            "playerId": pid,
+        }
+
+
+@app.post("/api/auth/login")
+def auth_login(data: AuthPayload) -> dict:
+    """Login with username/password. Returns profile on success."""
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT username, password, display_name, player_id FROM users WHERE username = ?",
+            (data.username,),
+        ).fetchone()
+        if not row:
+            return {"error": "not_found"}
+        if row["password"] != data.password:
+            return {"error": "wrong_password"}
+        return {
+            "ok": True,
+            "username": row["username"],
+            "displayName": row["display_name"],
+            "playerId": row["player_id"],
+        }
+
+
+@app.post("/api/auth/verify")
+def auth_verify(data: UsernamePayload) -> dict:
+    """Verify a username exists (for auto-login). Returns profile."""
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT username, display_name, player_id FROM users WHERE username = ?",
+            (data.username,),
+        ).fetchone()
+        if not row:
+            return {"error": "not_found"}
+        return {
+            "ok": True,
+            "username": row["username"],
+            "displayName": row["display_name"],
+            "playerId": row["player_id"],
+        }
+
+
+@app.post("/api/auth/password")
+def auth_change_password(data: PasswordChangePayload) -> dict:
+    """Change password for a user."""
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT password FROM users WHERE username = ?", (data.username,)
+        ).fetchone()
+        if not row:
+            return {"error": "not_found"}
+        if row["password"] != data.oldPassword:
+            return {"error": "wrong_password"}
+        conn.execute(
+            "UPDATE users SET password = ? WHERE username = ?",
+            (data.newPassword, data.username),
+        )
+        return {"ok": True}
+
+
+@app.post("/api/auth/display-name")
+def auth_update_display_name(data: DisplayNamePayload) -> dict:
+    """Update display name for a user."""
+    with get_db() as conn:
+        conn.execute(
+            "UPDATE users SET display_name = ? WHERE username = ?",
+            (data.displayName, data.username),
+        )
+        return {"ok": True}
+
+
+@app.delete("/api/auth/user/{username}")
+def auth_delete_user(username: str) -> dict:
+    """Delete a user account permanently."""
+    with get_db() as conn:
+        conn.execute("DELETE FROM users WHERE username = ?", (username,))
+        return {"ok": True}
+
+
+@app.get("/api/auth/lookup/{player_id}")
+def auth_lookup_player(player_id: str) -> dict:
+    """Look up a username by player ID (cross-browser)."""
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT username, display_name FROM users WHERE player_id = ?",
+            (player_id.upper(),),
+        ).fetchone()
+        if not row:
+            return {"error": "not_found"}
+        return {
+            "ok": True,
+            "username": row["username"],
+            "displayName": row["display_name"],
+        }
 
 
 # ─── Serve static HTML ──────────────────────────────────────────────────────

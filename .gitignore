@@ -1,5 +1,8 @@
 .DS_Store
 __pycache__/
+mathdata.db
+mathdata.db-wal
+mathdata.db-shm
 *.pyc
 .venv/
 *.egg-info/

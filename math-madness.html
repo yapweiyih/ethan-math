@@ -1576,8 +1576,13 @@
   .mod-lb-rank { font-family:'Orbitron',sans-serif; font-size:1rem; color:#ffd86b; min-width:28px; }
   .mod-lb-name { flex:1; font-family:'Orbitron',sans-serif; font-size:0.85rem; color:#fff; }
   .mod-lb-score { font-family:'Share Tech Mono',monospace; font-size:0.8rem; color:#7fffb2; }
-  .mod-pie-wrap { display:flex; align-items:center; justify-content:center; gap:20px; margin:14px 0; }
-  .mod-pie { width:110px; height:110px; border-radius:50%; }
+  .mod-pie-wrap { display:flex; align-items:center; justify-content:center; gap:24px; margin:16px 0; flex-wrap:wrap; }
+  .mod-pie { width:160px; height:160px; border-radius:50%; }
+  .mod-opt-bar { display:flex; align-items:flex-end; gap:6px; height:100px; margin-top:16px; }
+  .mod-opt-bar-col { display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
+  .mod-opt-bar-fill { width:100%; min-width:24px; border-radius:4px 4px 0 0; transition:height 0.3s; }
+  .mod-opt-bar-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:rgba(255,255,255,0.5); text-align:center; max-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .mod-opt-bar-count { font-family:'Orbitron',sans-serif; font-size:0.7rem; color:#fff; }
 
   /* ─── PLAYER WAITING OVERLAY ─── */
   #player-waiting-overlay {
@@ -4245,11 +4250,18 @@ async function doEndGameFromMod() {
   playClick();
   const el = document.getElementById('end-game-confirm');
   if (el) el.remove();
-  // Mark room as moderator-ended
   if (currentRoom) {
-    updateRoom(currentRoom, r => r.modEnded = true);
+    // Mark room as mod-ended + finished (keep room alive so players can see it)
+    await api('/api/rooms/' + currentRoom + '/end');
+    updateRoom(currentRoom, r => { r.modEnded = true; });
   }
-  await leaveRoomFromLobby();
+  // Moderator goes home without deleting the room
+  clearAllModIntervals();
+  document.getElementById('mod-dashboard-overlay').style.display = 'none';
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
+  currentRoom = null; isRoomMode = false; isRoomHost = false;
+  document.getElementById('startscreen').style.display = '';
+  document.body.style.background = '#1a0533';
 }
 
 async function leaveRoomFromLobby() {
@@ -4533,6 +4545,19 @@ function modNextQuestion() {
 async function modFinishGame() {
   playClick();
   clearAllModIntervals();
+  // Mark unanswered players as timeout for current question
+  const room = getRoom(currentRoom);
+  if (room) {
+    const qIdx = room.currentQuestion;
+    for (const p of room.players) {
+      const res = room.results[p.username];
+      if (!res || !res.answers || res.answers.length <= qIdx) {
+        await api('/api/rooms/' + currentRoom + '/answer', {
+          username: p.username, qIndex: qIdx, correct: false, score: res ? res.score : 0, timeout: true
+        });
+      }
+    }
+  }
   await api('/api/rooms/' + currentRoom + '/end');
   await fetchRoom(currentRoom);
   document.getElementById('mod-dashboard-overlay').style.display = 'none';
@@ -4697,7 +4722,12 @@ function advanceRoomQuestion() {
   if (!room) return;
   const nextQ = roomCurrentQ + 1;
   if (room.playStyle === 'live' && isRoomHost && room.mode === '1v1') { showHostLiveControl(nextQ); }
-  else if (room.playStyle === 'live') { showWaitingForHost(); }
+  else if (room.playStyle === 'live') {
+    // Show waiting overlay with math ticker
+    playerLastAnswer = roomAnswers.length > 0 ? roomAnswers[roomAnswers.length - 1] : null;
+    showPlayerWaiting();
+    showWaitingForHost();
+  }
   else { setTimeout(() => loadRoomQuestion(nextQ), 600); }
 }
 
@@ -4723,21 +4753,67 @@ async function hostAdvanceQuestion(nextQ) {
 function showWaitingForHost() {
   roomLiveWaiting = true;
   document.getElementById('timer-wrap').style.display = 'none';
-  document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
-    + '<div style="font-family:\'Orbitron\',sans-serif;font-size:1.3rem;color:rgba(255,255,255,0.5);"><span class="lobby-waiting-dots">Waiting for moderator</span></div>'
-    + '</div>';
   if (roomPollInterval) clearInterval(roomPollInterval);
+  let reviewShown = false;
   roomPollInterval = setInterval(async () => {
     await fetchRoom(currentRoom);
     const r = getRoom(currentRoom);
-    if (!r) return;
+    if (!r) {
+      // Room deleted = mod ended
+      clearInterval(roomPollInterval); roomPollInterval = null;
+      hidePlayerWaiting();
+      document.getElementById('mod-ended-overlay').classList.add('active');
+      return;
+    }
+    // Detect mod-ended
+    if (r.modEnded) {
+      clearInterval(roomPollInterval); roomPollInterval = null;
+      hidePlayerWaiting();
+      document.getElementById('room-hud').classList.remove('active');
+      document.getElementById('mod-ended-overlay').classList.add('active');
+      return;
+    }
+    // Detect review phase → show results to player
+    if (r.phase === 'review' && !reviewShown) {
+      reviewShown = true;
+      const isCorrect = playerLastAnswer && playerLastAnswer.correct;
+      // Reveal on waiting overlay
+      const ov = document.getElementById('player-waiting-overlay');
+      ov.classList.add(isCorrect ? 'reveal-correct' : 'reveal-wrong');
+      setTimeout(() => {
+        hidePlayerWaiting();
+        // Show cards with result highlighting
+        const q = r.questions[roomCurrentQ];
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        grid.style.gridTemplateColumns = 'repeat(' + q.gridCols + ', 1fr)';
+        grid.style.gridTemplateRows = 'repeat(' + q.gridRows + ', 1fr)';
+        q.equations.forEach(eq => {
+          const card = document.createElement('div');
+          card.className = 'eq-card';
+          card.innerHTML = eq.display;
+          card.style.pointerEvents = 'none';
+          if (eq.isWrong) card.classList.add('player-correct');
+          grid.appendChild(card);
+        });
+        document.body.classList.add(isCorrect ? 'room-bg-correct' : 'room-bg-wrong');
+      }, 1200);
+    }
+    // Detect next question
     if (r.currentQuestion > roomCurrentQ) {
       clearInterval(roomPollInterval); roomPollInterval = null;
       roomLiveWaiting = false;
+      hidePlayerWaiting();
+      document.body.classList.remove('room-bg-correct', 'room-bg-wrong');
       document.getElementById('timer-wrap').style.display = '';
       loadRoomQuestion(r.currentQuestion);
     }
-    if (r.status === 'finished') { clearInterval(roomPollInterval); roomPollInterval = null; showRoomResults(); }
+    if (r.status === 'finished' && !r.modEnded) {
+      clearInterval(roomPollInterval); roomPollInterval = null;
+      hidePlayerWaiting();
+      document.body.classList.remove('room-bg-correct', 'room-bg-wrong');
+      showRoomResults();
+    }
   }, 500);
 }
 

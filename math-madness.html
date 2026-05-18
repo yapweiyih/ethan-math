@@ -1870,6 +1870,25 @@ const DIFFICULTY_NAMES = [
   [100,'Chaos'],
 ];
 
+const optColors = [
+  '#ffd700', // Gold/Yellow
+  '#3b82f6', // Vibrant Blue
+  '#ec4899', // Pink
+  '#a855f7', // Purple
+  '#f97316', // Orange
+  '#10b981', // Emerald Green
+  '#06b6d4', // Cyan
+  '#f43f5e', // Rose/Red
+  '#84cc16', // Lime
+  '#eab308', // Yellow
+  '#6366f1', // Indigo
+  '#14b8a6', // Teal
+  '#8b5cf6', // Violet
+  '#f59e0b', // Amber
+  '#ef4444', // Red
+  '#6b7280'  // Grey
+];
+
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let level = 1, score = 0;
 let timerInterval = null, timerLeft = 0, timerDuration = 0;
@@ -2359,19 +2378,41 @@ function loadUserData() {
   highScore = parseInt(localStorage.getItem(storageKey('highScore')) || '0', 10);
 }
 function saveHighScore() {
-  localStorage.setItem(storageKey('highScore'), String(highScore));
+  try {
+    localStorage.setItem(storageKey('highScore'), String(highScore));
+  } catch(e) {
+    console.error(e);
+  }
 }
 function getUserHistory() {
-  return JSON.parse(localStorage.getItem(storageKey('history')) || '[]');
+  try {
+    const arr = JSON.parse(localStorage.getItem(storageKey('history')) || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch(e) {
+    return [];
+  }
 }
 function saveUserHistory(history) {
-  localStorage.setItem(storageKey('history'), JSON.stringify(history));
+  try {
+    localStorage.setItem(storageKey('history'), JSON.stringify(history));
+  } catch(e) {
+    console.error(e);
+  }
 }
 function getUserBestGame() {
-  return JSON.parse(localStorage.getItem(storageKey('bestGame')) || 'null');
+  try {
+    const val = JSON.parse(localStorage.getItem(storageKey('bestGame')) || 'null');
+    return (val && typeof val === 'object') ? val : null;
+  } catch(e) {
+    return null;
+  }
 }
 function saveUserBestGame(best) {
-  localStorage.setItem(storageKey('bestGame'), JSON.stringify(best));
+  try {
+    localStorage.setItem(storageKey('bestGame'), JSON.stringify(best));
+  } catch(e) {
+    console.error(e);
+  }
 }
 // ─── CHECK AUTO-LOGIN ───────────────────────────────────────────────────────
 async function checkAutoLogin() {
@@ -2436,37 +2477,86 @@ let fontScale = parseFloat(localStorage.getItem('mathMadness_fontScale') || '1')
 // Apply saved font scale on load
 document.documentElement.style.setProperty('--font-scale', fontScale);
 
-// Extended music patterns (~80 steps = ~16s loop, feels like longer track)
+// Extended music patterns (exactly 300 steps = 60.0s loop, feels like a full professional chiptune track)
 const MUSIC_BASS = [
-  130.81,130.81,130.81,130.81, 130.81,130.81,130.81,130.81,
-  164.81,164.81,164.81,164.81, 164.81,164.81,164.81,164.81,
-  174.61,174.61,174.61,174.61, 174.61,174.61,196.00,196.00,
-  196.00,196.00,164.81,164.81, 146.83,146.83,146.83,146.83,
-  130.81,130.81,146.83,146.83, 164.81,164.81,174.61,174.61,
-  196.00,196.00,196.00,196.00, 220.00,220.00,196.00,196.00,
-  174.61,174.61,164.81,164.81, 146.83,146.83,130.81,130.81,
-  130.81,130.81,164.81,164.81, 196.00,196.00,164.81,164.81,
-  146.83,146.83,174.61,174.61, 196.00,196.00,220.00,220.00,
-  196.00,196.00,174.61,174.61, 164.81,164.81,130.81,130.81
+  // Section 1 (C Major)
+  130.81,130.81,130.81,130.81, 164.81,164.81,164.81,164.81, 174.61,174.61,174.61,174.61, 196.00,196.00,196.00,196.00, 130.81,130.81,196.00,196.00,
+  130.81,130.81,130.81,130.81, 164.81,164.81,164.81,164.81, 174.61,174.61,174.61,174.61, 196.00,196.00,196.00,196.00, 130.81,130.81,196.00,196.00,
+  130.81,130.81,130.81,130.81, 164.81,164.81,164.81,164.81, 174.61,174.61,174.61,174.61, 196.00,196.00,196.00,196.00, 130.81,130.81,196.00,196.00,
+
+  // Section 2 (A Minor)
+  220.00,220.00,220.00,220.00, 261.63,261.63,261.63,261.63, 146.83,146.83,146.83,146.83, 164.81,164.81,164.81,164.81, 220.00,220.00,164.81,164.81,
+  220.00,220.00,220.00,220.00, 261.63,261.63,261.63,261.63, 146.83,146.83,146.83,146.83, 164.81,164.81,164.81,164.81, 220.00,220.00,164.81,164.81,
+  220.00,220.00,220.00,220.00, 261.63,261.63,261.63,261.63, 146.83,146.83,146.83,146.83, 164.81,164.81,164.81,164.81, 220.00,220.00,164.81,164.81,
+
+  // Section 3 (F Major)
+  174.61,174.61,174.61,174.61, 220.00,220.00,220.00,220.00, 116.54,116.54,116.54,116.54, 130.81,130.81,130.81,130.81, 174.61,174.61,130.81,130.81,
+  174.61,174.61,174.61,174.61, 220.00,220.00,220.00,220.00, 116.54,116.54,116.54,116.54, 130.81,130.81,130.81,130.81, 174.61,174.61,130.81,130.81,
+  174.61,174.61,174.61,174.61, 220.00,220.00,220.00,220.00, 116.54,116.54,116.54,116.54, 130.81,130.81,130.81,130.81, 174.61,174.61,130.81,130.81,
+
+  // Section 4 (D Minor)
+  146.83,146.83,146.83,146.83, 174.61,174.61,174.61,174.61, 196.00,196.00,196.00,196.00, 220.00,220.00,220.00,220.00, 146.83,146.83,220.00,220.00,
+  146.83,146.83,146.83,146.83, 174.61,174.61,174.61,174.61, 196.00,196.00,196.00,196.00, 220.00,220.00,220.00,220.00, 146.83,146.83,220.00,220.00,
+  146.83,146.83,146.83,146.83, 174.61,174.61,174.61,174.61, 196.00,196.00,196.00,196.00, 220.00,220.00,220.00,220.00, 146.83,146.83,220.00,220.00,
+
+  // Section 5 (Climax / Resolving Outro)
+  130.81,130.81,146.83,146.83, 164.81,164.81,174.61,174.61, 196.00,196.00,220.00,220.00, 246.94,246.94,261.63,261.63, 196.00,196.00,146.83,146.83,
+  130.81,130.81,146.83,146.83, 164.81,164.81,174.61,174.61, 196.00,196.00,220.00,220.00, 246.94,246.94,261.63,261.63, 196.00,196.00,146.83,146.83,
+  130.81,130.81,146.83,146.83, 164.81,164.81,174.61,174.61, 196.00,196.00,220.00,220.00, 246.94,246.94,261.63,261.63, 196.00,196.00,146.83,146.83
 ];
+
 const MUSIC_MELODY = [
-  523.25,0,659.25,0, 587.33,0,523.25,0, 0,0,466.16,0, 523.25,0,587.33,0,
-  659.25,0,0,0, 587.33,0,523.25,0, 466.16,0,523.25,0, 0,0,0,0,
-  392.00,0,440.00,0, 523.25,0,587.33,0, 659.25,0,587.33,0, 523.25,0,0,0,
-  440.00,0,392.00,0, 349.23,0,392.00,0, 440.00,0,523.25,0, 587.33,0,0,0,
-  523.25,0,0,0, 659.25,0,0,0, 587.33,0,523.25,0, 466.16,0,392.00,0
+  // Section 1 (C Major)
+  523.25,0,659.25,0, 587.33,0,523.25,0, 0,0,392.00,0, 523.25,0,587.33,0, 659.25,0,0,0,
+  523.25,0,659.25,0, 587.33,0,523.25,0, 0,0,392.00,0, 523.25,0,587.33,0, 659.25,0,0,0,
+  523.25,0,659.25,0, 587.33,0,523.25,0, 0,0,392.00,0, 523.25,0,587.33,0, 659.25,0,0,0,
+
+  // Section 2 (A Minor)
+  880.00,0,1046.50,0, 987.77,0,880.00,0, 0,0,659.25,0, 880.00,0,987.77,0, 1046.50,0,0,0,
+  880.00,0,1046.50,0, 987.77,0,880.00,0, 0,0,659.25,0, 880.00,0,987.77,0, 1046.50,0,0,0,
+  880.00,0,1046.50,0, 987.77,0,880.00,0, 0,0,659.25,0, 880.00,0,987.77,0, 1046.50,0,0,0,
+
+  // Section 3 (F Major)
+  698.46,0,880.00,0, 783.99,0,698.46,0, 0,0,523.25,0, 698.46,0,783.99,0, 880.00,0,0,0,
+  698.46,0,880.00,0, 783.99,0,698.46,0, 0,0,523.25,0, 698.46,0,783.99,0, 880.00,0,0,0,
+  698.46,0,880.00,0, 783.99,0,698.46,0, 0,0,523.25,0, 698.46,0,783.99,0, 880.00,0,0,0,
+
+  // Section 4 (D Minor)
+  587.33,0,698.46,0, 659.25,0,587.33,0, 0,0,440.00,0, 587.33,0,659.25,0, 698.46,0,0,0,
+  587.33,0,698.46,0, 659.25,0,587.33,0, 0,0,440.00,0, 587.33,0,659.25,0, 698.46,0,0,0,
+  587.33,0,698.46,0, 659.25,0,587.33,0, 0,0,440.00,0, 587.33,0,659.25,0, 698.46,0,0,0,
+
+  // Section 5 (Climax / Resolving Outro)
+  523.25,0,587.33,0, 659.25,0,698.46,0, 783.99,0,880.00,0, 987.77,0,1046.50,0, 0,0,0,0,
+  523.25,0,587.33,0, 659.25,0,698.46,0, 783.99,0,880.00,0, 987.77,0,1046.50,0, 0,0,0,0,
+  523.25,0,587.33,0, 659.25,0,698.46,0, 783.99,0,880.00,0, 987.77,0,1046.50,0, 0,0,0,0
 ];
+
 const MUSIC_ARP = [
-  392,523.25,659.25,523.25, 349.23,466.16,587.33,466.16,
-  349.23,440,523.25,440, 392,523.25,659.25,523.25,
-  329.63,440,523.25,440, 349.23,466.16,587.33,466.16,
-  392,523.25,659.25,523.25, 440,523.25,659.25,523.25,
-  349.23,440,523.25,440, 329.63,392,466.16,392,
-  349.23,466.16,587.33,466.16, 392,523.25,659.25,523.25,
-  440,587.33,659.25,587.33, 392,523.25,659.25,523.25,
-  349.23,466.16,587.33,466.16, 329.63,440,523.25,440,
-  392,523.25,659.25,523.25, 349.23,466.16,587.33,466.16,
-  329.63,392,466.16,392, 349.23,440,523.25,440
+  // Section 1 (C Major)
+  392.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00, 392.00,493.88,587.33,493.88, 392.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00,
+  392.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00, 392.00,493.88,587.33,493.88, 392.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00,
+  392.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00, 392.00,493.88,587.33,493.88, 392.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00,
+
+  // Section 2 (A Minor)
+  440.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00, 392.00,493.88,587.33,493.88, 440.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00,
+  440.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00, 392.00,493.88,587.33,493.88, 440.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00,
+  440.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00, 392.00,493.88,587.33,493.88, 440.00,523.25,659.25,523.25, 349.23,440.00,523.25,440.00,
+
+  // Section 3 (F Major)
+  349.23,440.00,523.25,440.00, 466.16,587.33,698.46,587.33, 261.63,329.63,392.00,329.63, 349.23,440.00,523.25,440.00, 466.16,587.33,698.46,587.33,
+  349.23,440.00,523.25,440.00, 466.16,587.33,698.46,587.33, 261.63,329.63,392.00,329.63, 349.23,440.00,523.25,440.00, 466.16,587.33,698.46,587.33,
+  349.23,440.00,523.25,440.00, 466.16,587.33,698.46,587.33, 261.63,329.63,392.00,329.63, 349.23,440.00,523.25,440.00, 466.16,587.33,698.46,587.33,
+
+  // Section 4 (D Minor)
+  293.66,349.23,440.00,349.23, 392.00,493.88,587.33,493.88, 329.63,392.00,466.16,392.00, 293.66,349.23,440.00,349.23, 392.00,493.88,587.33,493.88,
+  293.66,349.23,440.00,349.23, 392.00,493.88,587.33,493.88, 329.63,392.00,466.16,392.00, 293.66,349.23,440.00,349.23, 392.00,493.88,587.33,493.88,
+  293.66,349.23,440.00,349.23, 392.00,493.88,587.33,493.88, 329.63,392.00,466.16,392.00, 293.66,349.23,440.00,349.23, 392.00,493.88,587.33,493.88,
+
+  // Section 5 (Climax / Resolving Outro)
+  392.00,523.25,659.25,523.25, 440.00,587.33,698.46,587.33, 493.88,659.25,783.99,659.25, 523.25,698.46,880.00,698.46, 587.33,783.99,987.77,783.99,
+  392.00,523.25,659.25,523.25, 440.00,587.33,698.46,587.33, 493.88,659.25,783.99,659.25, 523.25,698.46,880.00,698.46, 587.33,783.99,987.77,783.99,
+  392.00,523.25,659.25,523.25, 440.00,587.33,698.46,587.33, 493.88,659.25,783.99,659.25, 523.25,698.46,880.00,698.46, 587.33,783.99,987.77,783.99
 ];
 
 function ensureAudioCtx() {
@@ -2981,45 +3071,58 @@ function flashScreen(type, dur, cb) {
 }
 
 function showGameOver() {
+  isAnimating = false;
   document.body.classList.remove('vibrating');
-  clearInterval(polkaSpawner); polkaSpawner = null;
-  document.getElementById('polka-layer').innerHTML = '';
-  document.getElementById('go-score').textContent = `Score: ${score}`;
+  if (polkaSpawner) { clearInterval(polkaSpawner); polkaSpawner = null; }
+  const polkaLayer = document.getElementById('polka-layer');
+  if (polkaLayer) polkaLayer.innerHTML = '';
+  const goScore = document.getElementById('go-score');
+  if (goScore) goScore.textContent = `Score: ${score}`;
 
-  // Save history (per-user)
-  const record = { score: score, date: new Date().toLocaleString(), custom: isCustomMode || undefined };
-  let gameHistory = getUserHistory();
-  gameHistory.unshift(record);
-  if (gameHistory.length > 10) gameHistory.pop();
-  saveUserHistory(gameHistory);
+  // Save history (per-user) safely
+  let isNewHigh = false;
+  let effectiveHighScore = highScore;
+  try {
+    const record = { score: score, date: new Date().toLocaleString(), custom: isCustomMode || undefined };
+    let gameHistory = getUserHistory();
+    gameHistory.unshift(record);
+    if (gameHistory.length > 10) gameHistory.pop();
+    saveUserHistory(gameHistory);
 
-  let bestGame = getUserBestGame();
-  if (!bestGame || score > bestGame.score) {
-    bestGame = record;
-    saveUserBestGame(bestGame);
+    let bestGame = getUserBestGame();
+    if (!bestGame || score > bestGame.score) {
+      bestGame = record;
+      saveUserBestGame(bestGame);
+    }
+
+    // High score logic (per-user, separate for custom mode)
+    effectiveHighScore = isCustomMode ? getCustomHighScore() : highScore;
+    isNewHigh = score > effectiveHighScore && score > 0;
+    if (isNewHigh) {
+      if (isCustomMode) { saveCustomHighScore(score); effectiveHighScore = score; }
+      else { highScore = score; saveHighScore(); effectiveHighScore = highScore; }
+    }
+  } catch(e) {
+    console.error("Error saving user stats on Game Over:", e);
   }
 
-  // High score logic (per-user, separate for custom mode)
-  let effectiveHighScore = isCustomMode ? getCustomHighScore() : highScore;
-  const isNewHigh = score > effectiveHighScore && score > 0;
-  if (isNewHigh) {
-    if (isCustomMode) { saveCustomHighScore(score); effectiveHighScore = score; }
-    else { highScore = score; saveHighScore(); effectiveHighScore = highScore; }
-  }
   const hsVal = document.getElementById('go-highscore-value');
-  hsVal.textContent = effectiveHighScore;
+  if (hsVal) hsVal.textContent = effectiveHighScore;
   const badge = document.getElementById('new-high-badge');
-  if (isNewHigh) {
-    hsVal.classList.add('rainbow');
-    badge.textContent = '🎉 New High!';
-    badge.className = 'new-high-badge';
-  } else {
-    hsVal.classList.remove('rainbow');
-    badge.textContent = '';
-    badge.className = '';
+  if (badge) {
+    if (isNewHigh) {
+      if (hsVal) hsVal.classList.add('rainbow');
+      badge.textContent = '🎉 New High!';
+      badge.className = 'new-high-badge';
+    } else {
+      if (hsVal) hsVal.classList.remove('rainbow');
+      badge.textContent = '';
+      badge.className = '';
+    }
   }
 
-  document.getElementById('gameover').classList.add('active');
+  const goOverlay = document.getElementById('gameover');
+  if (goOverlay) goOverlay.classList.add('active');
 }
 
 function restartGame() {
@@ -3486,24 +3589,42 @@ function startCustomGame() {
 
 function customStorageKey(key) {
   const prefix = currentUser ? 'mathMadness_user_' + currentUser : 'mathMadness_guest';
-  const topicKey = customTopics.slice().sort().join('-');
+  const topicsArr = Array.isArray(customTopics) ? customTopics : ['add', 'sub'];
+  const topicKey = topicsArr.slice().sort().join('-');
   return prefix + '_custom_' + topicKey + '_' + key;
 }
 
 function getCustomHighScore() {
-  return parseInt(localStorage.getItem(customStorageKey('highScore')) || '0', 10);
+  try {
+    return parseInt(localStorage.getItem(customStorageKey('highScore')) || '0', 10);
+  } catch(e) {
+    return 0;
+  }
 }
 
 function saveCustomHighScore(val) {
-  localStorage.setItem(customStorageKey('highScore'), String(val));
+  try {
+    localStorage.setItem(customStorageKey('highScore'), String(val));
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 function getCustomHistory() {
-  return JSON.parse(localStorage.getItem(customStorageKey('history')) || '[]');
+  try {
+    const arr = JSON.parse(localStorage.getItem(customStorageKey('history')) || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch(e) {
+    return [];
+  }
 }
 
 function saveCustomHistory(history) {
-  localStorage.setItem(customStorageKey('history'), JSON.stringify(history));
+  try {
+    localStorage.setItem(customStorageKey('history'), JSON.stringify(history));
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 // ─── ROOM SYSTEM (API-backed — works across browsers) ───────────────────────
@@ -4303,12 +4424,76 @@ function modRenderReviewContent(q, room, qIdx) {
     const wPct = total>0?Math.round(wrong/total*100):0;
     const tPct = total>0?Math.round(timeout/total*100):0;
     const pie = `background:conic-gradient(#7fffb2 0% ${cPct}%, #ff4466 ${cPct}% ${cPct+wPct}%, #666 ${cPct+wPct}% 100%);`;
-    el.innerHTML = `<div class="mod-pie-wrap"><div class="mod-pie" style="${pie}"></div>`
-      + `<div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:rgba(255,255,255,0.7);">`
-      + `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#7fffb2;"></div> Correct: ${correct} (${cPct}%)</div>`
-      + `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#ff4466;"></div> Incorrect: ${wrong} (${wPct}%)</div>`
-      + `<div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:#666;"></div> Timeout: ${timeout} (${tPct}%)</div>`
-      + `</div></div>`;
+
+    // Calculate option selection counts and percentage
+    const optionCounts = {};
+    for (let i = 0; i < q.equations.length; i++) optionCounts[i] = 0;
+    let totalSelections = 0;
+    room.players.forEach(p => {
+      const res = room.results[p.username];
+      if (res && res.answers && res.answers.length > qIdx) {
+        const a = res.answers[qIdx];
+        if (!a.timeout && a.selectedIdx !== undefined && a.selectedIdx >= 0 && a.selectedIdx < q.equations.length) {
+          optionCounts[a.selectedIdx]++;
+          totalSelections++;
+        }
+      }
+    });
+
+    let selectionPieParts = [];
+    let currentSelectionPct = 0;
+    let legendItemsHtml = '';
+
+    if (totalSelections > 0) {
+      for (let i = 0; i < q.equations.length; i++) {
+        const cnt = optionCounts[i];
+        if (cnt > 0) {
+          const pct = (cnt / totalSelections) * 100;
+          const nextPct = currentSelectionPct + pct;
+          const col = optColors[i % optColors.length];
+          selectionPieParts.push(`${col} ${currentSelectionPct.toFixed(1)}% ${nextPct.toFixed(1)}%`);
+          currentSelectionPct = nextPct;
+        }
+      }
+    }
+
+    const selectionPieStyle = totalSelections > 0
+      ? `background:conic-gradient(${selectionPieParts.join(', ')})`
+      : `background:#444`;
+
+    for (let i = 0; i < q.equations.length; i++) {
+      const cnt = optionCounts[i];
+      const pct = totalSelections > 0 ? Math.round((cnt / totalSelections) * 100) : 0;
+      const col = optColors[i % optColors.length];
+      const opacity = cnt > 0 ? 1 : 0.35;
+      legendItemsHtml += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;opacity:${opacity};">`
+        + `<div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0;"></div>`
+        + `<span style="font-family:'Share Tech Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;" title="${q.equations[i].display}">`
+        + `Opt ${i+1} (${q.equations[i].display})`
+        + `</span>`
+        + `<span style="font-family:'Share Tech Mono',monospace;margin-left:auto;font-weight:bold;">${cnt} (${pct}%)</span>`
+        + `</div>`;
+    }
+
+    el.innerHTML = `<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:20px; padding:4px;">`
+      + `<!-- Chart 1: Answer Status -->`
+      + `<div class="mod-stat-card" style="flex:1; min-width:240px; background:rgba(255,255,255,0.04); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.06);">`
+      + `<h4 style="font-family:'Orbitron',sans-serif; color:rgba(255,255,255,0.9); font-size:0.85rem; margin:0 0 12px 0; text-align:center; letter-spacing:1px;">ANSWER STATUS</h4>`
+      + `<div class="mod-pie-wrap" style="margin:0; gap:16px; justify-content:space-between;">`
+      + `<div class="mod-pie" style="${pie}; width:120px; height:120px; flex-shrink:0;"></div>`
+      + `<div style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:rgba(255,255,255,0.7); flex:1;">`
+      + `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#7fffb2;flex-shrink:0;"></div> Correct: ${correct} (${cPct}%)</div>`
+      + `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#ff4466;flex-shrink:0;"></div> Incorrect: ${wrong} (${wPct}%)</div>`
+      + `<div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:#666;flex-shrink:0;"></div> Timeout: ${timeout} (${tPct}%)</div>`
+      + `</div></div></div>`
+      + `<!-- Chart 2: Selection Distribution -->`
+      + `<div class="mod-stat-card" style="flex:1; min-width:240px; background:rgba(255,255,255,0.04); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.06);">`
+      + `<h4 style="font-family:'Orbitron',sans-serif; color:rgba(255,255,255,0.9); font-size:0.85rem; margin:0 0 12px 0; text-align:center; letter-spacing:1px;">SELECTION DISTRIBUTION</h4>`
+      + `<div class="mod-pie-wrap" style="margin:0; gap:16px; justify-content:space-between;">`
+      + `<div class="mod-pie" style="${selectionPieStyle}; width:120px; height:120px; flex-shrink:0;"></div>`
+      + `<div style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:rgba(255,255,255,0.7); flex:1; max-height:120px; overflow-y:auto; padding-right:4px;">`
+      + legendItemsHtml
+      + `</div></div></div></div>`;
   } else {
     const sorted = [...room.players].sort((a,b) => ((room.results[b.username]||{}).score||0) - ((room.results[a.username]||{}).score||0));
     el.innerHTML = sorted.map((p,i) => {

@@ -2207,26 +2207,29 @@ function showMenuSettings() {
   document.getElementById('user-menu-title').style.display = '';
   document.getElementById('user-menu-title').textContent = 'Settings';
   const content = document.getElementById('user-menu-content');
-  const fontVal = fontScale === 0.85 ? 'small' : fontScale === 1.15 ? 'large' : 'medium';
+  const fontVal = fontScale === 0.7 ? 'small' : fontScale === 1.4 ? 'large' : 'medium';
   content.innerHTML = `
-    <div class="settings-row"><label>Click Volume</label>
-      <input type="range" min="0" max="100" value="${clickVol*100}" oninput="setClickVolume(this.value)" style="-webkit-appearance:none;appearance:none;width:120px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Click Volume: <span id="menu-click-vol-pct">${Math.round(clickVol*100)}%</span></label>
+      <input type="range" min="0" max="100" value="${Math.round(clickVol*100)}" oninput="updateClickVol(this.value)" style="-webkit-appearance:none;appearance:none;width:120px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
     </div>
-    <div class="settings-row"><label>Music</label>
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Music Volume: <span id="menu-music-vol-pct">${Math.round(musicVolume*100)}%</span></label>
       <div style="display:flex;align-items:center;gap:10px;">
-        <input type="range" min="0" max="100" value="${Math.round(musicVolume*100)}" oninput="setMusicVolume(this.value)" style="-webkit-appearance:none;appearance:none;width:90px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
-        <button onclick="toggleMusic(!musicPlaying);showMenuSettings()" style="font-family:'Orbitron',sans-serif;font-size:0.75rem;padding:5px 12px;border:1.5px solid ${musicPlaying?'#7fffb2':'rgba(255,255,255,0.3)'};border-radius:8px;background:${musicPlaying?'rgba(127,255,178,0.15)':'rgba(255,255,255,0.06)'};color:${musicPlaying?'#7fffb2':'rgba(255,255,255,0.5)'};cursor:pointer;">${musicPlaying?'ON':'OFF'}</button>
+        <input type="range" min="0" max="100" value="${Math.round(musicVolume*100)}" oninput="updateMusicVol(this.value)" style="-webkit-appearance:none;appearance:none;width:80px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+        <button onclick="toggleMusic(!musicPlaying);showMenuSettings()" style="font-family:'Orbitron',sans-serif;font-size:0.7rem;padding:4px 10px;border:1.5px solid ${musicPlaying?'#7fffb2':'rgba(255,255,255,0.3)'};border-radius:6px;background:${musicPlaying?'rgba(127,255,178,0.15)':'rgba(255,255,255,0.06)'};color:${musicPlaying?'#7fffb2':'rgba(255,255,255,0.5)'};cursor:pointer;text-transform:uppercase;">${musicPlaying?'ON':'OFF'}</button>
       </div>
     </div>
-    <div class="settings-row"><label>Font Size</label>
-      <div class="room-toggle-group" id="font-size-toggle" style="width:auto;gap:2px;">
-        <button class="room-toggle-opt ${fontVal==='small'?'active':''}" data-val="small" onclick="setFontScale(0.85);showMenuSettings()" style="padding:6px 12px;font-size:0.8rem;">S</button>
-        <button class="room-toggle-opt ${fontVal==='medium'?'active':''}" data-val="medium" onclick="setFontScale(1.0);showMenuSettings()" style="padding:6px 12px;font-size:0.8rem;">M</button>
-        <button class="room-toggle-opt ${fontVal==='large'?'active':''}" data-val="large" onclick="setFontScale(1.15);showMenuSettings()" style="padding:6px 12px;font-size:0.8rem;">L</button>
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Font Size</label>
+      <div class="room-toggle-group" id="font-size-toggle" style="width:auto;gap:2px;display:flex;background:rgba(255,255,255,0.06);padding:2px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);">
+        <button class="room-toggle-opt ${fontVal==='small'?'active':''}" onclick="updateFontScale(0.7);showMenuSettings()" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='small'?'var(--accent)':'transparent'};color:#fff;">S</button>
+        <button class="room-toggle-opt ${fontVal==='medium'?'active':''}" onclick="updateFontScale(1.0);showMenuSettings()" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='medium'?'var(--accent)':'transparent'};color:#fff;">M</button>
+        <button class="room-toggle-opt ${fontVal==='large'?'active':''}" onclick="updateFontScale(1.4);showMenuSettings()" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='large'?'var(--accent)':'transparent'};color:#fff;">L</button>
       </div>
     </div>
-    <div class="help-buttons" style="margin-top:14px;">
-      <button class="help-btn-secondary" onclick="openUserMenu()">Back</button>
+    <div class="help-buttons" style="margin-top:14px;text-align:center;">
+      <button class="help-btn-secondary" onclick="openUserMenu()" style="width:100%;padding:10px;border:1.5px solid rgba(255,255,255,0.25);border-radius:50px;background:rgba(255,255,255,0.08);color:#fff;cursor:pointer;font-family:'Orbitron',sans-serif;">Back</button>
     </div>`;
 }
 
@@ -2473,6 +2476,8 @@ let musicInterval = null;
 let musicGain = null;
 let musicStep = 0;
 let fontScale = parseFloat(localStorage.getItem('mathMadness_fontScale') || '1');
+if (fontScale === 0.85) fontScale = 0.7;
+if (fontScale === 1.15) fontScale = 1.4;
 
 // Apply saved font scale on load
 document.documentElement.style.setProperty('--font-scale', fontScale);
@@ -2670,6 +2675,31 @@ function setFontScale(scale) {
   fontScale = scale;
   document.documentElement.style.setProperty('--font-scale', scale);
   localStorage.setItem('mathMadness_fontScale', String(scale));
+}
+
+function updateClickVol(v) {
+  setClickVolume(v);
+  const el1 = document.getElementById('click-vol-pct');
+  if (el1) el1.textContent = v + '%';
+  const el2 = document.getElementById('mod-click-vol-pct');
+  if (el2) el2.textContent = v + '%';
+  const el3 = document.getElementById('menu-click-vol-pct');
+  if (el3) el3.textContent = v + '%';
+  playClick();
+}
+
+function updateMusicVol(v) {
+  setMusicVolume(v);
+  const el1 = document.getElementById('music-vol-pct');
+  if (el1) el1.textContent = v + '%';
+  const el2 = document.getElementById('mod-music-vol-pct');
+  if (el2) el2.textContent = v + '%';
+  const el3 = document.getElementById('menu-music-vol-pct');
+  if (el3) el3.textContent = v + '%';
+}
+
+function updateFontScale(scale) {
+  setFontScale(scale);
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -3151,21 +3181,17 @@ function goHome() {
   hasImmunity = false; lightbulbUsed = false; lightbulbCooldown = 0; scoreAtLastHint = null; cheatHighlightCorrect = false; scoreAt5x5 = null;
   clearInterval(timerInterval);
   clearInterval(polkaSpawner); polkaSpawner = null;
-  document.getElementById('gameover').classList.remove('active');
-  document.getElementById('settings-overlay').classList.remove('active');
-  document.getElementById('confirm-overlay').classList.remove('active');
-  document.getElementById('help-overlay').classList.remove('active');
-  document.getElementById('friends-overlay').classList.remove('active');
-  document.getElementById('mode-select-overlay').classList.remove('active');
-  if (document.getElementById('custom-mode-overlay')) document.getElementById('custom-mode-overlay').classList.remove('active');
-  document.getElementById('room-overlay').classList.remove('active');
-  document.getElementById('room-hud').classList.remove('active');
-  document.getElementById('room-results-overlay').classList.remove('active');
-  document.getElementById('room-invite-popup').classList.remove('active');
-  hidePlayerWaiting();
-  document.getElementById('mod-ended-overlay').classList.remove('active');
-  document.getElementById('who-clicked-overlay').classList.remove('active');
-  document.getElementById('mod-dashboard-overlay').style.display = 'none';
+  const overlays = [
+    'gameover', 'settings-overlay', 'confirm-overlay', 'help-overlay',
+    'mode-select-overlay', 'custom-mode-overlay', 'room-overlay', 'room-hud',
+    'room-results-overlay', 'room-invite-popup', 'mod-ended-overlay', 'who-clicked-overlay'
+  ];
+  overlays.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const modDashboard = document.getElementById('mod-dashboard-overlay');
+  if (modDashboard) modDashboard.style.display = 'none';
   document.body.classList.remove('room-bg-correct','room-bg-wrong');
   clearAllModIntervals();
   const modSettingsEl = document.getElementById('mod-settings-overlay');
@@ -3210,13 +3236,57 @@ function startClassicMode() {
 }
 
 // ─── SETTINGS & CONFIRM ─────────────────────────────────────────────────────
+function renderStandardSettings() {
+  const panel = document.getElementById('settings-panel');
+  if (!panel) return;
+  const fontVal = fontScale === 0.7 ? 'small' : fontScale === 1.4 ? 'large' : 'medium';
+  panel.innerHTML = `
+    <button id="settings-close" onclick="closeSettings()">✕</button>
+    <h2 style="font-family:'Orbitron',sans-serif;font-size:1.5rem;color:var(--accent);margin-bottom:1em;text-align:center;">Settings</h2>
+    
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Click Volume: <span id="click-vol-pct">${Math.round(clickVol*100)}%</span></label>
+      <input type="range" min="0" max="100" value="${Math.round(clickVol*100)}" oninput="updateClickVol(this.value)" style="-webkit-appearance:none;appearance:none;width:120px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+    </div>
+    
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Music Volume: <span id="music-vol-pct">${Math.round(musicVolume*100)}%</span></label>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="range" min="0" max="100" value="${Math.round(musicVolume*100)}" oninput="updateMusicVol(this.value)" style="-webkit-appearance:none;appearance:none;width:80px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+        <button onclick="toggleMusic(!musicPlaying);renderStandardSettings();" style="font-family:'Orbitron',sans-serif;font-size:0.7rem;padding:4px 10px;border:1.5px solid ${musicPlaying?'#7fffb2':'rgba(255,255,255,0.3)'};border-radius:6px;background:${musicPlaying?'rgba(127,255,178,0.15)':'rgba(255,255,255,0.06)'};color:${musicPlaying?'#7fffb2':'rgba(255,255,255,0.5)'};cursor:pointer;text-transform:uppercase;">${musicPlaying?'ON':'OFF'}</button>
+      </div>
+    </div>
+    
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Font Size</label>
+      <div class="room-toggle-group" style="width:auto;gap:2px;display:flex;background:rgba(255,255,255,0.06);padding:2px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);">
+        <button class="room-toggle-opt ${fontVal==='small'?'active':''}" onclick="updateFontScale(0.7);renderStandardSettings();" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='small'?'var(--accent)':'transparent'};color:#fff;">S</button>
+        <button class="room-toggle-opt ${fontVal==='medium'?'active':''}" onclick="updateFontScale(1.0);renderStandardSettings();" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='medium'?'var(--accent)':'transparent'};color:#fff;">M</button>
+        <button class="room-toggle-opt ${fontVal==='large'?'active':''}" onclick="updateFontScale(1.4);renderStandardSettings();" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='large'?'var(--accent)':'transparent'};color:#fff;">L</button>
+      </div>
+    </div>
+    
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Debug Mode</label>
+      <div class="toggle-switch">
+        <input type="checkbox" id="debug-toggle" ${debugMode?'checked':''} onchange="toggleDebugMode(this.checked)">
+        <span class="toggle-slider"></span>
+      </div>
+    </div>
+    
+    <button id="settings-home-btn" onclick="confirmGoHome()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:50px;color:#fff;cursor:pointer;transition:transform 0.12s,background 0.12s;box-shadow:none;" onmouseover="this.style.transform='scale(1.02)';this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,0.08)'">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Return to Homepage
+    </button>
+  `;
+}
+
 function openSettings() {
   playClick();
   gamePaused = true;
   clearInterval(timerInterval);
   if (isRoomMode) clearInterval(roomTimerInterval);
-  // Sync debug toggle with current state
-  document.getElementById('debug-toggle').checked = debugMode;
+  renderStandardSettings();
   document.getElementById('settings-overlay').classList.add('active');
 }
 
@@ -4576,15 +4646,50 @@ function openModSettings() {
   const overlay = document.createElement('div');
   overlay.id = 'mod-settings-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;';
-  overlay.innerHTML = `<div style="background:linear-gradient(135deg,#1e0a3a,#12213f);border:1.5px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px 32px;width:320px;max-width:90vw;animation:goIn 0.25s ease;text-align:center;">
-    <h2 style="font-family:'Orbitron',sans-serif;font-size:1.5rem;color:var(--accent);margin-bottom:1em;">Settings</h2>
-    <div class="settings-row"><label>Click Volume</label>
-      <input type="range" min="0" max="100" value="${clickVol*100}" oninput="setClickVolume(this.value)" style="-webkit-appearance:none;appearance:none;width:120px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+  document.body.appendChild(overlay);
+  renderModSettings();
+}
+
+function renderModSettings() {
+  const overlay = document.getElementById('mod-settings-overlay');
+  if (!overlay) return;
+  let container = overlay.querySelector('div');
+  if (!container) {
+    container = document.createElement('div');
+    container.style.cssText = 'background:linear-gradient(135deg,#1e0a3a,#12213f);border:1.5px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px 32px;width:320px;max-width:90vw;animation:goIn 0.25s ease;text-align:left;position:relative;';
+    overlay.appendChild(container);
+  }
+  
+  const fontVal = fontScale === 0.7 ? 'small' : fontScale === 1.4 ? 'large' : 'medium';
+  
+  container.innerHTML = `
+    <h2 style="font-family:'Orbitron',sans-serif;font-size:1.5rem;color:var(--accent);margin-bottom:1em;text-align:center;margin-top:0;">Settings</h2>
+    
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Click Volume: <span id="mod-click-vol-pct">${Math.round(clickVol*100)}%</span></label>
+      <input type="range" min="0" max="100" value="${Math.round(clickVol*100)}" oninput="updateClickVol(this.value)" style="-webkit-appearance:none;appearance:none;width:120px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
     </div>
+    
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Music Volume: <span id="mod-music-vol-pct">${Math.round(musicVolume*100)}%</span></label>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="range" min="0" max="100" value="${Math.round(musicVolume*100)}" oninput="updateMusicVol(this.value)" style="-webkit-appearance:none;appearance:none;width:80px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);outline:none;">
+        <button onclick="toggleMusic(!musicPlaying);renderModSettings();" style="font-family:'Orbitron',sans-serif;font-size:0.7rem;padding:4px 10px;border:1.5px solid ${musicPlaying?'#7fffb2':'rgba(255,255,255,0.3)'};border-radius:6px;background:${musicPlaying?'rgba(127,255,178,0.15)':'rgba(255,255,255,0.06)'};color:${musicPlaying?'#7fffb2':'rgba(255,255,255,0.5)'};cursor:pointer;text-transform:uppercase;">${musicPlaying?'ON':'OFF'}</button>
+      </div>
+    </div>
+    
+    <div class="settings-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;width:100%;">
+      <label style="font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.85);margin-bottom:0;">Font Size</label>
+      <div class="room-toggle-group" style="width:auto;gap:2px;display:flex;background:rgba(255,255,255,0.06);padding:2px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);">
+        <button class="room-toggle-opt ${fontVal==='small'?'active':''}" onclick="updateFontScale(0.7);renderModSettings();" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='small'?'var(--accent)':'transparent'};color:#fff;">S</button>
+        <button class="room-toggle-opt ${fontVal==='medium'?'active':''}" onclick="updateFontScale(1.0);renderModSettings();" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='medium'?'var(--accent)':'transparent'};color:#fff;">M</button>
+        <button class="room-toggle-opt ${fontVal==='large'?'active':''}" onclick="updateFontScale(1.4);renderModSettings();" style="padding:4px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;background:${fontVal==='large'?'var(--accent)':'transparent'};color:#fff;">L</button>
+      </div>
+    </div>
+    
     <button style="font-family:'Orbitron',sans-serif;font-size:1rem;padding:12px 24px;border:none;border-radius:50px;background:#ff4466;color:#fff;cursor:pointer;width:100%;margin-top:12px;transition:transform 0.12s;" onclick="document.getElementById('mod-settings-overlay').remove();confirmEndGame()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">End Room</button>
     <button style="font-family:'Orbitron',sans-serif;font-size:0.9rem;padding:10px 20px;border:1.5px solid rgba(255,255,255,0.25);border-radius:50px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);cursor:pointer;width:100%;margin-top:8px;transition:transform 0.12s;" onclick="closeModSettings()" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">Close</button>
-  </div>`;
-  document.body.appendChild(overlay);
+  `;
 }
 
 function closeModSettings() {
@@ -4768,17 +4873,71 @@ function advanceRoomQuestion() {
 
 // --- Live Mode Controls ---
 function showHostLiveControl(nextQ) {
-  const room = getRoom(currentRoom);
-  if (nextQ >= room.questions.length) { finishRoomGame(); return; }
+  const r = getRoom(currentRoom);
+  if (nextQ >= r.questions.length) { finishRoomGame(); return; }
   document.getElementById('timer-wrap').style.display = 'none';
-  document.getElementById('grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
+  
+  if (roomPollInterval) clearInterval(roomPollInterval);
+  
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;">'
     + '<div style="font-family:\'Orbitron\',sans-serif;font-size:1.5rem;color:rgba(255,255,255,0.6);margin-bottom:16px;">Question ' + (roomCurrentQ + 1) + ' complete</div>'
-    + '<button class="room-btn-primary" style="max-width:300px;margin:0 auto;" onclick="hostAdvanceQuestion(' + nextQ + ')">Next Question →</button>'
+    + '<div id="opponent-status-msg" style="font-family:\'Share Tech Mono\',monospace;font-size:1.1rem;color:#ffd86b;margin-bottom:20px;text-shadow:0 0 8px rgba(255,216,107,0.3);">Waiting for opponent...</div>'
+    + '<button id="host-next-btn" class="room-btn-primary" style="max-width:300px;margin:0 auto;background:#555;color:#aaa;cursor:not-allowed;box-shadow:none;pointer-events:none;" onclick="hostAdvanceQuestion(' + nextQ + ')">Next Question →</button>'
     + '</div>';
+    
+  roomPollInterval = setInterval(async () => {
+    await fetchRoom(currentRoom);
+    const updatedRoom = getRoom(currentRoom);
+    if (!updatedRoom) { clearInterval(roomPollInterval); return; }
+    
+    const opponent = updatedRoom.players.find(p => p.username !== currentUser);
+    if (!opponent) {
+      clearInterval(roomPollInterval);
+      enableHostNextButton();
+      return;
+    }
+    
+    const oppRes = updatedRoom.results[opponent.username];
+    const isOpponentDone = oppRes && oppRes.answers.some(ans => ans.q === roomCurrentQ);
+    
+    if (isOpponentDone) {
+      clearInterval(roomPollInterval);
+      enableHostNextButton();
+    }
+  }, 1000);
+  
+  const opponent = r.players.find(p => p.username !== currentUser);
+  if (opponent) {
+    const oppRes = r.results[opponent.username];
+    const isOpponentDone = oppRes && oppRes.answers.some(ans => ans.q === roomCurrentQ);
+    if (isOpponentDone) {
+      clearInterval(roomPollInterval);
+      setTimeout(() => enableHostNextButton(), 50);
+    }
+  }
+}
+
+function enableHostNextButton() {
+  const msgEl = document.getElementById('opponent-status-msg');
+  if (msgEl) {
+    msgEl.style.color = '#7fffb2';
+    msgEl.style.textShadow = '0 0 8px rgba(127,255,178,0.3)';
+    msgEl.textContent = 'Opponent is ready!';
+  }
+  const btn = document.getElementById('host-next-btn');
+  if (btn) {
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#fff';
+    btn.style.cursor = 'pointer';
+    btn.style.boxShadow = '0 0 24px rgba(255,107,255,0.4)';
+    btn.style.pointerEvents = 'auto';
+  }
 }
 
 async function hostAdvanceQuestion(nextQ) {
   playClick();
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
   await api('/api/rooms/' + currentRoom + '/advance', { nextQuestion: nextQ });
   await fetchRoom(currentRoom);
   document.getElementById('timer-wrap').style.display = '';

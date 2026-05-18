@@ -187,6 +187,13 @@ def delete_room(code: str) -> dict:
     return {"ok": True}
 
 
+@app.post("/api/rooms/{code}/delete")
+def delete_room_post(code: str) -> dict:
+    """Delete a room entirely (POST fallback for beacons)."""
+    rooms.pop(code, None)
+    return {"ok": True}
+
+
 @app.post("/api/rooms/{code}/toggle-public")
 def toggle_public(code: str) -> dict:
     """Toggle room between public and private."""

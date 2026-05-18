@@ -971,128 +971,6 @@
     flex-wrap: wrap;
   }
 
-  /* FRIENDS OVERLAY */
-  #friends-overlay {
-    display: none; position: fixed; inset: 0; z-index: 350;
-    background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
-    align-items: center; justify-content: center;
-  }
-  #friends-overlay.active { display: flex; }
-  #friends-panel {
-    background: linear-gradient(135deg,#1e0a3a,#12213f);
-    border: 1.5px solid rgba(255,255,255,0.15); border-radius: 20px;
-    padding: 24px; width: 420px; max-width: 90vw;
-    animation: goIn 0.25s ease;
-    max-height: 85vh;
-    display: flex; flex-direction: column;
-  }
-  .friends-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 15px;
-  }
-  .friends-header h2 {
-    font-family: 'Orbitron', sans-serif; color: var(--accent);
-    font-size: 2rem; margin: 0; text-shadow: 0 0 12px var(--accent);
-  }
-  .friends-tabs {
-    display: flex; gap: 4px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 12px; padding: 4px;
-    margin-bottom: 14px;
-  }
-  .friends-tab {
-    flex: 1;
-    font-family: 'Orbitron', sans-serif; font-size: 1.1rem;
-    padding: 10px 0; border: none; border-radius: 10px;
-    background: transparent; color: rgba(255,255,255,0.5);
-    cursor: pointer; transition: background 0.2s, color 0.2s;
-  }
-  .friends-tab.active {
-    background: var(--accent); color: #fff;
-  }
-  .friends-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
-  .friends-content {
-    flex: 1; overflow-y: auto; min-height: 200px;
-  }
-  .friends-empty {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; min-height: 200px;
-    color: rgba(255,255,255,0.4);
-    font-family: 'Orbitron', sans-serif;
-  }
-  .friends-empty-icon {
-    font-size: 3rem; margin-bottom: 10px;
-    opacity: 0.3;
-  }
-  .friends-empty p { font-size: 1.1rem; text-align: center; line-height: 1.5; }
-  .friend-item {
-    background: rgba(255,255,255,0.08); border-radius: 10px;
-    padding: 12px 14px; margin-bottom: 8px;
-    display: flex; justify-content: space-between; align-items: center;
-    font-family: 'Share Tech Mono', monospace;
-  }
-  .friend-name { color: #fff; font-size: 0.95rem; font-weight: bold; }
-  .friend-id { color: rgba(255,255,255,0.4); font-size: 0.7rem; }
-  .friend-action-btn {
-    font-family: 'Orbitron', sans-serif; font-size: 0.9rem;
-    padding: 6px 14px; border: none; border-radius: 20px;
-    cursor: pointer; transition: transform 0.12s;
-  }
-  .friend-action-btn:hover { transform: scale(1.08); }
-  .friend-accept { background: #7fffb2; color: #1a0533; }
-  .friend-decline { background: rgba(255,68,102,0.3); color: #ff4466; margin-left: 6px; }
-  .friend-remove { background: rgba(255,68,102,0.2); color: #ff4466; }
-  .friend-pending { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); font-size: 0.8rem; }
-
-  /* REQUEST SUB-TABS */
-  .request-subtabs {
-    display: flex; gap: 0; margin-bottom: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  .request-subtab {
-    flex: 1; font-family: 'Orbitron', sans-serif; font-size: 1rem;
-    padding: 8px 0; border: none; background: transparent;
-    color: rgba(255,255,255,0.4); cursor: pointer;
-    transition: color 0.2s; border-bottom: 2px solid transparent;
-  }
-  .request-subtab.active {
-    color: var(--accent); border-bottom-color: var(--accent);
-  }
-  .request-subtab:hover:not(.active) { color: rgba(255,255,255,0.7); }
-
-  /* ADD FRIEND INPUT */
-  .add-friend-wrap {
-    display: flex; gap: 8px; margin-bottom: 14px;
-  }
-  .add-friend-wrap input {
-    flex: 1;
-    font-family: 'Share Tech Mono', monospace; font-size: 0.85rem;
-    padding: 10px 12px;
-    border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px;
-    background: rgba(255,255,255,0.06); color: #fff;
-    outline: none; transition: border-color 0.2s;
-  }
-  .add-friend-wrap input:focus { border-color: var(--accent); }
-  .add-friend-wrap input::placeholder { color: rgba(255,255,255,0.3); }
-  .add-friend-send {
-    font-family: 'Orbitron', sans-serif; font-size: 1rem;
-    padding: 10px 18px; border: none; border-radius: 10px;
-    background: var(--accent); color: #fff; cursor: pointer;
-    transition: transform 0.12s;
-  }
-  .add-friend-send:hover { transform: scale(1.06); }
-  .add-friend-msg {
-    font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
-    min-height: 1.2em; margin-bottom: 8px;
-    text-align: center;
-  }
-  .add-friend-msg.error { color: #ff4466; }
-  .add-friend-msg.success { color: #7fffb2; }
-  .outgoing-label {
-    font-family: 'Orbitron', sans-serif; font-size: 0.95rem;
-    color: rgba(255,255,255,0.4); margin: 10px 0 6px;
-  }
-
   /* ─── ROOM SYSTEM ─── */
   /* Mode selection overlay */
   #mode-select-overlay {
@@ -1539,6 +1417,9 @@
     transition:background 0.3s; flex-shrink:0;
   }
   .mod-player-status.answered { background:#7fffb2; }
+  .mod-player-status.correct { background:#7fffb2; }
+  .mod-player-status.wrong { background:#ff4466; }
+  .mod-player-status.idle { background:rgba(255,255,255,0.15); }
   .mod-player-pts {
     font-family:'Share Tech Mono',monospace; font-size:0.7rem;
     color:rgba(255,255,255,0.45); min-width:36px; text-align:right;
@@ -1567,6 +1448,35 @@
     transition:transform 0.2s,background 0.15s;
   }
   .mod-settings-btn:hover { transform:scale(1.15) rotate(30deg); background:rgba(255,255,255,0.2); }
+
+  /* Floating Moderator Notifications */
+  #mod-notification-container {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+  }
+  .mod-notification {
+    background: rgba(26, 5, 51, 0.92);
+    border: 1.5px solid rgba(255, 68, 102, 0.5);
+    box-shadow: 0 4px 20px rgba(255, 68, 102, 0.25), inset 0 0 12px rgba(255, 68, 102, 0.1);
+    color: #fff; border-radius: 12px; padding: 14px 20px;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 10px; min-width: 250px;
+    animation: slideInUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: opacity 0.3s, transform 0.3s; pointer-events: auto;
+  }
+  .mod-notification.fade-out {
+    opacity: 0; transform: translateY(10px) scale(0.95);
+  }
+  .mod-notification-icon {
+    font-size: 1.2rem; line-height: 1; color: #ff4466;
+  }
+  .mod-notification-title {
+    font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: #ff4466; margin-bottom: 2px;
+  }
+  @keyframes slideInUp {
+    from { transform: translateY(40px) scale(0.85); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
   .mod-settings-btn svg { width:20px; height:20px; fill:#fff; }
   .mod-lb-item {
     display:flex; align-items:center; gap:10px;
@@ -1595,6 +1505,20 @@
   #player-waiting-overlay.active { display:flex; }
   #player-waiting-overlay.reveal-correct { background:rgba(0,180,80,0.65); }
   #player-waiting-overlay.reveal-wrong { background:rgba(200,20,40,0.65); }
+  #player-waiting-overlay.reveal-timeout { background:rgba(200,120,20,0.65); }
+  #player-waiting-result {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 0 0 30px currentColor;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    margin-top: 20px;
+  }
+  #player-waiting-result.show { opacity: 1; }
+  #player-waiting-result.result-correct { color: #7fffb2; }
+  #player-waiting-result.result-wrong { color: #ff4466; }
+  #player-waiting-result.result-timeout { color: #ffd86b; }
   .waiting-title {
     font-family:'Orbitron',sans-serif; font-size:1.4rem;
     color:rgba(255,255,255,0.85); margin-bottom:20px;
@@ -1625,6 +1549,7 @@
   /* Player answer result bg */
   body.room-bg-correct { background:linear-gradient(135deg,#0d2b1f 0%,#1a3300 100%)!important; }
   body.room-bg-wrong { background:linear-gradient(135deg,#2a0a0a 0%,#330000 100%)!important; }
+  body.room-bg-timeout { background:linear-gradient(135deg,#2a1f0a 0%,#332200 100%)!important; }
   .eq-card.player-correct {
     background:rgba(127,255,178,0.35)!important;
     border:2px solid #7fffb2!important;
@@ -1775,10 +1700,6 @@
     <button class="start-btn-primary" onclick="startGame()">PLAY</button>
   </div>
   <div class="start-secondary-row">
-    <button class="start-btn-secondary" onclick="openFriends()" title="Friends" id="friends-start-btn">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      Friends<span class="notif-badge" id="friends-start-badge" style="display:none">!</span>
-    </button>
     <button class="start-btn-secondary" onclick="openHistory()" title="History">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
       History
@@ -1800,24 +1721,6 @@
       <button class="menu-option danger" onclick="confirmLogout()">Logout</button>
     </div>
     <button class="menu-close" onclick="closeUserMenu()">Close</button>
-  </div>
-</div>
-
-<!-- FRIENDS OVERLAY -->
-<div id="friends-overlay">
-  <div id="friends-panel">
-    <div class="friends-header">
-      <button onclick="closeFriends()" title="Return" style="background:transparent;border:none;cursor:pointer;fill:#fff;">
-        <svg viewBox="0 0 24 24" width="32" height="32"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      </button>
-      <h2>Friends</h2>
-      <div style="width:32px"></div>
-    </div>
-    <div class="friends-tabs">
-      <button class="friends-tab active" id="friends-tab-list" onclick="switchFriendsTab('list')">Friends</button>
-      <button class="friends-tab" id="friends-tab-requests" onclick="switchFriendsTab('requests')">Requests<span class="notif-badge" id="requests-tab-badge" style="display:none">!</span></button>
-    </div>
-    <div class="friends-content" id="friends-content"></div>
   </div>
 </div>
 
@@ -1926,8 +1829,9 @@
 
 <!-- PLAYER WAITING OVERLAY -->
 <div id="player-waiting-overlay">
-  <div class="waiting-title">Waiting for other Players...</div>
+  <div class="waiting-title" id="waiting-title">Waiting for other Players...</div>
   <div class="math-ticker" id="math-ticker"></div>
+  <div id="player-waiting-result"></div>
 </div>
 
 <!-- MODERATOR ENDED OVERLAY (shown to players) -->
@@ -2127,7 +2031,6 @@ function loginSuccess() {
   document.getElementById('startscreen').style.display = '';
   updateUserGreeting();
   updatePlayerIdBadge();
-  updateIncomingBadges();
 }
 
 function playAsGuest() {
@@ -2344,20 +2247,6 @@ async function doDeleteAccount() {
   const names = JSON.parse(localStorage.getItem('mathMadness_displayNames') || '{}');
   delete names[uname];
   localStorage.setItem('mathMadness_displayNames', JSON.stringify(names));
-  const fdata = getFriendData();
-  if (fdata[uname]) {
-    (fdata[uname].friends || []).forEach(f => {
-      if (fdata[f]) fdata[f].friends = (fdata[f].friends || []).filter(u => u !== uname);
-    });
-    (fdata[uname].outgoing || []).forEach(f => {
-      if (fdata[f]) fdata[f].incoming = (fdata[f].incoming || []).filter(u => u !== uname);
-    });
-    (fdata[uname].incoming || []).forEach(f => {
-      if (fdata[f]) fdata[f].outgoing = (fdata[f].outgoing || []).filter(u => u !== uname);
-    });
-    delete fdata[uname];
-    saveFriendData(fdata);
-  }
   const keysToRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -2425,259 +2314,6 @@ function saveDisplayNameFromInput() {
   msg.textContent = 'Display name updated!';
   msg.style.color = '#7fffb2';
   setTimeout(() => msg.textContent = '', 2000);
-}
-
-// ─── FRIENDS SYSTEM ─────────────────────────────────────────────────────────
-function getFriendData() {
-  return JSON.parse(localStorage.getItem('mathMadness_friends') || '{}');
-}
-
-function saveFriendData(data) {
-  localStorage.setItem('mathMadness_friends', JSON.stringify(data));
-}
-
-function getUserFriends(username) {
-  const data = getFriendData();
-  if (!data[username]) data[username] = { friends: [], outgoing: [], incoming: [] };
-  return data[username];
-}
-
-function saveUserFriends(username, fdata) {
-  const data = getFriendData();
-  data[username] = fdata;
-  saveFriendData(data);
-}
-
-function openFriends() {
-  playClick();
-  friendsTab = 'list';
-  document.getElementById('friends-tab-list').classList.add('active');
-  document.getElementById('friends-tab-requests').classList.remove('active');
-  renderFriendsContent();
-  document.getElementById('friends-overlay').classList.add('active');
-}
-
-function closeFriends() {
-  playClick();
-  document.getElementById('friends-overlay').classList.remove('active');
-}
-
-function switchFriendsTab(tab) {
-  playClick();
-  friendsTab = tab;
-  document.getElementById('friends-tab-list').classList.toggle('active', tab === 'list');
-  document.getElementById('friends-tab-requests').classList.toggle('active', tab === 'requests');
-  if (tab === 'requests') requestSubTab = 'add';
-  renderFriendsContent();
-}
-
-function renderFriendsContent() {
-  const container = document.getElementById('friends-content');
-  if (!currentUser) {
-    container.innerHTML = '<div class="friends-empty"><p>Login to use Friends!</p></div>';
-    return;
-  }
-  if (friendsTab === 'list') {
-    renderFriendsList(container);
-  } else {
-    renderRequestsTab(container);
-  }
-}
-
-function renderFriendsList(container) {
-  const fdata = getUserFriends(currentUser);
-  if (fdata.friends.length === 0) {
-    container.innerHTML = `
-      <div class="friends-empty">
-        <div class="friends-empty-icon">+</div>
-        <p>No friends yet.<br>Add one now!</p>
-      </div>`;
-    return;
-  }
-  let html = '';
-  fdata.friends.forEach(friendUser => {
-    const dname = getDisplayName(friendUser);
-    const pid = getPlayerIdForUser(friendUser);
-      html += `<div class="friend-item">
-      <div><div class="friend-name">${dname}</div><div class="friend-id">ID: ${pid}</div></div>
-      <button class="friend-action-btn friend-remove" onclick="confirmRemoveFriend('${friendUser}')">Remove</button>
-    </div>`;
-  });
-  container.innerHTML = html;
-}
-
-function renderRequestsTab(container) {
-  const _fdata = getUserFriends(currentUser);
-  const _hasIncoming = _fdata.incoming && _fdata.incoming.length > 0;
-  let html = `<div class="request-subtabs">
-    <button class="request-subtab ${requestSubTab === 'add' ? 'active' : ''}" onclick="switchRequestSubTab('add')">Add</button>
-    <button class="request-subtab ${requestSubTab === 'incoming' ? 'active' : ''}" onclick="switchRequestSubTab('incoming')">Incoming${_hasIncoming ? '<span class="notif-badge">!</span>' : ''}</button>
-  </div>`;
-  if (requestSubTab === 'add') {
-    html += renderAddSection();
-  } else {
-    html += renderIncomingSection();
-  }
-  container.innerHTML = html;
-}
-
-function switchRequestSubTab(tab) {
-  playClick();
-  requestSubTab = tab;
-  renderFriendsContent();
-}
-
-function renderAddSection() {
-  const fdata = getUserFriends(currentUser);
-  let html = `
-    <div class="add-friend-wrap">
-      <input type="text" id="add-friend-input" placeholder="Enter friend's ID" autocomplete="off" maxlength="8">
-      <button class="add-friend-send" onclick="sendFriendRequest()">Send</button>
-    </div>
-    <div class="add-friend-msg" id="add-friend-msg"></div>`;
-  if (fdata.outgoing && fdata.outgoing.length > 0) {
-    html += '<div class="outgoing-label">Outgoing Requests</div>';
-    fdata.outgoing.forEach(targetUser => {
-      const dname = getDisplayName(targetUser);
-      const pid = getPlayerIdForUser(targetUser);
-      html += `<div class="friend-item">
-        <div><div class="friend-name">${dname}</div><div class="friend-id">ID: ${pid}</div></div>
-        <span class="friend-action-btn friend-pending">Pending</span>
-      </div>`;
-    });
-  }
-  return html;
-}
-
-function renderIncomingSection() {
-  const fdata = getUserFriends(currentUser);
-  if (!fdata.incoming || fdata.incoming.length === 0) {
-    return '<div class="friends-empty" style="min-height:120px;"><p style="font-size:0.95rem;">No incoming requests</p></div>';
-  }
-  let html = '';
-  fdata.incoming.forEach(fromUser => {
-    const dname = getDisplayName(fromUser);
-    const pid = getPlayerIdForUser(fromUser);
-    html += `<div class="friend-item">
-      <div><div class="friend-name">${dname}</div><div class="friend-id">ID: ${pid}</div></div>
-      <div>
-        <button class="friend-action-btn friend-accept" onclick="acceptFriend('${fromUser}')">Accept</button>
-        <button class="friend-action-btn friend-decline" onclick="declineFriend('${fromUser}')">Decline</button>
-      </div>
-    </div>`;
-  });
-  return html;
-}
-
-async function sendFriendRequest() {
-  playClick();
-  const input = document.getElementById('add-friend-input');
-  const msg = document.getElementById('add-friend-msg');
-  const pid = input.value.trim().toUpperCase();
-  if (!pid) { msg.className = 'add-friend-msg error'; msg.textContent = 'Enter a player ID.'; return; }
-  if (pid === currentPlayerId) { msg.className = 'add-friend-msg error'; msg.textContent = "You can't add yourself!"; return; }
-  const targetUser = await getUsernameByPlayerId(pid);
-  if (!targetUser) { msg.className = 'add-friend-msg error'; msg.textContent = 'Player not found.'; return; }
-  const myData = getUserFriends(currentUser);
-  if (myData.friends.includes(targetUser)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Already friends!'; return; }
-  if (myData.outgoing.includes(targetUser)) { msg.className = 'add-friend-msg error'; msg.textContent = 'Request already sent.'; return; }
-  if (myData.incoming.includes(targetUser)) {
-    acceptFriend(targetUser);
-    return;
-  }
-  myData.outgoing.push(targetUser);
-  saveUserFriends(currentUser, myData);
-  const theirData = getUserFriends(targetUser);
-  if (!theirData.incoming.includes(currentUser)) theirData.incoming.push(currentUser);
-  saveUserFriends(targetUser, theirData);
-  msg.className = 'add-friend-msg success';
-  msg.textContent = 'Request sent!';
-  input.value = '';
-  setTimeout(() => renderFriendsContent(), 800);
-}
-
-function acceptFriend(fromUser) {
-  playClick();
-  const myData = getUserFriends(currentUser);
-  myData.incoming = myData.incoming.filter(u => u !== fromUser);
-  if (!myData.friends.includes(fromUser)) myData.friends.push(fromUser);
-  saveUserFriends(currentUser, myData);
-  const theirData = getUserFriends(fromUser);
-  theirData.outgoing = theirData.outgoing.filter(u => u !== currentUser);
-  if (!theirData.friends.includes(currentUser)) theirData.friends.push(currentUser);
-  saveUserFriends(fromUser, theirData);
-  renderFriendsContent();
-  updateIncomingBadges();
-}
-
-function declineFriend(fromUser) {
-  playClick();
-  const myData = getUserFriends(currentUser);
-  myData.incoming = myData.incoming.filter(u => u !== fromUser);
-  saveUserFriends(currentUser, myData);
-  const theirData = getUserFriends(fromUser);
-  theirData.outgoing = theirData.outgoing.filter(u => u !== currentUser);
-  saveUserFriends(fromUser, theirData);
-  renderFriendsContent();
-  updateIncomingBadges();
-}
-
-function confirmRemoveFriend(friendUser) {
-  playClick();
-  const dname = getDisplayName(friendUser);
-  document.getElementById('confirm-box').innerHTML = `
-    <p>Remove <span style="color:#ffd86b">${dname}</span> from friends?</p>
-    <div class="confirm-buttons">
-      <button id="confirm-yes" onclick="doRemoveFriend('${friendUser}')">Remove</button>
-      <button id="confirm-cancel" onclick="cancelRemoveFriend()">Cancel</button>
-    </div>`;
-  document.getElementById('confirm-overlay').classList.add('active');
-}
-
-function doRemoveFriend(friendUser) {
-  playClick();
-  document.getElementById('confirm-overlay').classList.remove('active');
-  restoreConfirmBox();
-  const myData = getUserFriends(currentUser);
-  myData.friends = myData.friends.filter(u => u !== friendUser);
-  saveUserFriends(currentUser, myData);
-  const theirData = getUserFriends(friendUser);
-  theirData.friends = theirData.friends.filter(u => u !== currentUser);
-  saveUserFriends(friendUser, theirData);
-  renderFriendsContent();
-  updateIncomingBadges();
-}
-
-function cancelRemoveFriend() {
-  playClick();
-  document.getElementById('confirm-overlay').classList.remove('active');
-  restoreConfirmBox();
-}
-
-function restoreConfirmBox() {
-  document.getElementById('confirm-box').innerHTML = `
-    <p>Return to homepage?<br><span style="font-size:0.9rem;color:rgba(255,255,255,0.55);">Your progress will be lost.</span></p>
-    <div class="confirm-buttons">
-      <button id="confirm-yes" onclick="confirmYes()">Yes</button>
-      <button id="confirm-cancel" onclick="confirmCancel()">Cancel</button>
-    </div>`;
-}
-
-// ─── NOTIFICATION BADGES ────────────────────────────────────────────────────
-function updateIncomingBadges() {
-  if (!currentUser) {
-    const fb = document.getElementById('friends-start-badge');
-    if (fb) fb.style.display = 'none';
-    const rb = document.getElementById('requests-tab-badge');
-    if (rb) rb.style.display = 'none';
-    return;
-  }
-  const fdata = getUserFriends(currentUser);
-  const hasIncoming = fdata.incoming && fdata.incoming.length > 0;
-  const fb = document.getElementById('friends-start-badge');
-  if (fb) fb.style.display = hasIncoming ? '' : 'none';
-  const rb = document.getElementById('requests-tab-badge');
-  if (rb) rb.style.display = hasIncoming ? '' : 'none';
 }
 
 // ─── PASSWORD VISIBILITY TOGGLE ─────────────────────────────────────────────
@@ -3735,17 +3371,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   checkAutoLogin();
   initMathBg();
-  updateIncomingBadges();
   // Auto-start music after first user interaction
   const startMusicOnce = () => { startMusic(); document.removeEventListener('click', startMusicOnce); };
   document.addEventListener('click', startMusicOnce);
-  // Periodically check for room invites and friend request badges on start screen
+  // Periodically check for room invites on start screen
   setInterval(() => {
     if (document.getElementById('startscreen').style.display !== 'none' && currentUser) {
       checkRoomInvites();
-      updateIncomingBadges();
     }
   }, 3000);
+  // Cleanly leave or delete room on tab/window close
+  window.addEventListener('beforeunload', () => {
+    if (isRoomMode && currentRoom && currentUser) {
+      if (isRoomHost) {
+        const blob = new Blob([], { type: 'application/json' });
+        navigator.sendBeacon('/api/rooms/' + currentRoom + '/delete', blob);
+      } else {
+        const blob = new Blob([JSON.stringify({ username: currentUser })], { type: 'application/json' });
+        navigator.sendBeacon('/api/rooms/' + currentRoom + '/leave', blob);
+      }
+    }
+  });
 });
 
 // ─── FLOATING MATH BACKGROUND ──────────────────────────────────────────────
@@ -3833,6 +3479,7 @@ function startCustomGame() {
   isCustomMode = true;
   document.getElementById('custom-mode-overlay').classList.remove('active');
   document.getElementById('startscreen').style.display = 'none';
+  document.getElementById('lightbulb-btn').classList.remove('hidden');
   lastDiffName = '';
   buildLevel();
 }
@@ -3872,6 +3519,7 @@ let roomLiveWaiting = false;
 let roomTimeLeft = 0;
 let roomTimeTotal = 0;
 let _roomCache = {};
+let modKnownPlayers = [];
 
 // --- Room Data (API-backed) ---
 function getRoom(code) { return _roomCache[code] || null; }
@@ -4239,8 +3887,30 @@ function saveRoomInvite(targetUser, roomCode, fromUser) {
 // --- UI: Lobby / Waiting Room ---
 function showLobby() {
   playClick();
-  if (!getRoom(currentRoom)) return;
-  const renderLobby = async () => {
+  const room = getRoom(currentRoom);
+  if (!room) return;
+  
+  // Render static lobby skeleton once
+  const desc = room.settings.numQuestions + 'Q · ' + room.settings.difficulty + ' · ' + room.settings.timePerQuestion + 's · ' + room.mode;
+  const panel = document.getElementById('room-panel');
+  panel.innerHTML = '<div class="room-header">'
+    + (isRoomHost ? '<button class="room-back-btn" onclick="showInvitePlayers()"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg></button>' : '<div style="width:28px"></div>')
+    + '<h2>Waiting Room</h2><div style="width:28px"></div></div>'
+    + '<div class="room-code-display" style="font-size:1.4rem;margin-bottom:6px;">' + currentRoom + '</div>'
+    + `<p style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;">${desc}</p>`
+    + '<span class="room-form-label" id="lobby-players-label" style="text-align:center;display:block;">Players</span>'
+    + '<div class="lobby-players" id="lobby-players-list"></div>'
+    + (isRoomHost
+      ? '<div class="room-form-group" style="margin-top:14px;margin-bottom:14px;text-align:left;"><span class="room-form-label">Key In Player ID to Invite</span>'
+        + '<div class="add-friend-wrap" style="display:flex;gap:8px;margin-bottom:6px;"><input type="text" id="lobby-invite-input" placeholder="Enter Player ID" autocomplete="off" maxlength="8" style="font-family:\'Share Tech Mono\',monospace;padding:8px 12px;font-size:0.85rem;flex:1;border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;background:rgba(255,255,255,0.06);color:#fff;outline:none;">'
+        + '<button class="add-friend-send" onclick="inviteFromLobby()" style="font-family:\'Orbitron\',sans-serif;font-size:0.9rem;padding:8px 16px;border:none;border-radius:10px;background:var(--accent);color:#fff;cursor:pointer;">Invite</button></div>'
+        + '<div id="lobby-invite-msg" class="add-friend-msg" style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;text-align:center;margin-top:4px;min-height:1.2em;"></div></div>'
+      : '')
+    + '<div class="lobby-status" id="lobby-status-container"></div>'
+    + '<div id="lobby-actions-container"></div>'
+    + '<button class="room-btn-secondary" onclick="leaveRoomFromLobby()" style="margin-top:8px;">Leave Room</button>';
+
+  const renderLobbyData = async () => {
     await fetchRoom(currentRoom);
     const r = getRoom(currentRoom);
     if (!r) return;
@@ -4249,31 +3919,66 @@ function showLobby() {
       clearInterval(roomPollInterval); roomPollInterval = null;
       startRoomGameAsPlayer(); return;
     }
-    let chips = '';
-    r.players.forEach(p => {
-      const h = p.username === r.host;
-      chips += '<div class="lobby-player-chip ' + (h ? 'host' : '') + '">' + (h ? '' : '') + p.displayName + '</div>';
-    });
-    const desc = r.settings.numQuestions + 'Q · ' + r.settings.difficulty + ' · ' + r.settings.timePerQuestion + 's · ' + r.mode;
-    const panel = document.getElementById('room-panel');
-    panel.innerHTML = '<div class="room-header">'
-      + (isRoomHost ? '<button class="room-back-btn" onclick="showInvitePlayers()"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#fff"/></svg></button>' : '<div style="width:28px"></div>')
-      + '<h2>Waiting Room</h2><div style="width:28px"></div></div>'
-      + '<div class="room-code-display" style="font-size:1.4rem;margin-bottom:6px;">' + currentRoom + '</div>'
-      + `<p style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;">${desc}</p>`
-      + '<span class="room-form-label" style="text-align:center;display:block;">Players (' + r.players.length + ')</span>'
-      + '<div class="lobby-players">' + chips + '</div>'
-      + '<div class="lobby-status">'
-      + (isRoomHost
+    // Update player list
+    const listEl = document.getElementById('lobby-players-list');
+    const labelEl = document.getElementById('lobby-players-label');
+    if (listEl && labelEl) {
+      labelEl.textContent = 'Players (' + r.players.length + ')';
+      let chips = '';
+      r.players.forEach(p => {
+        const h = p.username === r.host;
+        chips += '<div class="lobby-player-chip ' + (h ? 'host' : '') + '">' + p.displayName + '</div>';
+      });
+      listEl.innerHTML = chips;
+    }
+    // Update status
+    const statusEl = document.getElementById('lobby-status-container');
+    if (statusEl) {
+      statusEl.innerHTML = isRoomHost
         ? (r.players.length < 2 ? '<span class="lobby-waiting-dots">Waiting for players to join</span>' : 'Ready to start!')
-        : '<span class="lobby-waiting-dots">Waiting for host to start</span>')
-      + '</div>'
-      + (isRoomHost ? '<button class="room-btn-primary" onclick="hostStartGame()"' + (r.players.length < 2 ? ' disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Start Game</button>' : '')
-      + '<button class="room-btn-secondary" onclick="leaveRoomFromLobby()" style="margin-top:8px;">Leave Room</button>';
+        : '<span class="lobby-waiting-dots">Waiting for host to start</span>';
+    }
+    // Update actions
+    const actionsEl = document.getElementById('lobby-actions-container');
+    if (actionsEl) {
+      actionsEl.innerHTML = (isRoomHost ? '<button class="room-btn-primary" onclick="hostStartGame()"' + (r.players.length < 2 ? ' disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Start Game</button>' : '');
+    }
   };
-  renderLobby();
+
+  renderLobbyData();
   if (roomPollInterval) clearInterval(roomPollInterval);
-  roomPollInterval = setInterval(renderLobby, 1000);
+  roomPollInterval = setInterval(renderLobbyData, 1000);
+}
+
+async function inviteFromLobby() {
+  playClick();
+  const inp = document.getElementById('lobby-invite-input');
+  const msg = document.getElementById('lobby-invite-msg');
+  if (!inp || !msg) return;
+  const pid = inp.value.trim().toUpperCase();
+  if (!pid) { msg.style.color = '#ff4466'; msg.textContent = 'Enter a player ID.'; return; }
+  if (pid === currentPlayerId) { msg.style.color = '#ff4466'; msg.textContent = "Can't invite yourself!"; return; }
+  
+  msg.style.color = '#ffd86b';
+  msg.textContent = 'Searching...';
+  const target = await getUsernameByPlayerId(pid);
+  if (!target) { msg.style.color = '#ff4466'; msg.textContent = 'Player not found.'; return; }
+  
+  const r = getRoom(currentRoom);
+  if (!r) return;
+  if (r.players.some(p => p.username === target)) { msg.style.color = '#ff4466'; msg.textContent = 'Already in room.'; return; }
+  if (r.invites && r.invites.includes(target)) { msg.style.color = '#ff4466'; msg.textContent = 'Already invited.'; return; }
+  
+  await api('/api/rooms/' + currentRoom + '/add-invite', { username: target });
+  
+  // Also push invite notification to server invites database so target sees it
+  await api('/api/invites', { targetUser: target, roomCode: currentRoom, fromUser: currentUser });
+  
+  await fetchRoom(currentRoom);
+  msg.style.color = '#7fffb2';
+  msg.textContent = 'Invited ' + getDisplayName(target) + '!';
+  inp.value = '';
+  setTimeout(() => { msg.textContent = ''; }, 3000);
 }
 
 function confirmEndGame() {
@@ -4358,6 +4063,12 @@ function showRoomModeratorUI() {
   document.getElementById('startscreen').style.display = 'none';
   document.getElementById('mod-dashboard-overlay').style.display = 'block';
   modPhase = 'answering';
+  const r = getRoom(currentRoom);
+  if (r) {
+    modKnownPlayers = r.players.map(p => p.username);
+  } else {
+    modKnownPlayers = [];
+  }
   modStartQuestion(0);
 }
 
@@ -4393,6 +4104,17 @@ async function modPollAnswers() {
   const r = getRoom(currentRoom);
   if (!r) return;
   if (r.status === 'finished') { clearAllModIntervals(); document.getElementById('mod-dashboard-overlay').style.display = 'none'; showRoomResults(); return; }
+  
+  // Check for players who left midway
+  const currentUnameList = r.players.map(p => p.username);
+  modKnownPlayers.forEach(uname => {
+    if (!currentUnameList.includes(uname)) {
+      const dname = getDisplayName(uname) || uname;
+      showModNotification('Player Left', `${dname} left the game room!`);
+    }
+  });
+  modKnownPlayers = currentUnameList;
+
   renderModPlayerList(r);
   // Auto-advance if all answered
   const qIdx = r.currentQuestion;
@@ -4410,8 +4132,8 @@ function modTransitionToReview() {
   if (modDashboardInterval) { clearInterval(modDashboardInterval); modDashboardInterval = null; }
   updateRoom(currentRoom, r => { r.phase = 'review'; });
   renderModDashboard();
-  // Keep polling for fresh data
-  modDashboardInterval = setInterval(async () => { await fetchRoom(currentRoom); renderModPlayerList(getRoom(currentRoom)); }, 2000);
+  // Keep polling for fresh data & midway leave detection
+  modDashboardInterval = setInterval(modPollAnswers, 2000);
 }
 
 function renderModDashboard() {
@@ -4481,11 +4203,52 @@ function renderModPlayerList(room) {
     const res = room.results[p.username];
     const hasAns = res && res.answers && res.answers.length > qIdx;
     const pts = res ? res.score : 0;
+    
+    let statusClass = '';
+    if (room.phase === 'review') {
+      if (hasAns) {
+        const a = res.answers[qIdx];
+        if (a.correct) {
+          statusClass = 'correct';
+        } else if (a.timeout) {
+          statusClass = 'idle';
+        } else {
+          statusClass = 'wrong';
+        }
+      } else {
+        statusClass = 'idle';
+      }
+    } else {
+      statusClass = hasAns ? 'answered' : '';
+    }
+    
     html += `<div class="mod-player-row"><div class="mod-player-name">${p.displayName}</div>`
-      + `<div class="mod-player-status ${hasAns?'answered':''}"></div>`
+      + `<div class="mod-player-status ${statusClass}"></div>`
       + `<div class="mod-player-pts">${pts}</div></div>`;
   });
   document.getElementById('mod-players-list').innerHTML = html;
+}
+
+function showModNotification(title, text) {
+  let container = document.getElementById('mod-notification-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'mod-notification-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = 'mod-notification';
+  toast.innerHTML = `<span class="mod-notification-icon">⚠️</span>`
+    + `<div><div class="mod-notification-title">${title}</div>`
+    + `<div>${text}</div></div>`;
+  
+  container.appendChild(toast);
+  
+  // Auto fade-out and remove
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
 }
 
 function calcModStats(room, qIdx) {
@@ -4659,7 +4422,13 @@ const TICKER_SYMS = ['+','−','÷','×','π','log','sin','cos','tan','x!','6⁷
 
 function showPlayerWaiting() {
   document.getElementById('player-waiting-overlay').classList.add('active');
-  document.getElementById('player-waiting-overlay').classList.remove('reveal-correct','reveal-wrong');
+  document.getElementById('player-waiting-overlay').classList.remove('reveal-correct','reveal-wrong','reveal-timeout');
+  const resultEl = document.getElementById('player-waiting-result');
+  if (resultEl) { resultEl.textContent = ''; resultEl.className = ''; }
+  const titleEl = document.getElementById('waiting-title');
+  if (titleEl) titleEl.textContent = 'Waiting for other Players...';
+  const timerEl = document.getElementById('room-hud-timer');
+  if (timerEl) { timerEl.style.color = ''; }
   if (mathTickerInterval) clearInterval(mathTickerInterval);
   const ticker = document.getElementById('math-ticker');
   mathTickerInterval = setInterval(() => {
@@ -4670,7 +4439,7 @@ function showPlayerWaiting() {
 function hidePlayerWaiting() {
   if (mathTickerInterval) { clearInterval(mathTickerInterval); mathTickerInterval = null; }
   const ov = document.getElementById('player-waiting-overlay');
-  ov.classList.remove('active','reveal-correct','reveal-wrong');
+  ov.classList.remove('active','reveal-correct','reveal-wrong','reveal-timeout');
 }
 
 function returnFromModEnded() {
@@ -4694,9 +4463,35 @@ function startRoomGameAsPlayer() {
 
 // --- Room Game Logic ---
 function loadRoomQuestion(qIdx) {
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
   const room = getRoom(currentRoom);
   if (!room || qIdx >= room.questions.length) { finishRoomGame(); return; }
   roomCurrentQ = qIdx; roomLiveWaiting = false;
+  
+  // Active gameplay polling for live mode players to detect moderator early finish
+  if (room.playStyle === 'live' && !isRoomHost) {
+    roomPollInterval = setInterval(async () => {
+      await fetchRoom(currentRoom);
+      const r = getRoom(currentRoom);
+      if (!r) return;
+      if (r.modEnded) {
+        clearInterval(roomPollInterval); roomPollInterval = null;
+        if (roomTimerInterval) clearInterval(roomTimerInterval);
+        document.getElementById('room-hud').classList.remove('active');
+        document.getElementById('mod-ended-overlay').classList.add('active');
+        return;
+      }
+      if (r.phase === 'review') {
+        clearInterval(roomPollInterval); roomPollInterval = null;
+        if (roomTimerInterval) clearInterval(roomTimerInterval);
+        roomAnswers.push({ qIndex: roomCurrentQ, correct: false, timeout: true });
+        document.querySelectorAll('.eq-card').forEach(c => { if (c.dataset.wrong === '1') c.classList.add('highlight-correct'); c.style.pointerEvents = 'none'; });
+        await api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: false, score: roomScore, timeout: true });
+        advanceRoomQuestion();
+      }
+    }, 1000);
+  }
+
   const q = room.questions[qIdx];
   // Update HUD
   document.getElementById('room-hud-q').textContent = 'Q ' + (qIdx + 1) + '/' + room.questions.length;
@@ -4706,12 +4501,12 @@ function loadRoomQuestion(qIdx) {
   grid.innerHTML = '';
   grid.style.gridTemplateColumns = 'repeat(' + q.gridCols + ', 1fr)';
   grid.style.gridTemplateRows = 'repeat(' + q.gridRows + ', 1fr)';
-  q.equations.forEach((eq) => {
+  q.equations.forEach((eq, idx) => {
     const card = document.createElement('div');
     card.className = 'eq-card';
     card.innerHTML = eq.display;
     card.dataset.wrong = eq.isWrong ? '1' : '0';
-    card.addEventListener('click', () => { playClick(); handleRoomClick(eq.isWrong, card); });
+    card.addEventListener('click', () => { playClick(); handleRoomClick(eq.isWrong, card, idx); });
     grid.appendChild(card);
   });
   // Timer
@@ -4736,9 +4531,10 @@ function loadRoomQuestion(qIdx) {
   }, 50);
 }
 
-function handleRoomClick(isWrong, card) {
+function handleRoomClick(isWrong, card, idx) {
   if (roomLiveWaiting || gamePaused) return;
   clearInterval(roomTimerInterval);
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
   document.querySelectorAll('.eq-card').forEach(c => c.style.pointerEvents = 'none');
   const room = getRoom(currentRoom);
   if (isWrong) {
@@ -4748,22 +4544,23 @@ function handleRoomClick(isWrong, card) {
     if (secs > totalSecs * 0.7) speedBonus = 50;
     else if (secs > totalSecs * 0.4) speedBonus = 25;
     roomScore += 100 + speedBonus;
-    roomAnswers.push({ qIndex: roomCurrentQ, correct: true, speedBonus });
+    roomAnswers.push({ qIndex: roomCurrentQ, correct: true, speedBonus, selectedIdx: idx });
     card.style.background = 'rgba(127,255,178,0.4)'; card.style.border = '2px solid #7fffb2'; card.style.transform = 'scale(1.1)';
     if (speedBonus > 0) showSpeedBonus(speedBonus);
-    api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: true, score: roomScore });
+    api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: true, score: roomScore, selectedIdx: idx });
     flashScreen('correct', 400, () => advanceRoomQuestion());
   } else {
-    roomAnswers.push({ qIndex: roomCurrentQ, correct: false });
+    roomAnswers.push({ qIndex: roomCurrentQ, correct: false, selectedIdx: idx });
     document.querySelectorAll('.eq-card').forEach(c => { if (c.dataset.wrong === '1') c.classList.add('highlight-correct'); });
     card.style.background = 'rgba(255,68,102,0.4)'; card.style.border = '2px solid #ff4466';
-    api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: false, score: roomScore });
+    api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: false, score: roomScore, selectedIdx: idx });
     flashScreen('wrong', 600, () => advanceRoomQuestion());
   }
   document.getElementById('room-hud-score').textContent = 'Score: ' + roomScore;
 }
 
 function handleRoomTimeout() {
+  if (roomPollInterval) { clearInterval(roomPollInterval); roomPollInterval = null; }
   roomAnswers.push({ qIndex: roomCurrentQ, correct: false, timeout: true });
   document.querySelectorAll('.eq-card').forEach(c => { if (c.dataset.wrong === '1') c.classList.add('highlight-correct'); c.style.pointerEvents = 'none'; });
   api('/api/rooms/' + currentRoom + '/answer', { username: currentUser, qIndex: roomCurrentQ, correct: false, score: roomScore, timeout: true });
@@ -4830,9 +4627,31 @@ function showWaitingForHost() {
     if (r.phase === 'review' && !reviewShown) {
       reviewShown = true;
       const isCorrect = playerLastAnswer && playerLastAnswer.correct;
+      const isTimeout = playerLastAnswer && playerLastAnswer.timeout;
+      
       // Reveal on waiting overlay
       const ov = document.getElementById('player-waiting-overlay');
-      ov.classList.add(isCorrect ? 'reveal-correct' : 'reveal-wrong');
+      const resultEl = document.getElementById('player-waiting-result');
+      const titleEl = document.getElementById('waiting-title');
+      
+      if (titleEl) titleEl.textContent = 'Question Review';
+      
+      if (resultEl) {
+        if (isTimeout) {
+          ov.classList.add('reveal-timeout');
+          resultEl.textContent = 'TIMEOUT';
+          resultEl.className = 'result-timeout show';
+        } else if (isCorrect) {
+          ov.classList.add('reveal-correct');
+          resultEl.textContent = 'CORRECT';
+          resultEl.className = 'result-correct show';
+        } else {
+          ov.classList.add('reveal-wrong');
+          resultEl.textContent = 'INCORRECT';
+          resultEl.className = 'result-wrong show';
+        }
+      }
+      
       setTimeout(() => {
         hidePlayerWaiting();
         // Show cards with result highlighting
@@ -4841,15 +4660,32 @@ function showWaitingForHost() {
         grid.innerHTML = '';
         grid.style.gridTemplateColumns = 'repeat(' + q.gridCols + ', 1fr)';
         grid.style.gridTemplateRows = 'repeat(' + q.gridRows + ', 1fr)';
-        q.equations.forEach(eq => {
+        q.equations.forEach((eq, idx) => {
           const card = document.createElement('div');
           card.className = 'eq-card';
           card.innerHTML = eq.display;
           card.style.pointerEvents = 'none';
           if (eq.isWrong) card.classList.add('player-correct');
+          if (playerLastAnswer && !playerLastAnswer.correct && playerLastAnswer.selectedIdx === idx) {
+            card.classList.add('player-wrong');
+          }
           grid.appendChild(card);
         });
-        document.body.classList.add(isCorrect ? 'room-bg-correct' : 'room-bg-wrong');
+        
+        const hudTimer = document.getElementById('room-hud-timer');
+        if (isTimeout) {
+          document.body.classList.add('room-bg-timeout');
+          if (hudTimer) {
+            hudTimer.textContent = 'TIMEOUT';
+            hudTimer.style.color = '#ffd86b';
+          }
+        } else {
+          document.body.classList.add(isCorrect ? 'room-bg-correct' : 'room-bg-wrong');
+          if (hudTimer) {
+            hudTimer.textContent = isCorrect ? 'CORRECT' : 'INCORRECT';
+            hudTimer.style.color = isCorrect ? '#7fffb2' : '#ff4466';
+          }
+        }
       }, 1200);
     }
     // Detect next question
@@ -4857,14 +4693,14 @@ function showWaitingForHost() {
       clearInterval(roomPollInterval); roomPollInterval = null;
       roomLiveWaiting = false;
       hidePlayerWaiting();
-      document.body.classList.remove('room-bg-correct', 'room-bg-wrong');
+      document.body.classList.remove('room-bg-correct', 'room-bg-wrong', 'room-bg-timeout');
       document.getElementById('timer-wrap').style.display = '';
       loadRoomQuestion(r.currentQuestion);
     }
     if (r.status === 'finished' && !r.modEnded) {
       clearInterval(roomPollInterval); roomPollInterval = null;
       hidePlayerWaiting();
-      document.body.classList.remove('room-bg-correct', 'room-bg-wrong');
+      document.body.classList.remove('room-bg-correct', 'room-bg-wrong', 'room-bg-timeout');
       showRoomResults();
     }
   }, 500);

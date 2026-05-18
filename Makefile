@@ -31,6 +31,7 @@ deploy:
 		--project $(PROJECT_ID) \
 		--allow-unauthenticated \
 		--port 8080 \
+		--min-instances 1 \
 		--max-instances 1
 
 # Local build target
